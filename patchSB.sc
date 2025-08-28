@@ -1,7 +1,7 @@
 import sbmod._
 import scala.collection.immutable.TreeMap
 
-def patchEffect(obj: UAssetApi.DataObject): Unit = {
+def patchEffect(obj: UAssetApi.Struct): Unit = {
   val name = obj.name
   name match {
 
@@ -34,7 +34,7 @@ def patchEffect(obj: UAssetApi.DataObject): Unit = {
   }
 }
 
-def patchTargetFilter(obj: UAssetApi.DataObject): Unit = {
+def patchTargetFilter(obj: UAssetApi.Struct): Unit = {
   val name = obj.name
   name match {
 

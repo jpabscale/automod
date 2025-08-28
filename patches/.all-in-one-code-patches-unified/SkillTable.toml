@@ -244,10 +244,10 @@ JustActionTime = 1
 JustActionTime_StoryMode = 1
 
 [P_Eve_Sword_Normal_FinishAttack3_4_Ex]
-AttackDamageRate = 3
-FirstSkillActiveAlias = "M_Scarlet_SwingTriple_Cast1"
-ShieldAttackDamageRate = 3
-TargetFilterAlias = "M_Scarlet_SwingTriple_Target"
+AttackDamageRate = 8
+FirstSkillActiveAlias = "P_Eve_Sword_Beta_ChainStab1_1_Cast1"
+ShieldAttackDamageRate = 4
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Normal_FinishAttack4_1_Ex]
 AttackDamageRate = 6
@@ -300,10 +300,10 @@ ShieldAttackDamageRate = 8
 TargetFilterAlias = "P_Eve_Sword_0600_360_500_Target"
 
 [P_Eve_Sword_Normal_StrongAttack8_1_Ex]
-AttackDamageRate = 9.5
-FirstSkillActiveAlias = "P_Eve_Sword_Beta_SwordAura1_Ex_Cast1"
-ShieldAttackDamageRate = 4.5
-TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"
+AttackDamageRate = 6
+FirstSkillActiveAlias = "P_Eve_Tachy_Skill_Chainstab1_1_Cast1"
+ShieldAttackDamageRate = 6
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Tachy_Lockon_Evade1_1]
 JustActionTime = 1

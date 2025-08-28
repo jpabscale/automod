@@ -5,10 +5,14 @@ import scala.collection.mutable.HashMap
 import scala.reflect.runtime.universe._
 import sbmod._
 
-val typeKey = ".type" 
-val valueKey = ".value"
-val nameKey = ".name"
-val uint32Key = ".uint32"
+object Constants {
+  val typeKey = ".type" 
+  val valueKey = ".value"
+  val nameKey = ".name"
+  val uint32Key = ".uint32"
+}
+
+import Constants._
 
 /*
  * To create UAssetAPI's object data:
@@ -98,7 +102,7 @@ def newEnum(name: String, enumType: String, jsonValue: TextNode): ObjectNode = t
      |  "InnerType": "ByteProperty",
      |  "Name": "$name",
      |  "ArrayIndex": 0,
-     |  "IsZero": true,
+     |  "IsZero": false,
      |  "PropertyTagFlags": "None",
      |  "PropertyTagExtensions": "NoExtension",
      |  "Value": ${jsonValue.toPrettyString}
@@ -110,7 +114,7 @@ def newString(name: String, jsonValue: TextNode): ObjectNode = toJsonNode(
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.StrPropertyData, UAssetAPI",
      |  "Name": "$name",
      |  "ArrayIndex": 0,
-     |  "IsZero": true,
+     |  "IsZero": false,
      |  "PropertyTagFlags": "None",
      |  "PropertyTagExtensions": "NoExtension",
      |  "Value": ${if (jsonValue == null) "null" else jsonValue.toPrettyString}
@@ -122,7 +126,7 @@ def newBoolean(name: String, jsonValue: BooleanNode): ObjectNode = toJsonNode(
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.BoolPropertyData, UAssetAPI",
      |  "Name": "$name",
      |  "ArrayIndex": 0,
-     |  "IsZero": true,
+     |  "IsZero": false,
      |  "PropertyTagFlags": "None",
      |  "PropertyTagExtensions": "NoExtension",
      |  "Value": ${jsonValue.toPrettyString}
@@ -134,7 +138,7 @@ def newName(name: String, jsonValue: TextNode): ObjectNode = toJsonNode(
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI",
      |  "Name": "$name",
      |  "ArrayIndex": 0,
-     |  "IsZero": true,
+     |  "IsZero": false,
      |  "PropertyTagFlags": "None",
      |  "PropertyTagExtensions": "NoExtension",
      |  "Value": ${if (jsonValue == null) "null" else jsonValue.toPrettyString}
@@ -147,7 +151,7 @@ def newUAssetApiFloatPropertyData(name: String, jsonValue: DoubleNode): ObjectNo
      |  "Value": "+0",
      |  "Name": "$name",
      |  "ArrayIndex": 0,
-     |  "IsZero": true,
+     |  "IsZero": false,
      |  "PropertyTagFlags": "None",
      |  "PropertyTagExtensions": "NoExtension",
      |  "Value": ${jsonValue.toPrettyString}
@@ -161,7 +165,7 @@ def newUAssetApiArrayPropertyData(name: String): ObjectNode = toJsonNode(
      |  "DummyStruct": null,
      |  "Name": "$name",
      |  "ArrayIndex": 0,
-     |  "IsZero": true,
+     |  "IsZero": false,
      |  "PropertyTagFlags": "None",
      |  "PropertyTagExtensions": "NoExtension",
      |  "Value": []
@@ -173,7 +177,7 @@ def newUAssetApiIntPropertyData(name: String, jsonValue: IntNode): ObjectNode = 
       |  "$$type": "UAssetAPI.PropertyTypes.Objects.IntPropertyData, UAssetAPI",
       |  "Name": "$name",
       |  "ArrayIndex": 0,
-      |  "IsZero": true,
+      |  "IsZero": false,
       |  "PropertyTagFlags": "None",
       |  "PropertyTagExtensions": "NoExtension",
       |  "Value": ${jsonValue.toPrettyString}
@@ -192,8 +196,36 @@ def newUInt32(name: String, jsonValue: IntNode): ObjectNode = toJsonNode(
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
+def toValue[T](node: JsonNode): Option[T] = {
+  def toT(o: Any): T = o.asInstanceOf[T]
+  node match {
+    case node: BooleanNode => Some(toT(node.booleanValue))
+    case node: IntNode => Some(toT(node.intValue))
+    case node: DoubleNode => Some(toT(node.doubleValue))
+    case node: TextNode => 
+      val text = node.textValue
+      var r: Any = text
+      for (v <- text.toBooleanOption) r = v
+      for (v <- text.toIntOption) r = v
+      for (v <- text.toDoubleOption) r = v
+      Some(toT(r))
+    case null => None
+    case _ => exit(-1, s"Unsupported value: '${node.toPrettyString}'")
+  }
+}
 
-case class DataObject(uassetName: String, value: JsonNode, addToDataTableFilePatches: Boolean) {
+def fromValue(v: Any): JsonNode = {
+  v match {
+    case v: Boolean => BooleanNode.valueOf(v)
+    case v: Int => IntNode.valueOf(v)
+    case v: Double => DoubleNode.valueOf(v)
+    case v: String => TextNode.valueOf(v)
+    case null => null
+    case _ => exit(-1, s"Unsupported value: '$v'")
+  }
+}
+
+case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches: Boolean) {
   var objectMap: HashMap[String, ObjectNode] = {
     var r = HashMap.empty[String, ObjectNode]
     val values = value.get("Value").asInstanceOf[ArrayNode]

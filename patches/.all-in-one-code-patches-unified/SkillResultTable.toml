@@ -1,3 +1,6 @@
+['.*: ^(?!.*_Ex.*$)P_Eve_Sword_Normal_(Light|Strong)Attack.*_Hit1$']
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.9}]"
+
 [M_Scarlet_AirDashCut_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
 

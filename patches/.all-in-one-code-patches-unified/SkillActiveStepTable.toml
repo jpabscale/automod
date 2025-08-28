@@ -1,3 +1,6 @@
+['.*: ^(?!.*_Ex.*$)P_Eve_Sword_Normal_(Light|Strong)Attack.*_Cast.*$']
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}, {\"Alias\":\"AddHitDefense_EveSkill\", \"CalculationValue\":2}, {\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockGuard_Skill\"}, {\"Alias\":\"BlockMove_Step\"}]"
+
 [M_Scarlet_AirDashSpaceCut_Cast1]
 StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"
 
@@ -88,8 +91,17 @@ StartSelfEffect = "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoDamage_Skil
 [M_Scarlet_MoveBackShot2_Finish1]
 StartSelfEffect = "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"
 
+[P_Eve_Sword_Beta_ChargeSlashCombo1_Ex_Cast1]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}, {\"Alias\":\"AddHitDefense_EveSkill\", \"CalculationValue\":2}, {\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockGuard_Skill\"}, {\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"BlockHuddleUpAction_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}, {\"Alias\":\"AddHitDefense_EveSkill\", \"CalculationValue\":5}, {\"Alias\":\"P_Eve_SkillTree_ShieldBreak_ShieldAttackPower\"}]"
+
 [P_Eve_Sword_Evade_Evade1_1_Cast1]
 StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}]"
+
+[P_Eve_Sword_JustParry_LightAttackCombo2_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}, {\"Alias\":\"AddHitDefense_EveSkill\", \"CalculationValue\":2}, {\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockGuard_Skill\"}, {\"Alias\":\"BlockMove_Step\"}]"
 
 [P_Eve_Sword_LockonEvade_Evade1_1_Cast1]
 StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}]"
