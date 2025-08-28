@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.9.1"
+val header = s"Auto Modding Script v2.9.2"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
 
@@ -811,9 +811,16 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
     for ((property, valueOldValuePair) <- properties) {
       var value = valueOldValuePair.newValueOpt.orNull
       value match {
-        case v: TextNode if patchlet.getKeyPrefix(v.textValue) == Some(patchlet.Constants.codePrefix) =>
-          val code = v.textValue.substring(patchlet.Constants.codePrefix.length)
-          value = patchlet.evalProperty(uassetName, addToFilePatches, dataMap, code, obj, property, orig, ast, origAst)
+        case v: TextNode =>
+          def code(codePrefix: String, lang: patchlet.Lang): Unit =
+            value = patchlet.evalProperty(lang, uassetName, addToFilePatches, dataMap, 
+                                          v.textValue.substring(codePrefix.length), obj, property, orig, ast, origAst)
+          patchlet.getKeyPrefix(v.textValue) match {
+            case Some(patchlet.Constants.codePrefixScala) => code(patchlet.Constants.codePrefixScala, patchlet.Lang.Scala)
+            case Some(patchlet.Constants.codePrefixJavascript) => code(patchlet.Constants.codePrefixJavascript, patchlet.Lang.Js)
+            case Some(patchlet.Constants.codePrefixPython) => code(patchlet.Constants.codePrefixPython, patchlet.Lang.Python)
+            case _ =>
+          }
         case _ =>
       }
       obj.setJson(property, value)

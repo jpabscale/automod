@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import com.jayway.jsonpath
 import java.util.{List => JList}
+import org.graalvm.polyglot.{Context, HostAccess, Value}
 import scala.collection.immutable.TreeMap
 import scala.jdk.CollectionConverters._
 import scala.reflect.runtime.universe._
@@ -9,7 +10,10 @@ import scala.tools.reflect.ToolBox
 
 
 object Constants {
-  val codePrefix: String = "=>"
+  val codePrefixScala: String = "=>"
+  val codePrefixTypescript: String = "=ts>"
+  val codePrefixJavascript: String = "=js>"
+  val codePrefixPython: String = "=py>"
   val atPrefix = ".@:"
   val javaRegexPrefix = ".*:"
   val addValueKey = "value"
@@ -24,7 +28,70 @@ object Constants {
 
 import Constants._
 
-def eval[T](exp: String): T = tb.eval(tb.parse(exp)).asInstanceOf[T]
+sealed trait Lang
+object Lang {
+  case object Scala extends Lang
+  case object Typescript extends Lang
+  case object Js extends Lang
+  case object Python extends Lang
+}
+
+def graalContext(id: String): Context =
+  Context.newBuilder(id).
+    allowHostAccess(HostAccess.newBuilder(HostAccess.ALL).build).
+    allowHostClassLookup(_ => true).
+    build
+
+def evalPoly(context: Context, lang: String, code: String): Value = try context.eval(lang, code) catch {
+  case t: Throwable =>
+    automod.exit(-1, 
+      s"""Failed to evaluate $lang: ${t.getMessage}
+         |$code""".stripMargin)
+}
+def evalScala[T](exp: String): T = tb.eval(tb.parse(exp)).asInstanceOf[T]
+def evalJs(v: Context => Value, code: String): (Context, Value) = {
+  val context = graalContext("js")
+  context.getBindings("js").putMember("v", v(context))
+  (context, evalPoly(context, "js", code))
+}
+
+lazy val tsCache = new java.util.concurrent.ConcurrentHashMap[String, String]
+
+def evalTypescript(preamble: String)(v: Context => Value, exp: String): (Context, Value) = {
+  val code = s"$preamble${util.Properties.lineSeparator}$exp"
+  val js = Option(tsCache.get(code)) match {
+    case Some(c) => c
+    case _ =>
+      val d = os.temp.dir()
+      val input = d / "f.ts"
+      val output = d / "f.js"
+      os.write.over(input, code)
+      if (automod.osKind.isWin) os.proc("cmd", "/d", "/c", "tsc", "--outFile", output, input).call()
+      else os.proc("tsc", "--outFile", output, input).call()
+      val c = os.read(output)
+      tsCache.put(code, c)
+      c
+  }
+  evalJs(v, js)
+}
+def evalPython(v: Context => Value, code: String): (Context, Value) = {
+  val context = graalContext("python")
+  context.getBindings("python").putMember("v", v(context))
+  (context, evalPoly(context, "python", code.trim))
+}  
+
+def evalObjectNamePredicate(lang: Lang, code: String): String => Boolean = {
+  def graal(f: (Context => Value, String) => (Context, Value)): String => Boolean = { (v: String) => 
+    val (context, r) = f((c: Context) => uassetapi.toPolyValue(c, TextNode.valueOf(v)), code)
+    try uassetapi.toValue[Boolean](uassetapi.fromPolyValue(r)).get finally context.close
+  }
+  lang match {
+    case Lang.Scala => evalScala[String => Boolean](s"{ (v: String) => def predicate(): Boolean = { $code }; predicate() }")
+    case Lang.Typescript => graal(evalTypescript("declare var v: string"))
+    case Lang.Js => graal(evalJs)
+    case Lang.Python => graal(evalPython)
+  }
+}
 
 def checkPatches(uassetName: String, map: automod.UAssetPropertyChanges): automod.UAssetPropertyChanges = {
   for ((objName, properties) <- map) {
@@ -50,7 +117,10 @@ def checkPatches(uassetName: String, map: automod.UAssetPropertyChanges): automo
     for ((property, value) <- properties) {
       value.newValueOpt match {
         case Some(node: TextNode) => getKeyPrefix(node.textValue) match {
-          case Some(`codePrefix`) =>
+          case Some(`codePrefixScala`) =>
+          case Some(`codePrefixTypescript`) =>
+          case Some(`codePrefixJavascript`) =>
+          case Some(`codePrefixPython`) =>
           case Some(prefix) => automod.exit(-1, s"Unrecognized value prefix for $uassetName/$objName/$property: $prefix")
           case _ =>
         }
@@ -65,13 +135,19 @@ def getKeyPrefix(key: String): Option[String] = {
   if (key.isEmpty) return None
   val i = key.indexOf(':')
   if (key.head == '.' && i > 0) return Some(key.substring(0, i + 1))
-  if (key.startsWith("=>")) return Some(key.substring(0, 2)) 
+  if (key.startsWith(codePrefixScala)) return Some(key.substring(0, codePrefixScala.length)) 
+  if (key.startsWith(codePrefixTypescript)) return Some(key.substring(0, codePrefixTypescript.length)) 
+  if (key.startsWith(codePrefixJavascript)) return Some(key.substring(0, codePrefixJavascript.length)) 
+  if (key.startsWith(codePrefixPython)) return Some(key.substring(0, codePrefixPython.length)) 
   return None
 }
 
 def isKeyPrefix(title: String, key: String): Boolean = getKeyPrefix(key) match {
   case Some(prefix) => prefix match {
-    case `codePrefix` => true
+    case `codePrefixScala` => true
+    case `codePrefixTypescript` => true
+    case `codePrefixJavascript` => true
+    case `codePrefixPython` => true
     case `javaRegexPrefix` => true
     case `atPrefix` => true
     case _ => automod.exit(-1, s"Unrecognized prefix for $title: '$prefix'")
@@ -88,60 +164,110 @@ type CodeContext = {
   def origAst: JsonNode
 }
 
-
-def evalProperty(uassetName: String, addToFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
-                 code: String, obj: uassetapi.Struct, property: String, orig: JsonNode, _ast: automod.JsonAst, _origAst: automod.JsonAst): JsonNode = {
-  val currentValue = obj.getJson(property)
-  val origValue = uassetapi.Struct(uassetName, orig, addToFilePatches = false).getJson(property)
-  try {
-    val nil = """"null""""
-    val propertyF = eval[CodeContext => Any](
-    s"""{
-        |import com.fasterxml.jackson.databind.JsonNode
-        |import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
-        |
-        |lazy val mapper = new com.fasterxml.jackson.databind.ObjectMapper
-        |def toJsonNode(content: String): JsonNode = if (content == null) null else mapper.readTree(content)
-        |def toJsonNodeT[T <: JsonNode](content: String): T = (if (content == null) null else mapper.readTree(content)).asInstanceOf[T]
-        |def fromJsonNode(node: JsonNode): String = Option(node).map(_.toString).getOrElse($nil)
-        |
-        |(v: {
-        |    def objName: String
-        |    def orig[T]: T
-        |    def currentOpt[T]: Option[T]
-        |    def valueOf[T](objName: String, property: String): Option[T]
-        |    def ast: JsonNode
-        |    def origAst: JsonNode
-        |  }) => 
-        |  def calc(): Any = {
-        |    $code
-        |  }
-        |  calc() 
-        |}""".stripMargin)              
-    val ctx = (new {
-      def objName: String = obj.name
-      def orig[T]: T = uassetapi.toValue[T](origValue).get
-      def currentOpt[T]: Option[T] = uassetapi.toValue[T](currentValue)
-      def valueOf[T](objName: String, property: String): Option[T] = {
-        dataMap.get(objName) match {
-          case Some(node) =>
-            val obj = uassetapi.Struct(uassetName, node, addToFilePatches)
-            uassetapi.toValue[T](obj.getJson(property))
-          case _ => None
-        }
-      }
-      def ast: JsonNode = _ast.json[JsonNode]
-      def origAst: JsonNode = _origAst.json[JsonNode]
-    }: CodeContext)
-    return uassetapi.fromValue(propertyF(ctx))
-  } catch {
-    case t: Throwable =>
-      automod.exit(-1, 
-        s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
-           |the current value ${currentValue} using $code:
-           |  ${t.getMessage}""".stripMargin)
+class PolyCodeContext(context: Context,
+                      uassetName: String,
+                      addToFilePatches: Boolean,
+                      dataMap: collection.Map[String, ObjectNode],
+                      @HostAccess.Export val objName: Value,
+                      @HostAccess.Export val orig: Value,
+                      @HostAccess.Export val current: Value,
+                      @HostAccess.Export val ast: Value,
+                      @HostAccess.Export val origAst: Value) {
+  def valueOf(objName: Value, property: Value): Value = {
+    dataMap.get(uassetapi.fromPolyValue(objName).asInstanceOf[String]) match {
+      case Some(node) =>
+        val obj = uassetapi.Struct(uassetName, node, addToFilePatches)
+        uassetapi.toPolyValue(context, obj.getJson(uassetapi.fromPolyValue(property).asInstanceOf[String]))
+      case _ => uassetapi.toPolyValue(context, NullNode.instance)
+    }
   }
 }
+
+def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
+                 code: String, obj: uassetapi.Struct, property: String, orig: JsonNode, _ast: automod.JsonAst, 
+                 _origAst: automod.JsonAst): JsonNode = {
+  val currentValue = obj.getJson(property)
+  val origValue = uassetapi.Struct(uassetName, orig, addToFilePatches = false).getJson(property)
+  lang match {
+    case Lang.Scala =>
+      try {
+        val nil = """"null""""
+        val propertyF = evalScala[CodeContext => Any](
+        s"""{
+            |import com.fasterxml.jackson.databind.JsonNode
+            |import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+            |
+            |lazy val mapper = new com.fasterxml.jackson.databind.ObjectMapper
+            |def toJsonNode(content: String): JsonNode = if (content == null) null else mapper.readTree(content)
+            |def toJsonNodeT[T <: JsonNode](content: String): T = (if (content == null) null else mapper.readTree(content)).asInstanceOf[T]
+            |def fromJsonNode(node: JsonNode): String = Option(node).map(_.toString).getOrElse($nil)
+            |
+            |(v: {
+            |    def objName: String
+            |    def orig[T]: T
+            |    def currentOpt[T]: Option[T]
+            |    def valueOf[T](objName: String, property: String): Option[T]
+            |    def ast: JsonNode
+            |    def origAst: JsonNode
+            |  }) => 
+            |  def calc(): Any = {
+            |    $code
+            |  }
+            |  calc() 
+            |}""".stripMargin)              
+        val ctx = (new {
+          def objName: String = obj.name
+          def orig[T]: T = uassetapi.toValue[T](origValue).get
+          def currentOpt[T]: Option[T] = uassetapi.toValue[T](currentValue)
+          def valueOf[T](objName: String, property: String): Option[T] = {
+            dataMap.get(objName) match {
+              case Some(node) =>
+                val obj = uassetapi.Struct(uassetName, node, addToFilePatches)
+                uassetapi.toValue[T](obj.getJson(property))
+              case _ => None
+            }
+          }
+          def ast: JsonNode = _ast.json[JsonNode]
+          def origAst: JsonNode = _origAst.json[JsonNode]
+        }: CodeContext)
+        return uassetapi.fromValue(propertyF(ctx))
+      } catch {
+        case t: Throwable =>
+          automod.exit(-1, 
+            s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
+               |the current value ${currentValue} using $code:
+               |  ${t.getMessage}""".stripMargin)
+      }
+    case _ =>
+      val v = (c: Context) => c.asValue(
+          new PolyCodeContext(c, uassetName, addToFilePatches, dataMap,
+                              uassetapi.toPolyValue(c, TextNode.valueOf(obj.name)), 
+                              uassetapi.toPolyValue(c, origValue),
+                              uassetapi.toPolyValue(c, currentValue),
+                              uassetapi.toPolyValue(c, _ast.json[JsonNode]),
+                              uassetapi.toPolyValue(c, _origAst.json[JsonNode])))     
+      val (context, r) = (lang: @unchecked) match {
+        case Lang.Typescript => evalTypescript(
+          s"""type JsonNode = { [key: string]: any }
+             |
+             |interface PolyCodeContext {
+             |  objName(): string
+             |  orig(): any
+             |  current(): any | undefined
+             |  ast(): JsonNode
+             |  origAst(): JsonNode
+             |  valueOf(objName: string, property: string): any | undefined
+             |}
+             |
+             |declare var v: PolyCodeContext""".stripMargin
+        )(v, code)
+        case Lang.Js => evalJs(v, code)
+        case Lang.Python => evalPython(v, code)
+      }                        
+      return try uassetapi.fromPolyValue(r) finally context.close
+  }
+}
+
 sealed trait FilteredChanges {
   def addToFilePatches: Boolean
   def uassetName: String
@@ -154,12 +280,17 @@ sealed trait FilteredChanges {
     for ((property, valueOldValuePair) <- changes) {
       var value = valueOldValuePair.newValueOpt.get
       value match {
-        case v: TextNode => getKeyPrefix(v.textValue) match {
-          case Some(`codePrefix`) =>
-            val code = v.textValue.substring(codePrefix.length)
-            value = evalProperty(uassetName, addToFilePatches, dataMap, code, obj, property, orig, this.ast, this.orig)
-          case _ =>
-        }
+        case v: TextNode => 
+          def code(codePrefix: String, lang: Lang): Unit =
+            value = evalProperty(lang, uassetName, addToFilePatches, dataMap, v.textValue.substring(codePrefix.length), 
+                                 obj, property, orig, this.ast, this.orig)
+          getKeyPrefix(v.textValue) match {
+            case Some(`codePrefixScala`) => code(codePrefixScala, Lang.Scala)
+            case Some(`codePrefixTypescript`) => code(codePrefixTypescript, Lang.Typescript)
+            case Some(`codePrefixJavascript`) => code(codePrefixJavascript, Lang.Js)
+            case Some(`codePrefixPython`) => code(codePrefixPython, Lang.Python)
+            case _ =>
+          }
         case _ =>
       }
       obj.setJson(property, value)
@@ -230,23 +361,28 @@ def kfcMap(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetName: Str
       case Some(_) => automod.exit(-1, s"Redefined key for $uassetName: $key")
       case _ =>
     }
+    def code(codePrefix: String, lang: Lang, key: String): Unit = {
+      val (code, props) = properties.get(codePrefix) match {
+        case Some(text) => 
+          text.newValueOpt match {
+            case Some(codeText: TextNode) => (codeText.asText, properties.removed(codePrefix))
+            case _ => automod.exit(-1, s"Invalid code for $uassetName: $text")
+          }
+        case _ => (key.substring(codePrefix.length), properties)
+      }
+      try {
+        val fun = evalObjectNamePredicate(lang, code)  
+        r1.put(key, KeyFilteredChanges(addToFilePatches, uassetName, ast, origAst, dataMap, fun, props))
+      } catch {
+        case _: Throwable => automod.exit(-1, s"Invalid code for $uassetName: $code")
+      }
+    }
     patchlet.getKeyPrefix(key) match {
       case Some(prefix) => prefix match {
-        case `codePrefix` =>
-          val (code, props) = properties.get(codePrefix) match {
-            case Some(text) => 
-              text.newValueOpt match {
-                case Some(codeText: TextNode) => (codeText.asText, properties.removed(codePrefix))
-                case _ => automod.exit(-1, s"Invalid code for $uassetName: $text")
-              }
-            case _ => (key.substring(codePrefix.length), properties)
-          }
-          try {
-            val fun = eval[String => Boolean](s"{ (v: String) => def predicate(): Boolean = { $code }; predicate() }".stripMargin)  
-            r1.put(key, KeyFilteredChanges(addToFilePatches, uassetName, ast, origAst, dataMap, fun, props))
-          } catch {
-            case _: Throwable => automod.exit(-1, s"Invalid code for $uassetName: $code")
-          }
+        case `codePrefixScala` => code(codePrefixScala, Lang.Scala, key)
+        case `codePrefixTypescript` => code(codePrefixTypescript, Lang.Typescript, key)
+        case `codePrefixJavascript` => code(codePrefixJavascript, Lang.Js, key)
+        case `codePrefixPython` => code(codePrefixPython, Lang.Python, key)
         case `atPrefix` =>
           var path = key.substring(atPrefix.length).trim
           var i = 0

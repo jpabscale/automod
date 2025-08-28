@@ -1,5 +1,7 @@
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+import org.graalvm.polyglot.{Context, Value}
+import org.graalvm.polyglot.proxy.{Proxy, ProxyArray, ProxyObject}
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable.HashMap
 import scala.jdk.CollectionConverters._
@@ -13,6 +15,95 @@ object Constants {
 }
 
 import Constants._
+
+object PolyArray {
+  def apply(context: Context, node: ArrayNode): PolyArray = new PolyArray(context, node.deepCopy)
+}
+
+class PolyArray(context: Context, val node: ArrayNode) extends ProxyArray {
+  override def get(index: Long): Object = toPolyValue(context, node.get(index.toInt))
+  override def set(index: Long, value: Value): Unit = node.set(index.toInt, fromPolyValue(value))
+  override def getSize(): Long = node.size()
+}
+
+object PolyObject {
+  def apply(context: Context, node: ObjectNode): PolyObject = new PolyObject(context, node.deepCopy())
+}
+
+class PolyObject(context: Context, val node: ObjectNode) extends java.util.Map[String, Value] {
+  override def size(): Int = node.size
+  override def isEmpty(): Boolean = node.isEmpty
+  override def containsKey(key: Object): Boolean = node.has(key.toString)
+  override def containsValue(value: Object): Boolean = {
+    for (v <- node.values.asScala if toPolyValue(context, v) == value) return true
+    false
+  }
+  override def get(key: Object): Value = toPolyValue(context, node.get(key.toString))
+  override def put(key: String, value: Value): Value = toPolyValue(context, node.replace(key, fromPolyValue(value)))
+  override def remove(key: Object): Value = toPolyValue(context, node.remove(key.toString))
+  override def putAll(m: java.util.Map[_ <: String, _ <: Value]): Unit = for (entry <- m.entrySet.asScala) put(entry.getKey, entry.getValue)
+  override def clear(): Unit = node.removeAll
+  override def keySet(): java.util.Set[String] = {
+    val r = new java.util.TreeSet[String]
+    for (f <- node.fieldNames.asScala) r.add(f)
+    r
+  }
+  override def values(): java.util.Collection[Value] = {
+    val r = new java.util.ArrayList[Value]
+    for (f <- keySet.asScala) r.add(get(f))
+    r
+  }
+  override def entrySet(): java.util.Set[java.util.Map.Entry[String, Value]] = {
+    val r = new java.util.TreeSet[java.util.Map.Entry[String, Value]]
+    for (f <- keySet.asScala) r.add(java.util.Map.entry(f, get(f)))
+    r
+  }
+}
+
+def toPolyValue(context: Context, node: JsonNode): Value = {
+  node match {
+    case node: BooleanNode => context.asValue(node.booleanValue)
+    case node: IntNode => context.asValue(node.intValue)
+    case node: DoubleNode => context.asValue(node.doubleValue)
+    case node: ArrayNode => context.asValue(new PolyArray(context, node))
+    case node: ObjectNode => context.asValue(new PolyObject(context, node))
+    case node: TextNode => 
+      val text = node.textValue
+      text match {
+        case "+0.0" | "-0.0" | "+0" | "-0" => context.asValue(0d)
+        case _ => context.asValue(text)
+      }
+    case null | _: NullNode => context.asValue(null)
+    case _ => automod.exit(-1, s"Unsupported value (${node.getClass}): '${node.toPrettyString}'")
+  }
+}
+
+def fromPolyValue(v: Value): JsonNode = {
+  if (v.isHostObject) v.asHostObject[Object] match {
+    case proxy: PolyArray => return proxy.node
+    case proxy: PolyObject => return proxy.node
+    case _ =>
+  }
+  if (v.isProxyObject) v.asProxyObject[Proxy] match {
+    case proxy: PolyArray => return proxy.node
+    case _ =>
+  }
+  if (v.isNull) NullNode.instance
+  else if (v.isBoolean) BooleanNode.valueOf(v.asBoolean)
+  else if (v.isNumber) if (v.fitsInInt) IntNode.valueOf(v.asInt) else DoubleNode.valueOf(v.asDouble)
+  else if (v.isString) TextNode.valueOf(v.asString)
+  else if (v.hasArrayElements) {
+    val r = JsonNodeFactory.instance.arrayNode
+    for (i <- 0L until v.getArraySize) r.add(fromPolyValue(v.getArrayElement(i)))
+    r
+  } else if (v.isInstanceOf[java.util.Map[_, _]]) {
+    val r = JsonNodeFactory.instance.objectNode
+    for ((name, value) <- v.asInstanceOf[java.util.Map[String, Value]].asScala) r.replace(name, fromPolyValue(value))
+    r
+  } else {
+    automod.exit(-1, s"fromPolyValue: Unsupported value (${v.getClass}): '$v'")
+  }
+}
 
 def toValue[T](node: JsonNode): Option[T] = {
   def toT(o: Any): T = o.asInstanceOf[T]
@@ -38,7 +129,7 @@ def toValue[T](node: JsonNode): Option[T] = {
         case _ => Some(toT(text))
       }
     case null | _: NullNode => None
-    case _ => automod.exit(-1, s"Unsupported value (class: ${node.getClass}): '${node.toPrettyString}'")
+    case _ => automod.exit(-1, s"Unsupported value (${node.getClass}): '${node.toPrettyString}'")
   }
 }
 
@@ -59,7 +150,7 @@ def fromValue(v: Any): JsonNode = {
       for ((k, v) <- v) r.set[JsonNode](k.toString, fromValue(v))
       r
     case null => NullNode.instance
-    case _ => automod.exit(-1, s"Unsupported value (class: ${v.getClass}): '$v'")
+    case _ => automod.exit(-1, s"Unsupported value (${v.getClass}): '$v'")
   }
 }
 
