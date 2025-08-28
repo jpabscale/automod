@@ -1,0 +1,10 @@
+.bsp
+.cache
+.metals
+.scala-build
+.vscode
+tools
+node_modules
+out
+*.tsbuildinfo
+*.vsix

@@ -1,0 +1,13 @@
+* text=auto !eol
+*.scala text eol=lf
+*.sc text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+*.cmd text eol=crlf
+*.json text eol=lf
+*.ts text eol=lf
+*.toml text eol=lf
+*.js text eol=lf
+*.sam text eol=lf
+*.yml
+automod text eol=lf
