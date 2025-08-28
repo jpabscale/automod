@@ -1,0 +1,33 @@
+# ...                                                        # Old Value
+[P_Eve_Sword_Beta_ShieldBreak2_1]
+AttackDamageRate = 3.0                                       # 8.0
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak2_1_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 3.0                                 # 7.0
+StartDelayTick = 1                                           # 1
+
+[P_Eve_Sword_Beta_ShieldBreak1_1]
+AttackDamageRate = 3.0                                       # 8.0
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak1_1_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 3.0                                 # 7.0
+StartDelayTick = 1                                           # 1
+
+[P_Eve_Sword_Beta_ShieldBreak1Ex_1]
+AttackDamageRate = 3.0                                       # 7.0
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target" # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 3.0                                 # 7.0
+StartDelayTick = 1                                           # 1
+
+[P_Eve_Sword_Beta_ChargeSlashCombo1_1]
+AttackDamageRate = 9.0                                       # 2.0
+FirstSkillActiveAlias = "M_Scarlet_BlinkCombo_Cast1"         # "P_Eve_Sword_Beta_ChargeSlashCombo1_1_Cast1"
+TargetFilterAlias = "M_Scarlet_BlinkCombo_Target"            # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 9.0                                 # 1.0
+
+[P_Eve_Sword_Beta_ChargeSlashCombo1Ex_1]
+AttackDamageRate = 9.0                                       # 4.0
+FirstSkillActiveAlias = "M_Scarlet_BlinkCombo_Cast1"         # "P_Eve_Sword_Beta_ChargeSlashCombo1_Ex_Cast1"
+TargetFilterAlias = "M_Scarlet_BlinkCombo_Target"            # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 9.0                                 # 2.0

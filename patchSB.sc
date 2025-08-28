@@ -1,13 +1,13 @@
 import sbmod._
 import scala.collection.immutable.TreeMap
 
-def patchEffect(obj: UAssetApiDataObject): Unit = {
+def patchEffect(obj: UAssetApi.DataObject): Unit = {
   val name = obj.name
   name match {
 
     // based on https://www.nexusmods.com/stellarblade/mods/802
     case "N_Drone_Scan" => 
-      obj("LifeTime") = 20d
+      obj("LifeTime") = 30d
 
     // based on https://www.nexusmods.com/stellarblade/mods/897
     case _ if name.startsWith("P_Eve_SkillTree_Just") && (name.contains("BetaGauge") || name.contains("BurstGauge")) =>
@@ -34,7 +34,7 @@ def patchEffect(obj: UAssetApiDataObject): Unit = {
   }
 }
 
-def patchTargetFilter(obj: UAssetApiDataObject): Unit = {
+def patchTargetFilter(obj: UAssetApi.DataObject): Unit = {
   val name = obj.name
   name match {
 

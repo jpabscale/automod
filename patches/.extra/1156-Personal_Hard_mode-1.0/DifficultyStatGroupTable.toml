@@ -1,0 +1,240 @@
+# ...                                                        # Old Value
+[17]
+StatValue4 = 240                                             # 80
+StatValue5 = 240                                             # 80
+
+[18]
+StatValue4 = 240                                             # 80
+StatValue5 = 240                                             # 80
+
+[19]
+StatValue4 = 240                                             # 80
+StatValue5 = 240                                             # 80
+
+[20]
+StatValue4 = 270                                             # 90
+StatValue5 = 270                                             # 90
+
+[21]
+StatValue4 = 300                                             # 100
+StatValue5 = 300                                             # 100
+
+[22]
+StatValue4 = 450                                             # 150
+StatValue5 = 450                                             # 150
+
+[23]
+StatValue4 = 450                                             # 150
+StatValue5 = 450                                             # 150
+
+[24]
+StatValue4 = 450                                             # 150
+StatValue5 = 450                                             # 150
+
+[25]
+StatValue4 = 600                                             # 200
+StatValue5 = 240                                             # 80
+
+[26]
+StatValue4 = 600                                             # 200
+StatValue5 = 240                                             # 80
+
+[27]
+StatValue4 = 750                                             # 250
+StatValue5 = 270                                             # 90
+
+[28]
+StatValue4 = 900                                             # 300
+StatValue5 = 300                                             # 100
+
+[29]
+StatValue4 = 450                                             # 150
+StatValue5 = 240                                             # 80
+
+[30]
+StatValue4 = 450                                             # 150
+StatValue5 = 240                                             # 80
+
+[301]
+StatValue1 = 115                                             # 150
+StatValue2 = 115                                             # 150
+StatValue3 = 115                                             # 150
+StatValue4 = 1800                                            # 300
+StatValue5 = 1800                                            # 300
+
+[302]
+StatValue1 = 200                                             # 250
+StatValue2 = 200                                             # 250
+StatValue3 = 200                                             # 250
+StatValue4 = 2400                                            # 400
+StatValue5 = 2400                                            # 400
+
+[303]
+StatValue1 = 120                                             # 150
+StatValue2 = 120                                             # 150
+StatValue3 = 120                                             # 150
+StatValue4 = 2400                                            # 400
+StatValue5 = 2400                                            # 400
+
+[304]
+StatValue1 = 150                                             # 200
+StatValue2 = 150                                             # 200
+StatValue3 = 150                                             # 200
+StatValue4 = 2400                                            # 400
+StatValue5 = 2400                                            # 400
+
+[306]
+StatValue1 = 90                                              # 150
+StatValue2 = 90                                              # 150
+StatValue3 = 90                                              # 150
+StatValue4 = 1800                                            # 300
+StatValue5 = 1800                                            # 300
+
+[307]
+StatValue1 = 115                                             # 150
+StatValue2 = 115                                             # 150
+StatValue3 = 115                                             # 150
+StatValue4 = 1800                                            # 300
+StatValue5 = 1800                                            # 300
+
+[308]
+StatValue1 = 120                                             # 150
+StatValue2 = 120                                             # 150
+StatValue3 = 120                                             # 150
+StatValue4 = 1800                                            # 300
+StatValue5 = 1800                                            # 300
+
+[309]
+StatValue1 = 90                                              # 150
+StatValue2 = 90                                              # 150
+StatValue3 = 90                                              # 150
+StatValue4 = 1200                                            # 200
+StatValue5 = 1200                                            # 200
+
+[31]
+StatValue4 = 525                                             # 175
+StatValue5 = 270                                             # 90
+
+[310]
+StatValue1 = 70                                              # 150
+StatValue2 = 70                                              # 150
+StatValue3 = 70                                              # 150
+StatValue4 = 1200                                            # 200
+StatValue5 = 1200                                            # 200
+
+[311]
+StatValue1 = 65                                              # 150
+StatValue2 = 65                                              # 150
+StatValue3 = 65                                              # 150
+StatValue4 = 1200                                            # 200
+StatValue5 = 1200                                            # 200
+
+[313]
+StatValue1 = 35                                              # 150
+StatValue2 = 35                                              # 150
+StatValue3 = 35                                              # 150
+StatValue4 = 900                                             # 150
+StatValue5 = 900                                             # 150
+
+[314]
+StatValue1 = 30                                              # 150
+StatValue2 = 30                                              # 150
+StatValue3 = 30                                              # 150
+StatValue4 = 900                                             # 150
+StatValue5 = 900                                             # 150
+
+[315]
+StatValue1 = 30                                              # 150
+StatValue2 = 30                                              # 150
+StatValue3 = 30                                              # 150
+StatValue4 = 900                                             # 150
+StatValue5 = 900                                             # 150
+
+[316]
+StatValue1 = 20                                              # 100
+StatValue2 = 20                                              # 100
+StatValue3 = 20                                              # 100
+StatValue4 = 480                                             # 80
+StatValue5 = 480                                             # 80
+
+[317]
+StatValue1 = 10                                              # 150
+StatValue2 = 10                                              # 150
+StatValue3 = 10                                              # 150
+StatValue4 = 600                                             # 100
+StatValue5 = 600                                             # 100
+
+[318]
+StatValue1 = 10                                              # 150
+StatValue2 = 10                                              # 150
+StatValue3 = 10                                              # 150
+StatValue4 = 600                                             # 100
+StatValue5 = 600                                             # 100
+
+[319]
+StatValue1 = -10                                             # 150
+StatValue2 = -10                                             # 150
+StatValue3 = -10                                             # 150
+StatValue4 = 600                                             # 100
+StatValue5 = 600                                             # 100
+
+[32]
+StatValue4 = 750                                             # 250
+StatValue5 = 300                                             # 100
+
+[320]
+StatValue1 = -20                                             # 120
+StatValue2 = -20                                             # 120
+StatValue3 = -20                                             # 120
+StatValue4 = 420                                             # 70
+StatValue5 = 420                                             # 70
+
+[321]
+StatValue1 = -20                                             # 130
+StatValue2 = -20                                             # 130
+StatValue3 = -20                                             # 130
+StatValue4 = 480                                             # 80
+StatValue5 = 480                                             # 80
+
+[322]
+StatValue1 = -30                                             # 130
+StatValue2 = -30                                             # 130
+StatValue3 = -30                                             # 130
+StatValue4 = 420                                             # 70
+StatValue5 = 420                                             # 70
+
+[323]
+StatValue1 = -40                                             # 100
+StatValue2 = -40                                             # 100
+StatValue3 = -40                                             # 100
+StatValue4 = 600                                             # 100
+StatValue5 = 600                                             # 100
+
+[324]
+StatValue1 = -40                                             # 100
+StatValue2 = -40                                             # 100
+StatValue3 = -40                                             # 100
+StatValue4 = 300                                             # 0
+StatValue5 = 300                                             # 0
+
+[325]
+StatValue1 = -40                                             # 115
+StatValue2 = -40                                             # 115
+StatValue3 = -40                                             # 115
+StatValue4 = 420                                             # 70
+StatValue5 = 420                                             # 70
+
+[326]
+StatValue1 = -30                                             # 130
+StatValue2 = -30                                             # 130
+StatValue3 = -30                                             # 130
+StatValue4 = 420                                             # 70
+StatValue5 = 420                                             # 70
+
+[327]
+StatValue1 = -50                                             # 60
+StatValue2 = -50                                             # 60
+StatValue3 = -50                                             # 60
+StatValue4 = 420                                             # 70
+StatValue5 = 270                                             # 0
+

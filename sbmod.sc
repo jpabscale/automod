@@ -1,20 +1,21 @@
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, ObjectWriter}
-import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, ObjectNode, TextNode}
 import com.fasterxml.jackson.dataformat.toml.TomlMapper
 import com.fasterxml.jackson.core.`type`.TypeReference
 import java.util.{Map => JMap}
 import scala.beans.BeanProperty
 import scala.collection.immutable.{TreeMap, TreeSet}
-import scala.reflect.runtime.universe._
+import scala.collection.mutable.HashMap
+import scala.jdk.CollectionConverters._
 
-val header = s"Auto Modding Script v2.2.2"
+val header = s"Auto Modding Script v2.2.3"
 
 var cliArgs = args
 //cliArgs = Array(".setup")
 
 def exit(code: Int, msg: String = null): Nothing = {
-  Option(msg).foreach(println(_))
+  Option(msg).foreach((if (code == 0) Console.out else Console.err).println(_))
   System.exit(code)
   throw new RuntimeException
 }
@@ -40,9 +41,54 @@ class Config {
   @BeanProperty var tools: Tools = new Tools
 }
 
-val workingDir = os.pwd
-val configPath = workingDir / ".config.json"
+final case class ValuePair(newValueOpt: Option[JsonNode], oldValueOpt: Option[JsonNode])
+type PropertyChanges = TreeMap[String, ValuePair]
+type UAssetPropertyChanges = TreeMap[String, PropertyChanges]
+type DataTableFilePatches = TreeMap[String, UAssetPropertyChanges]
+type DataTableCodePatches = TreeMap[String, UAssetApi.DataObject => Unit]
 
+object builder {
+  
+  type PropertyUpdates = TreeMap[String, JsonNode]
+  type UAssetUpdates = TreeMap[String, PropertyUpdates]
+  type DataTableUpdates = TreeMap[String, UAssetUpdates]
+
+  type JsonsOrJsonEntries = Either[Iterable[JsonNode], Iterable[(String, JsonNode)]]
+  implicit def jsons(o: Iterable[JsonNode]): JsonsOrJsonEntries = Left(o)
+  implicit def jsonEntries(o: Iterable[(String, JsonNode)]): JsonsOrJsonEntries = Right(o)
+
+  implicit class StringImplicit(val key: String) extends AnyVal {
+    def ~>(objChanges: UAssetUpdates): DataTableUpdates = {
+      var r: DataTableUpdates = TreeMap.empty
+      r = r + (key -> (r.getOrElse(key, TreeMap.empty: UAssetUpdates) ++ objChanges))
+      r
+    }
+
+    def +>(entry: Iterable[(String, JsonNode)]): UAssetUpdates = {
+      var r: UAssetUpdates = TreeMap.empty
+      r = r + (key -> (r.getOrElse(key, TreeMap.empty: PropertyUpdates) ++ entry))
+      r
+    }
+  }
+
+  implicit class UAssetUpdatesImplicit(val o: UAssetUpdates) extends AnyVal {
+    def +(other: UAssetUpdates): UAssetUpdates = o ++ other
+  }
+
+  implicit class DataTableUpdatesImplicit(val o: DataTableUpdates) extends AnyVal {
+    def +(other: DataTableUpdates): DataTableUpdates = o ++ other
+  }
+
+  implicit def boolean2json(v: Boolean): JsonNode = BooleanNode.valueOf(v)
+  implicit def int2json(v: Int): JsonNode = DoubleNode.valueOf(v)
+  implicit def float2json(v: Float): JsonNode = DoubleNode.valueOf(v)
+  implicit def double2json(v: Double): JsonNode = DoubleNode.valueOf(v)
+  implicit def string2json(v: String): JsonNode = TextNode.valueOf(v)
+  implicit def iterable2json(o: JsonsOrJsonEntries): JsonNode = o match {
+    case Left(v) => JsonNodeFactory.instance.arrayNode.addAll(v.asInstanceOf[Iterable[JsonNode]].asJavaCollection)
+    case Right(v) => JsonNodeFactory.instance.objectNode.setAll((TreeMap.empty[String, JsonNode] ++ v).asJava)
+  }
+}
 
 def objectWriter: ObjectWriter = {
   val indenter = new DefaultIndenter("  ", DefaultIndenter.SYS_LF)
@@ -61,11 +107,14 @@ def writeConfig(config: Config): Unit = {
 def getTimestamp(): String = {
   import java.time.{ZonedDateTime, ZoneOffset}
   import java.time.format.DateTimeFormatter
-  DateTimeFormatter.ISO_INSTANT.format(ZonedDateTime.now( ZoneOffset.UTC)).replace(":", "-").replace(".", "-")
+  DateTimeFormatter.ISO_INSTANT.format(ZonedDateTime.now(ZoneOffset.UTC)).replace(":", "-").replace(".", "-")
 }
 
 def absPath(p: os.Path): String = p.toIO.getCanonicalFile.getAbsolutePath
 def absPath(p: String): os.Path = os.Path(new java.io.File(p).getCanonicalFile.getAbsolutePath)
+
+val workingDir = os.pwd
+val configPath = workingDir / ".config.json"
 
 val config = {
   var r = new Config
@@ -105,10 +154,12 @@ val usmapFilename = usmapUrl.substring(usmapUrl.lastIndexOf('/') + 1)
 val usmapPath = workingDir / usmapFilename
 val usmap = usmapPath.baseName
 
-val retocExe = workingDir / "retoc.exe"
-val uassetGuiExe = workingDir / "UAssetGUI.exe"
-val fmodelExe = workingDir / "FModel.exe"
-val jdExe = workingDir / "jd.exe"
+val toolsDir = workingDir / "tools"
+
+val retocExe = toolsDir / "retoc.exe"
+val uassetGuiExe = toolsDir / "UAssetGUI.exe"
+val fmodelExe = toolsDir / "FModel.exe"
+val jdExe = toolsDir / "jd.exe"
 val uassetGuiSettingsDir = os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
@@ -116,41 +167,52 @@ val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
 val automod = workingDir / "automod.bat"
 
 val dataTablePath = "/Exports/0/Table/Data"
-
-
-final case class ValuePair(newValueOpt: Option[String], oldValueOpt: Option[String])
-type DataTablePropertyChanges = TreeMap[String, ValuePair]
-type UAssetDataPatches = TreeMap[String, DataTablePropertyChanges]
-type DataTableFilePatches = TreeMap[String, UAssetDataPatches]
-type DataTableCodePatches = TreeMap[String, UAssetApiDataObject => Unit]
+val noCodePatching = "--no-code-patching"
 
 def setupModTools(): Boolean = {
   var setup = true
+  
+  def download(url: String, renameOpt: Option[String] = None): Unit = {
+    val cacheName = java.util.Base64.getEncoder().encodeToString(url.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+    val cachePath = os.Path(System.getenv("LOCALAPPDATA")) / "Temp" / "automod" / cacheName
+    val dest = renameOpt match {
+      case Some(name) => toolsDir / name
+      case _ => toolsDir / url.substring(url.lastIndexOf('/') + 1)
+    }
+    if (!os.exists(cachePath)) {
+      os.makeDir.all(cachePath / os.up)
+      os.proc("curl", "-JLo", cachePath, url).call(cwd = toolsDir, stdout = os.Inherit, stderr = os.Inherit)
+    }
+    os.copy.over(cachePath, dest)
+  }
+
+  os.makeDir.all(toolsDir)
+
   if (!os.exists(retocExe)) {
     setup = false
-    println(s"Please wait while setting up retoc v$retocVersion in $workingDir ...")
-    os.proc("curl", "-JLO", retocUrl).call(cwd = workingDir)
-    os.proc("tar", "-xf", retocZip).call(cwd = workingDir)
-    os.remove.all(workingDir / retocZip)
-    os.move(workingDir / "LICENSE", workingDir / "retoc-LICENSE")
-    os.move(workingDir / "README.md", workingDir / "retoc-README.md")
+    println(s"Setting up retoc v$retocVersion in $toolsDir ...")
+    download(retocUrl)
+    os.proc("tar", "-xf", retocZip).call(cwd = toolsDir)
+    os.remove.all(toolsDir / retocZip)
+    os.move(toolsDir / "LICENSE", toolsDir / "retoc-LICENSE")
+    os.move(toolsDir / "README.md", toolsDir / "retoc-README.md")
     println()
   }
 
   if (!os.exists(uassetGuiExe)) {
     setup = false
-    println(s"Please wait while setting up UAssetGUI v$uassetGuiVersion in $workingDir ...")
-    os.proc("curl", "-JLO", uassetGuiUrl).call(cwd = workingDir)
+    println(s"Setting up UAssetGUI v$uassetGuiVersion in $toolsDir ...")
+    download(uassetGuiUrl)
     println()
   }
 
-  if (!os.exists(workingDir / usmapFilename)) {
+  if (!os.exists(toolsDir / usmapFilename)) {
     setup = false
-    println(s"Please wait while setting up $usmapFilename in $workingDir ...")
-    os.proc("curl", "-JLO", usmapUrl).call(cwd = workingDir)
+    println(s"Setting up $usmapFilename in $toolsDir ...")
+    download(usmapUrl)
     println()
 
-    val src = workingDir / usmapFilename
+    val src = toolsDir / usmapFilename
     val dest = uassetGuiMappingsDir / usmapFilename
     if (!os.exists(dest)) {
       os.makeDir.all(uassetGuiMappingsDir)
@@ -163,17 +225,17 @@ def setupModTools(): Boolean = {
   if (!os.exists(fmodelExe)) {
     setup = false
     val fmodelZip = s"${fmodelExe.last}.zip"
-    println(s"Please wait while setting up FModel @$fmodelShortSha in $workingDir ...")
-    os.proc("curl", "-JLo", fmodelZip, fmodelUrl).call(cwd = workingDir)
-    os.proc("tar", "-xf", fmodelZip).call(cwd = workingDir)
-    os.remove.all(workingDir / fmodelZip)
+    println(s"Setting up FModel @$fmodelShortSha in $toolsDir ...")
+    download(fmodelUrl, Some(fmodelZip))
+    os.proc("tar", "-xf", fmodelZip).call(cwd = toolsDir)
+    os.remove.all(toolsDir / fmodelZip)
     println()
   }
 
   if (!os.exists(jdExe)) {
     setup = false
-    println(s"Please wait while setting up jd v$jdVersion in $workingDir ...")
-    os.proc("curl", "-JLo", jdExe.last, jdUrl).call(cwd = workingDir)
+    println(s"Setting up jd v$jdVersion in $toolsDir ...")
+    download(jdUrl, Some(jdExe.last))
     println()
   }
 
@@ -189,14 +251,21 @@ def setupModTools(): Boolean = {
 
 def toJsonNode(content: String): JsonNode = new ObjectMapper().readTree(content)
 
-def jdDataTableFilePatches(path: os.Path): UAssetDataPatches = {
+def jdDataTableFilePatches(path: os.Path)(err: Vector[String] => Unit = 
+  msgs => if (msgs.nonEmpty) exit(-1, 
+    s"""Error when loading $path:
+       |${msgs.mkString(util.Properties.lineSeparator)}""".stripMargin)): UAssetPropertyChanges = {
   val entryPathPrefix = """@ [0,"Rows","""
-  var map: UAssetDataPatches = TreeMap.empty
+  var map: UAssetPropertyChanges = TreeMap.empty
   val lines = os.read(path).trim.replace("\r", "").split('\n').map(_.trim)
+  var errors = Vector[String]()
   val grouped = {
     var r = Vector.empty[Vector[String]]
     var i = 0
-    def unrecognized(): Unit = exit(-1, s"Unsupported patch form at line $i: ${lines(i)}")
+    def unrecognized(): Unit = {
+      errors = errors :+ s"* Unsupported patch form at line $i: ${lines(i)}"
+      while (i < lines.length && lines(i).head != '@') i += 1
+    }
     while (i < lines.length) {
       if (lines(i).startsWith(entryPathPrefix) && i + 1 < lines.length) {
         if (lines(i + 1).startsWith("- ")) {
@@ -220,7 +289,7 @@ def jdDataTableFilePatches(path: os.Path): UAssetDataPatches = {
           i += 2
         }
       } else {
-        exit(-1, s"Unsupported patch form at line $i: ${lines(i)}")
+        unrecognized()
       }
     }
     r
@@ -236,34 +305,29 @@ def jdDataTableFilePatches(path: os.Path): UAssetDataPatches = {
           var property = p
           name = name.substring(1, name.length - 1)
           property = property.substring(1, property.length - 1)
-          val oldValue = toJsonNode(
-            if (oldValueText.contains("::")) "\"" + oldValueText.substring(oldValueText.lastIndexOf("::") + 2)
-            else oldValueText).toPrettyString
+          val oldValue = toJsonNode(oldValueText)
           newValueTextOpt match {
             case Some(newValueText) =>
-              val value =
-                if (newValueText.contains("::")) "\"" + newValueText.substring(newValueText.lastIndexOf("::") + 2)
-                else newValueText
+              val value = newValueText
               val json = toJsonNode(value)
               if (json.isObject || json.isArray) {
                 ok = false
               } else {
-                map = map + (name -> (map.getOrElse(name, TreeMap.empty: DataTablePropertyChanges) +
-                  (property -> ValuePair(Some(json.toPrettyString), Some(oldValue)))))
+                map = map + (name -> (map.getOrElse(name, TreeMap.empty: PropertyChanges) +
+                  (property -> ValuePair(Some(json), Some(oldValue)))))
               }
             case _ =>
-              map = map + (name -> (map.getOrElse(name, TreeMap.empty: DataTablePropertyChanges) +
-                (property -> ValuePair(None, Some(oldValueText)))))
+              map = map + (name -> (map.getOrElse(name, TreeMap.empty: PropertyChanges) +
+                (property -> ValuePair(None, Some(oldValue)))))
           }
         case Array(n) if mode == "-" =>
           ok = true
           var name = n
           name = name.substring(1, name.length - 1)
           val oldObj = toJsonNode(oldValueText).asInstanceOf[ObjectNode]
-          var m: DataTablePropertyChanges = TreeMap.empty
-          import scala.jdk.CollectionConverters._
+          var m: PropertyChanges = TreeMap.empty
           for (fieldName <- oldObj.fieldNames.asScala) {
-            val oldValue = oldObj.get(fieldName).toPrettyString
+            val oldValue = oldObj.get(fieldName)
             m = m + (fieldName -> ValuePair(None, Some(oldValue)))
           }
           map = map + (name -> m)
@@ -272,10 +336,9 @@ def jdDataTableFilePatches(path: os.Path): UAssetDataPatches = {
           var name = n
           name = name.substring(1, name.length - 1)
           val newObjObj = toJsonNode(oldValueText).asInstanceOf[ObjectNode]
-          var m: DataTablePropertyChanges = TreeMap.empty
-          import scala.jdk.CollectionConverters._
+          var m: PropertyChanges = TreeMap.empty
           for (fieldName <- newObjObj.fieldNames.asScala) {
-            val newValue = newObjObj.get(fieldName).toPrettyString
+            val newValue = newObjObj.get(fieldName)
             m = m + (fieldName -> ValuePair(Some(newValue), None))
           }
           map = map + (name -> m)
@@ -294,28 +357,44 @@ def jdDataTableFilePatches(path: os.Path): UAssetDataPatches = {
     }
   }
 
+  if (errors.nonEmpty) err(errors)
   map
 }
 
-def tomlDataTableFilePatches(path: os.Path): UAssetDataPatches = {
+def tomlDataTableFilePatches(path: os.Path): UAssetPropertyChanges = {
   val toml: JMap[String, JMap[String, Object]] =
     new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, JMap[String, Object]]] {})
-  import scala.jdk.CollectionConverters._
-  var map: UAssetDataPatches = TreeMap.empty
+  var map: UAssetPropertyChanges = TreeMap.empty
   for (name <- toml.keySet.asScala) {
-    var m: DataTablePropertyChanges = TreeMap.empty
+    var m: PropertyChanges = TreeMap.empty
     val properties = toml.get(name)
     for (property <- properties.keySet.asScala) {
-      val value = properties.get(property)
-      def add(value: String): Unit = 
-        m = m + (property -> ValuePair(if (value.isEmpty) None else Some(value), None))
-      value match {
-        case value: java.lang.Boolean => add(BooleanNode.valueOf(value.booleanValue).toPrettyString)
-        case value: java.lang.Integer => add(IntNode.valueOf(value.intValue).toPrettyString)
-        case value: java.math.BigDecimal => add(DoubleNode.valueOf(value.doubleValue).toPrettyString)
-        case value: String => add(TextNode.valueOf(value).toPrettyString)
-        case _ => exit(-1, s"Unsupported property value form for $name/$property (${value.getClass}): $value")
+      def add(value: JsonNode): Unit = m = m + (property -> ValuePair(Some(value), None))
+      def valueOf(value: Object): JsonNode = value match {
+        case value: java.lang.Boolean => BooleanNode.valueOf(value.booleanValue)
+        case value: java.lang.Integer => IntNode.valueOf(value.intValue)
+        case value: java.math.BigDecimal => DoubleNode.valueOf(value.doubleValue)
+        case value: String => if (value == "null") null else TextNode.valueOf(value)
       }
+      def rec(value: Object): JsonNode = {
+        value match {
+          case _: java.lang.Boolean | _: java.lang.Integer | _: java.math.BigDecimal | _: String => valueOf(value)
+          case value: java.util.Map[_, _] =>
+            val r = JsonNodeFactory.instance.objectNode
+            for ((k, v) <- value.asScala) {
+              r.set(k.toString, rec(v.asInstanceOf[Object]))
+            }
+            r
+          case value: java.util.ArrayList[_] => 
+            val r = JsonNodeFactory.instance.arrayNode
+            for (e <- value.asScala) {
+              r.add(rec(e.asInstanceOf[Object]))
+            }
+            r
+          case _ => exit(-1, s"Unsupported property value form for $name/$property (${value.getClass}): $value")
+        }
+      }
+      add(rec(properties.get(property)))
     }
     map = map + (name -> m)
   }
@@ -323,29 +402,31 @@ def tomlDataTableFilePatches(path: os.Path): UAssetDataPatches = {
 }
 
 var _patches: DataTableFilePatches = null
+
+def applyChanges(map: DataTableFilePatches, uassetName: String, data: UAssetPropertyChanges): DataTableFilePatches = {
+  var m = map.getOrElse(uassetName, TreeMap.empty: UAssetPropertyChanges)
+  for ((name, properties) <- data) {
+    var m2 = m.getOrElse(name, TreeMap.empty: PropertyChanges)
+    for ((property, valuePair) <- properties) {
+      val valueString = toJsonPrettyString(valuePair.newValueOpt)
+      val oldValueOpt = m2.get(property) match {
+        case Some(v) =>
+          println(s"* $name/$property: ${toJsonPrettyString(v.newValueOpt)} => $valueString")
+          v.newValueOpt
+        case _ =>
+          println(s"* $name/$property: $valueString")
+          None
+      }
+      m2 = m2 + (property -> ValuePair(valuePair.newValueOpt, oldValueOpt))
+    }
+    m = m + (name -> m2)
+  }
+  map + (uassetName -> m)
+}
+
 def updatePatches(): Unit = {
   var map: DataTableFilePatches = if (_patches == null) TreeMap.empty else _patches
 
-  def add(uassetName: String, data: UAssetDataPatches): Unit = {
-    var m = map.getOrElse(uassetName, TreeMap.empty: UAssetDataPatches)
-    for ((name, properties) <- data) {
-      var m2 = m.getOrElse(name, TreeMap.empty: DataTablePropertyChanges)
-      for ((property, valuePair) <- properties) {
-        val valueString = toJsonPrettyString(valuePair.newValueOpt)
-        val oldValueOpt = m2.get(property) match {
-          case Some(v) =>
-            println(s"* $name/$property: ${toJsonPrettyString(v.newValueOpt)} => $valueString")
-            v.newValueOpt
-          case _ =>
-            println(s"* $name/$property: $valueString")
-            None
-        }
-        m2 = m2 + (property -> ValuePair(valuePair.newValueOpt, oldValueOpt))
-      }
-      m = m + (name -> m2)
-    }
-    map = map + (uassetName -> m)
-  }
   def rec(path: os.Path): Unit =   {
     if (path.last.headOption == Some('.')) {
       println(s"Ignoring $path ...")
@@ -369,12 +450,12 @@ def updatePatches(): Unit = {
             case "patch" =>
               println(s"Loading $p ...")
               val uassetName = p.baseName
-              add(uassetName, jdDataTableFilePatches(p))
+              map = applyChanges(map, uassetName, jdDataTableFilePatches(p)())
               println()
             case "toml" =>
               println(s"Loading $p ...")
               val uassetName = p.baseName
-              add(uassetName, tomlDataTableFilePatches(p))
+              map = applyChanges(map, uassetName, tomlDataTableFilePatches(p))
               println()
             case _ =>
           }
@@ -398,108 +479,63 @@ def readJson(path: os.Path): JsonNode = new ObjectMapper().readTree(path.toIO)
 
 def writeJson(path: os.Path, node: JsonNode): Unit = objectWriter.writeValue(path.toIO, node)
 
-case class UAssetApiDataObject(uassetName: String, value: JsonNode, addToDataTableFilePatches: Boolean) {
-  def obj(objName: String): ObjectNode = {
-    val values = value.get("Value").asInstanceOf[ArrayNode]
-    for (j <- 0 until values.size) {
-      val element = values.get(j).asInstanceOf[ObjectNode]
-      if (element.get("Name").asText == objName) {
-        return element
-      }
-    }
-    val r = toJsonNode(
-      s"""{
-         |  "$$type": "UAssetAPI.PropertyTypes.Structs.StructPropertyData, UAssetAPI",
-         |  "StructType": "SB${uassetName}Property",
-         |  "SerializeNone": true,
-         |  "StructGUID": "{00000000-0000-0000-0000-000000000000}",
-         |  "SerializationControl": "NoExtension",
-         |  "Operation": "None",
-         |  "Name": "$objName",
-         |  "ArrayIndex": 0,
-         |  "IsZero": false,
-         |  "PropertyTagFlags": "None",
-         |  "PropertyTagExtensions": "NoExtension",
-         |  "Value": []
-         |}""".stripMargin
-    ).asInstanceOf[ObjectNode]
-    values.add(r)
-    r
-  }
-  def setJson(property: String, value: JsonNode): Option[JsonNode] = {
-    val rOpt = Option(obj(property).replace("Value", value))
-    val rStringOpt = rOpt.map(_.toPrettyString)
-    val valueStringOpt = Option(value).map(_.toPrettyString)
-    println(s"* $name/$property: ${rStringOpt.getOrElse("")} => ${valueStringOpt.getOrElse("")}")
-    if (addToDataTableFilePatches) {
-      var map = _patches.getOrElse(uassetName, TreeMap.empty: UAssetDataPatches)
-      var m = map.getOrElse(name, TreeMap.empty: DataTablePropertyChanges)
-      m = m + (property -> ValuePair(valueStringOpt, rStringOpt))
-      map = map + (name -> m)
-      _patches = _patches + (uassetName -> map)
-    }
-    rOpt
-  }
-  
-  def set(name: String, value: Boolean): Boolean = setJson(name, BooleanNode.valueOf(value)).map(_.asBoolean).getOrElse(false)
-  def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).map(_.asInt).getOrElse(0)
-  def set(name: String, value: Double): Double = setJson(name, DoubleNode.valueOf(value)).map(_.asDouble).getOrElse(0d)
-  def set(name: String, value: String): String = setJson(name, TextNode.valueOf(value)).map(_.asText).orNull
+def toJsonPrettyString(valueOpt: Option[JsonNode], default: String = ""): String =
+  valueOpt.map(_.toPrettyString).getOrElse(default)
 
-  def update(name: String, value: Boolean): Boolean = set(name, value)
-  def update(name: String, value: Int): Int = set(name, value)
-  def update(name: String, value: Double): Double = set(name, value)
-  def update(name: String, value: String): String = set(name, value)
-
-  def name: String = value.get("Name").asText
-  def getJson(name: String): JsonNode = obj(name).get("Value")
-  
-  def getBoolean(name: String): Boolean = getJson(name).asBoolean
-  def getInt(name: String): Int = getJson(name).asInt
-  def getDouble(name: String): Double = getJson(name).asDouble
-  def getString(name: String): String = getJson(name).asText
-
-  def apply[T: TypeTag](name: String): T = typeOf[T] match {
-    case t if t =:= typeOf[Boolean] => getBoolean(name).asInstanceOf[T]
-    case t if t =:= typeOf[Int] => getInt(name).asInstanceOf[T]
-    case t if t =:= typeOf[Double] => getDouble(name).asInstanceOf[T]
-    case t if t =:= typeOf[String] => getString(name).asInstanceOf[T]
-  }
-}
-
-def toJsonPrettyString(valueOpt: Option[String], default: String = "") =
-  valueOpt.map(toJsonNode).map(_.toPrettyString).getOrElse(default)
-
-def patchFromTree(uassetName: String, data: ArrayNode)(tree: UAssetDataPatches): Unit = {
+def patchFromTree(uassetName: String, data: ArrayNode)(tree: UAssetPropertyChanges): Unit = {
+  var seenObjectNames = scala.collection.mutable.HashSet.empty[String]
   for (i <- 0 until data.size) {
-    val obj = UAssetApiDataObject(uassetName, data.get(i), addToDataTableFilePatches = false)
+    val obj = UAssetApi.DataObject(uassetName, data.get(i), addToDataTableFilePatches = false)
     tree.get(obj.name) match {
       case Some(properties) =>
         for ((property, valueOldValuePair) <- properties) {
-          obj.setJson(property, valueOldValuePair.newValueOpt.map(toJsonNode).orNull)
+          obj.setJson(property, valueOldValuePair.newValueOpt.orNull)
         }
       case _ =>
     }
+    seenObjectNames.add(obj.name)
+  }
+
+  val structName = s"${config.game.contentPaks.substring(0, config.game.contentPaks.indexOf('/'))}${uassetName}Property"
+  for ((objName, properties) <- tree if !seenObjectNames.contains(objName)) {
+    val obj = UAssetApi.newStruct(structName, objName)
+    val values = obj.get("Value").asInstanceOf[ArrayNode]
+    for ((property, valueOldValuePair) <- properties) {
+      val value = valueOldValuePair.newValueOpt.orNull
+      values.add(UAssetApi.newData(Vector(objName, property), property, value))
+    }
+    data.add(obj)
   }
 }
 
 def patchDataTable(addToDataTableFilePatches: Boolean, name: String, file: os.Path, ast: JsonNode, 
-                   fOpt: Option[UAssetApiDataObject => Unit]): Unit = {
-  println(s"Patching $file ...")
-  val data = ast.at("/Exports/0/Table/Data").asInstanceOf[ArrayNode]
-  for (i <- 0 until data.size) {
-    fOpt.foreach(_(UAssetApiDataObject(name, data.get(i), addToDataTableFilePatches)))
+                   fOpt: Option[UAssetApi.DataObject => Unit], disableCodePatching: Boolean): Unit = {
+  if (disableCodePatching) {
+    patches.get(name) match {
+      case Some(tree) => 
+        println(s"Patching $file ...")
+        val data = ast.at("/Exports/0/Table/Data").asInstanceOf[ArrayNode]
+        patchFromTree(name, data)(tree)
+        writeJson(file, ast)
+        println()
+      case _ =>
+    }
+  } else {
+    println(s"Patching $file ...")
+    val data = ast.at("/Exports/0/Table/Data").asInstanceOf[ArrayNode]
+    for (i <- 0 until data.size) {
+      fOpt.foreach(_(UAssetApi.DataObject(name, data.get(i), addToDataTableFilePatches)))
+    }
+    patches.get(name).foreach(patchFromTree(name, data))
+    writeJson(file, ast)
+    println()
   }
-  patches.get(name).foreach(patchFromTree(name, data))
-  writeJson(file, ast)
-  println()
 }
 
-def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () => {
-  val modDirOpt = modNameOpt.map(workingDir / _)
-  val output = workingDir / "out"
+def generateMod(modNameOpt: Option[String], sbPakDir: os.Path, disableCodePatching: Boolean): () => Unit = () => {
   val cacheDir = workingDir / ".cache"
   val cacheKey = cacheDir / "key.properties"
+  val output = workingDir / "out"
 
   def computeCacheKey(): String = {
     if (!os.exists(sbPakDir)) return ""
@@ -516,6 +552,10 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     os.remove.all(dir)
     os.makeDir.all(dir)
   }
+
+  val cwd = workingDir / ".temp"
+  recreateDir(cwd)
+  val modDirOpt = modNameOpt.map(cwd / _)
 
   val cacheHit = {
     val key = computeCacheKey()
@@ -538,7 +578,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
 
   def unpackDataTableJson(name: String): os.Path = {
     val json = s"$name.json"
-    val r = workingDir / json
+    val r = cwd / json
     val jsonCache = cacheDir / json
 
     if (cacheHit && os.exists(jsonCache)) {
@@ -555,7 +595,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
 
     println(s"Extracting $uasset ...")
     val pRetoc = os.proc(retoc("to-legacy", "--no-parallel", "--version", ueVersionCode, "--filter", uasset.last, sbPakDir, output))
-    if (pRetoc.call(check = false, cwd = workingDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
+    if (pRetoc.call(check = false, cwd = cwd, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
       exit(-1, 
         s"""Failed to use retoc to extract ${uasset.last} with the following command:
            |
@@ -567,7 +607,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
 
     println(s"Converting to $r ...")
     val pUassetGui = os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersionCode", usmap)
-    if (pUassetGui.call(check = false, cwd = workingDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
+    if (pUassetGui.call(check = false, cwd = cwd, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
       exit(-1, 
         s"""Failed to use UAssetGUI to convert $uasset to JSON with the following command:
            |
@@ -587,7 +627,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
 
     println(s"Regenerating $uasset ...")
     val pUassetGui = os.proc(uassetGuiExe, "fromjson", path, uasset, usmap)
-    if (pUassetGui.call(cwd = workingDir).exitCode != 0) {
+    if (pUassetGui.call(check = false, cwd = cwd, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
       exit(-1, 
         s"""Failed to use UAssetGUI to convert $uasset from JSON with the following command:
            |
@@ -609,7 +649,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     val utoc = modDir / s"${modName}_P.utoc"
     println(s"Converting to $utoc ...")
     val pRetoc = os.proc(retoc("to-zen", "--no-parallel", "--version", ueVersionCode, output, utoc))
-    if (pRetoc.call(check = false, cwd = workingDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
+    if (pRetoc.call(check = false, cwd = cwd, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) {
       exit(-1, 
         s"""Failed to use retoc to pack $modName with the following command:
            |
@@ -618,7 +658,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     println()
 
     println(s"Archiving $zip ...")
-    os.proc("tar", "-acf", zip.last, modName).call(cwd = workingDir)
+    os.proc("tar", "-acf", zip, modName).call(cwd = cwd)
     println()
 
     zip
@@ -627,26 +667,28 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
 
   def isStellarBlade(game: Game): Boolean = {
     val default = new Game
-    default.contentPaks == game.contentPaks && default.unrealEngine == game.unrealEngine
+    default.contentPaks == game.contentPaks && default.unrealEngine == game.unrealEngine && game.aesKey.isEmpty
   }
 
   var dataTableCodePatches: DataTableCodePatches = TreeMap.empty
-  if (isStellarBlade(config.game)) dataTableCodePatches = dataTableCodePatches ++ patchSB.patches // comment in this line to disable modding via code
+  if (!disableCodePatching) {
+    if (isStellarBlade(config.game)) dataTableCodePatches = dataTableCodePatches ++ patchSB.patches
+  }
 
   val shouldPack = modNameOpt.nonEmpty
-  val uassetNames = TreeSet.empty[String] ++ dataTableCodePatches.keys ++ patches.keys
+  val uassetNames = TreeSet.empty[String] ++ dataTableCodePatches.keys ++ patches.keys ++ (if (disableCodePatching) Vector() else patchCustom.uassetNames)
   val dataTableJsonMap = Map.empty[String, os.Path] ++ (for (uassetName <- uassetNames) yield (uassetName, unpackDataTableJson(uassetName)))
 
   var messageOpt: Option[String] = None 
   var skippedUassets = TreeSet.empty[String]
 
-  def insertYourAdditionalPatchingCodeHere(uassetName: String)(implicit line: sourcecode.Line, file: sourcecode.File): Unit = {
+  def skipUasset(uassetName: String): Unit = {
     skippedUassets = skippedUassets + uassetName
     if (messageOpt.isEmpty) {
       messageOpt = Some(
         s"""
            |This script requires additional advanced patching code to handle the skipped files.
-           |You can insert your own patching code at line ${line.value - 5} (or search for this message) in sbmod.sc
+           |You can insert your own patching code in patchCustom.sc
            |""".stripMargin)
     }
   }
@@ -654,11 +696,16 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
   for (uassetName <- uassetNames) {
     val file = dataTableJsonMap(uassetName)
     val ast = readJson(file)
-    ast.at(dataTablePath) match {
-      case _: ArrayNode => patchDataTable(!shouldPack, uassetName, file, ast, dataTableCodePatches.get(uassetName))
-      case _ =>
-        insertYourAdditionalPatchingCodeHere(uassetName)
-    }    
+    var custom = true
+    if (!patchCustom.uassetNames.contains(uassetName)) {
+      ast.at(dataTablePath) match {
+        case _: ArrayNode =>
+          custom = false 
+          patchDataTable(!shouldPack, uassetName, file, ast, dataTableCodePatches.get(uassetName), disableCodePatching)
+        case _ =>
+      }
+    }
+    if (custom && !patchCustom.patch(uassetName, ast, patches.get(uassetName))) skipUasset(uassetName)
   }
 
   modNameOpt match {
@@ -677,7 +724,10 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
   }
 
   if (skippedUassets.nonEmpty) println(s"The following .uassets were skipped: ${skippedUassets.mkString(", ")}")
-  messageOpt.foreach(println)
+  messageOpt match {
+    case Some(msg) => exit(-1, msg)
+    case _ =>
+  }
 }
 
 def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
@@ -700,7 +750,7 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
 
 def code(path: os.Path): Unit = {
   val map = path.ext match {
-    case "patch" => jdDataTableFilePatches(path)
+    case "patch" => jdDataTableFilePatches(path)()
     case "toml" => tomlDataTableFilePatches(path)
   } 
 
@@ -709,7 +759,7 @@ def code(path: os.Path): Unit = {
     if (i >= 0) path.last.substring(0, i) else path.last
   }
   var lines = Vector(
-    s"def patch$name(obj: UAssetApiDataObject): Unit = {",
+    s"def patch$name(obj: UAssetApi.DataObject): Unit = {",
     "  val name = obj.name",
     "  name match {"
   )
@@ -728,7 +778,20 @@ def code(path: os.Path): Unit = {
   println(lines.mkString(util.Properties.lineSeparator))
 }
 
-def writeToml(old: Boolean, path: os.Path, data: UAssetDataPatches): Unit = {
+def tomlString(valueOpt: Option[JsonNode], default: String): String = valueOpt match {
+  case Some(value: ObjectNode) =>
+    var elements = Vector[String]()
+    for (fieldName <- value.fieldNames.asScala) elements :+= s"$fieldName = ${tomlString(Option(value.get(fieldName)), default)}"
+    s"{ ${elements.mkString(", ")} }"
+  case Some(value: ArrayNode) =>
+    var elements = Vector[String]()
+    for (i <- 0 until value.size) elements :+= tomlString(Option(value.get(i)), default)
+    s"[ ${elements.mkString(", ")} ]"
+  case Some(_) => toJsonPrettyString(valueOpt, default)
+  case None => default
+}
+
+def writeToml(old: Boolean, path: os.Path, data: UAssetPropertyChanges): Unit = {
   val oldValueColumn = 61
   os.remove.all(path)
   val sep = util.Properties.lineSeparator
@@ -736,20 +799,16 @@ def writeToml(old: Boolean, path: os.Path, data: UAssetDataPatches): Unit = {
   for ((name, properties) <- data) {
     os.write.append(path, s"[$name]$sep")
     for ((property, valuePair) <- properties) {
-      val v = toJsonPrettyString(valuePair.newValueOpt, default = "\"\"")
-      if (v(0) == '[' || v(0) == '{') {
-        exit(-1, s"Unsupported TOML patch form for $name/$property: $v")
+      val v = tomlString(valuePair.newValueOpt, default = "\"null\"")
+      val comment = tomlString(valuePair.oldValueOpt, default = "N/A")
+      var line = s"$property = $v"
+      if (old) {
+        if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString} # $comment$sep"
+        else line = s"$line    # $comment$sep"
       } else {
-        val comment = toJsonPrettyString(valuePair.oldValueOpt, default = "N/A")
-        var line = s"$property = $v"
-        if (old) {
-          if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString} # $comment$sep"
-          else line = s"$line    # $comment$sep"
-        } else {
-          line = s"$line$sep"
-        }
-        os.write.append(path, line)
+        line = s"$line$sep"
       }
+      os.write.append(path, line)
     }
     os.write.append(path, sep)
   }
@@ -763,7 +822,7 @@ def toml(sbPakDirOpt: Option[os.Path], path: os.Path)(): Unit = {
 
   sbPakDirOpt match {
     case Some(sbPakDir) =>
-      generateMod(None, sbPakDir)()
+      generateMod(None, sbPakDir, disableCodePatching = false)()
       updatePatches()
     case _ =>
   }
@@ -778,6 +837,8 @@ def toml(sbPakDirOpt: Option[os.Path], path: os.Path)(): Unit = {
 }
 
 def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
+  var errors = Vector[String]()
+
   def rec(f: os.Path, t: os.Path): Unit = {
     if (os.isFile(f) && os.isFile(t) && f.ext.toLowerCase == "json" && t.ext.toLowerCase == "json") {
       val patch = out / s"${f.baseName}.patch"
@@ -787,7 +848,9 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
           println("No changes found")
         case 1 =>
           println(s"Wrote $patch")
-          writeToml(old = true, out / s"${f.baseName}.toml", jdDataTableFilePatches(patch))
+          writeToml(old = true, out / s"${f.baseName}.toml", jdDataTableFilePatches(patch)(msgs => 
+            errors :+= s"""* $patch
+                          |${msgs.map("  " + _).mkString(util.Properties.lineSeparator)}""".stripMargin))
         case code => exit(code, s"Error occurred when running jd")
       }
       println()
@@ -803,12 +866,16 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
   os.makeDir.all(out)
   rec(from, to)
   println()
+
+  if (errors.nonEmpty) exit(-1, 
+    s"""|The following patches were skipped:
+        |${errors.mkString(util.Properties.lineSeparator)}""".stripMargin)
 }
 
 def vscode(vscOpt: Option[os.Path]): Unit = {
   def setup(cmd: os.Path): Unit = {
     val name = if (cmd.last == "code.cmd") "VSCode"  else "VSCodium"
-    println(s"Please wait while setting up ${absPath(cmd / os.up /  os.up)} ...")
+    println(s"Setting up ${absPath(cmd / os.up /  os.up)} ...")
     println()
     val extensions = Vector(
       "scalameta.metals", 
@@ -838,14 +905,14 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
   exit(-1, "Could not find a suitable VSCode/VSCodium to install into")
 }
 
-def demo(isAIO: Boolean, gameDir: os.Path): Unit = {
+def demo(isAIO: Boolean, isBase: Boolean, gameDir: os.Path): Unit = {
   def execute(p: os.proc): Unit = {
     println(s"Executing: ${p.commandChunks.mkString(" ")} ...")
     println()
     if (p.call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) exit(-1)
   }
 
-  val modName = if (isAIO) "all-in-one" else "beta-burst-recovery-scan"
+  val modName = if (isAIO) if (isBase) "base-all-in-one" else "all-in-one" else "beta-burst-recovery-scan"
 
   val aio = workingDir / "patches" / "all-in-one-code-patches-unified"
   if (isAIO) {
@@ -854,6 +921,15 @@ def demo(isAIO: Boolean, gameDir: os.Path): Unit = {
     os.remove.all(aio)
     println()
     execute(os.proc("xcopy", "/e", s"$dotAIO\\", s"$aio\\"))
+    if (isBase) {
+      def base: os.Path = {
+        for (p <- os.list(workingDir / "patches" / ".all-in-one-patches") if p.last.contains("1329") && os.exists(p / ".base")) 
+          return p / ".base"
+        exit(-1, s"Could not find the .base patch")
+      }
+      println()
+      execute(os.proc("xcopy", "/e", s"$base\\", s"$aio\\base\\"))
+    }
   }
 
   try {
@@ -871,9 +947,9 @@ def printUsage(): Unit = {
   exit(0,
     s"""$header
        |
-       |Usage: automod [ <mod-name> <path-to-game>
+       |Usage: automod [ <mod-name> <path-to-game> [ $noCodePatching ]
        |               | .code <path-to-jd-patch-file>
-       |               | .demo[.aio] <path-to-StellarBlade>
+       |               | .demo[.aio[.base]] <path-to-StellarBlade>
        |               | .diff[.into] <from-path> <to-path> <out-path>
        |               | .setup[.vscode [ <path-to-vscode> ]]
        |               | .toml[.all <path-to-game>] <out-path>
@@ -881,7 +957,8 @@ def printUsage(): Unit = {
        |
        |  .code            Print Auto Modding Script patching code from a jd/TOML patch file
        |  .demo            Generate the beta-burst-recovery-scan demo mod
-       |  .demo.aio        Generate the aio demo mod
+       |  .demo.aio        Generate the all-in-one demo mod for NG+
+       |  .demo.aio.base   Generate the all-in-one demo mod for the base game
        |  .diff            Recursively diff JSON files and write jd and TOML patch files
        |  .diff.into       Use .diff between <from-path> with each sub-folder of <to-path>
        |  .setup           Only set up modding tools
@@ -899,6 +976,7 @@ def run(): Unit = {
     case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
     case ".toml.all" => if (cliArgs.length != 3) printUsage()
     case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
+    case _ if argName.head != '.' =>  if (!(cliArgs.length == 2 || cliArgs.length == 3 && cliArgs(2) == noCodePatching)) printUsage()
     case _ => if (cliArgs.length != 2) printUsage()
   }
   
@@ -906,8 +984,9 @@ def run(): Unit = {
 
   argName match {
     case ".code" => code(absPath(cliArgs(1)))
-    case ".demo" => demo(isAIO = false, absPath(cliArgs(1)))
-    case ".demo.aio" => demo(isAIO = true, absPath(cliArgs(1)))
+    case ".demo" => demo(isAIO = false, isBase = false, absPath(cliArgs(1)))
+    case ".demo.aio" => demo(isAIO = true, isBase = false, absPath(cliArgs(1)))
+    case ".demo.aio.base" => demo(isAIO = true, isBase = true, absPath(cliArgs(1)))
     case ".diff" => diff(absPath(cliArgs(1)), absPath(cliArgs(2)), absPath(cliArgs(3)))
     case ".diff.into" =>
       val out = absPath(cliArgs(3))
@@ -923,6 +1002,7 @@ def run(): Unit = {
       if (argName.startsWith(".")) exit(-1, s"Unrecognized command $argName")
       val modName = argName
       val gameDir = absPath(cliArgs(1))
+      val disableCodePatching = cliArgs.length == 3
       val sbPakDir = gameDir / os.RelPath(config.game.contentPaks)
       if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
       println(
@@ -933,7 +1013,7 @@ def run(): Unit = {
            |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $usmapFilename
            |* Extra: FModel @$fmodelShortSha
            |""".stripMargin)
-      setUAssetGUIConfigAndRun(generateMod(Some(modName), sbPakDir))
+      setUAssetGUIConfigAndRun(generateMod(Some(modName), sbPakDir, disableCodePatching))
   }
   println("... done!")
 }

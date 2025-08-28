@@ -1,0 +1,66 @@
+# ...                                                        # Old Value
+[P_Eve_Fusion_Lockon_Evade1_1]
+JustActionTime = 0.2                                         # 0.2
+JustActionTime_StoryMode = 0.3                               # 0.3
+
+[P_Eve_Fusion_Normal_Evade1_1]
+JustActionTime = 0.2                                         # 0.2
+JustActionTime_StoryMode = 0.3                               # 0.3
+
+[P_Eve_Fusion_Normal_Guard1_1]
+CoolTime = 0.2                                               # 0.2
+JustActionTime = 0.2                                         # 0.2
+JustActionTime_StoryMode = 0.2                               # 0.2
+
+[P_Eve_Sword_Evade_Evade1_1]
+CoolTime = 0.8                                               # 0.8
+
+[P_Eve_Sword_LockonEvade_Evade1_1]
+CoolTime = 0.8                                               # 0.8
+
+[P_Eve_Sword_Lockon_Evade1_1]
+CoolTime = 0.8                                               # 0.8
+
+[P_Eve_Sword_Lockon_Evade2_1]
+CoolTime = 0.8                                               # 0.8
+JustActionTime = 0.15                                        # 0.15
+JustActionTime_StoryMode = 0.3                               # 0.3
+
+[P_Eve_Sword_Normal_DashAttack1_1]
+CoolTime = 8                                                 # 8
+
+[P_Eve_Sword_Normal_DashAttack3_1]
+CoolTime = 8                                                 # 8
+
+[P_Eve_Sword_Normal_DashAttack4_1]
+CoolTime = 8                                                 # 8
+
+[P_Eve_Sword_Normal_Evade1_1]
+CoolTime = 0.8                                               # 0.8
+
+[P_Eve_Sword_Normal_Evade2_1]
+CoolTime = 0.8                                               # 0.8
+JustActionTime = 0.15                                        # 0.15
+JustActionTime_StoryMode = 0.3                               # 0.3
+
+[P_Eve_Sword_Normal_Guard1_1]
+CoolTime = 0.5                                               # 0.4
+
+[P_Eve_Sword_Normal_Guard2_1]
+CoolTime = 0.5                                               # 0.4
+JustActionTime = 0.15                                        # 0.15
+JustActionTime_StoryMode = 0.2                               # 0.2
+
+[P_Eve_Tachy_Lockon_Evade1_1]
+JustActionTime = 0.2                                         # 0.2
+JustActionTime_StoryMode = 0.3                               # 0.3
+
+[P_Eve_Tachy_Normal_Evade1_1]
+JustActionTime = 0.2                                         # 0.2
+JustActionTime_StoryMode = 0.3                               # 0.3
+
+[P_Eve_Tachy_Normal_Guard1_1]
+CoolTime = 0.2                                               # 0.2
+JustActionTime = 0.2                                         # 0.2
+JustActionTime_StoryMode = 0.2                               # 0.2
+
