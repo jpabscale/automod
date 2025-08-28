@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, NullNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import com.jayway.jsonpath
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
@@ -110,7 +110,14 @@ sealed trait FilteredChanges {
           case Some(`codePrefix`) =>
             val code = v.textValue.substring(codePrefix.length)
             val propertyF = eval[CodeContext => Any](
-              s"""{(v: {
+              s"""{
+                  |import com.fasterxml.jackson.databind.JsonNode
+                  |import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+                  |
+                  |def toJsonNode(content: String): JsonNode = new com.fasterxml.jackson.databind.ObjectMapper().readTree(content)
+                  |def fromJsonNode(node: JsonNode): String = Option(node).map(_.toPrettyString).getOrElse("null")
+                  |
+                  |(v: {
                   |    def objName: String
                   |    def orig[T]: T
                   |    def currentOpt[T]: Option[T]

@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.4.0"
+val header = s"Auto Modding Script v2.4.1"
 
 val dataTablePath = "/Exports/0/Table/Data"
 val noCodePatching = "--no-code-patching"
@@ -707,7 +707,7 @@ def generateMod(modNameOpt: Option[String],
   }
 
   val shouldPack = modNameOpt.nonEmpty
-  var uassetNames = uassetNameRequests ++ dataTableCodePatches.keys
+  var uassetNames = dataTableCodePatches.keySet ++ uassetNameRequests
   if (!disableFilePatching) {
     uassetNames = uassetNames ++ patches.keys
   }

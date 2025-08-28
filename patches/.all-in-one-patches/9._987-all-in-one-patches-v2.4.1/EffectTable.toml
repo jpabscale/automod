@@ -16,7 +16,7 @@ ActiveTargetFilterAlias = 'Self'
 LoopTargetFilterAlias = 'Self'
 
 ['.*: ^Gear_(?!.*_HitDmgUp).*$']                             # or, [ '=> v.startsWith("Gear_") && !v.contains("_HitDmgUp")' ]
-CalculationMultipleValue = 2
+CalculationValue = '=> v.orig[Double] * 2'
 
 ['.*: ^Gear_.*_HitDmgUp.*$']
 CalculationMultipleValue = 0.5
