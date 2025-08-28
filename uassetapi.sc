@@ -21,7 +21,10 @@ def toValue[T](node: JsonNode): Option[T] = {
     case node: BooleanNode => Some(toT(node.booleanValue))
     case node: IntNode => Some(toT(node.doubleValue))
     case node: DoubleNode => Some(toT(node.doubleValue))
-    case node: ArrayNode => Some(toT((for (i <- 0 until node.size) yield toValue[Any](node.get(i)).get).toSeq))
+    case node: ArrayNode => 
+      var builder = Vector.newBuilder[Any]
+      for (i <- 0 until node.size) builder += toValue[Any](node.get(i)).get
+      Some(toT(builder.result()))
     case node: ObjectNode => 
       var r = Map[String, Any]()
       for (property <- node.fieldNames.asScala) {

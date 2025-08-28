@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.9.0"
+val header = s"Auto Modding Script v2.9.1"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
 
@@ -113,6 +113,7 @@ class Game {
   @BeanProperty var unrealEngine: String = "4.26"
   @BeanProperty var mapUri: String = s"${usmapUrlPrefix}StellarBlade_1.3.1.usmap"
   @BeanProperty var aesKey: String = ""
+  @BeanProperty var repakPackOptions: String = ""
   @BeanProperty var zen: Boolean = true
 }
 
@@ -122,6 +123,7 @@ val soaGame = {
   g.contentPaks = "SandsOfAura/Content/Paks"
   g.unrealEngine = "4.25"
   g.mapUri = s"${usmapUrlPrefix}SandsOfAura_1.01.25.usmap"
+  g.repakPackOptions = "--version V11"
   g.zen = false
   g
 }
@@ -306,7 +308,15 @@ val retocPakExe = if (config.game.zen) retocExe else repakExe
 val fmodelExe = toolsDir / "FModel.exe"
 val jdExe = toolsDir / (if (osKind.isWin) "jd.exe" else "jd")
 val zipExe = toolsDir / "7z" / (if (osKind.isWin) "7z.exe" else "7zz")
-
+val repakPackOptions: Seq[os.Shellable] = {
+  val opts = config.game.repakPackOptions.trim
+  if (opts.isEmpty) Vector.empty[os.Shellable]
+  else {
+    var r = Vector.empty[os.Shellable]
+    for (opt <- opts.split(' ') if opt.trim.nonEmpty) r :+= opt
+    r
+  }
+}
 val uassetCliDir = toolsDir / "UAssetCLI"
 val uassetGuiSettingsDir = localAppData / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
@@ -689,22 +699,15 @@ def tomlFilePatches(path: os.Path): UAssetPropertyChanges = {
 var patchesInitialized = false
 private var _patches = emptyFilePatches
 
-val updatedPatches = new ConcurrentHashMap[String, UAssetPropertyChanges]
+val updatedPatches = new ConcurrentHashMap[(String, String, String), JsonNode]
 
 def updatePatch(uassetName: String, objName: String, property: String, valuePair: ValuePair): Unit = {
-  var map = Option(updatedPatches.get(uassetName)).getOrElse(emptyUAssetPropertyChanges)
-  var m = map.getOrElse(objName, emptyPropertyChanges)
-  m = m + (property -> valuePair)
-  map = map + (objName -> m)
-  updatedPatches.put(uassetName, map)
+  val key = (uassetName, objName, property)
+  updatedPatches.put(key, valuePair.newValueOpt.get)
 }
 
 def updatePatches(uassetName: String, objName: String, properties: Iterable[(String, ValuePair)]): Unit = {
-  var map = Option(updatedPatches.get(uassetName)).getOrElse(emptyUAssetPropertyChanges)
-  var m = map.getOrElse(objName, emptyPropertyChanges)
-  m = m ++ properties
-  map = map + (objName -> m)
-  updatedPatches.put(uassetName, map)
+  for ((property, valuePair) <- properties) updatePatch(uassetName, objName, property, valuePair)
 }
 
 def applyChanges(path: String, map: FilePatches, uassetName: String, data: UAssetPropertyChanges): FilePatches = {
@@ -1068,7 +1071,7 @@ def generateMod(addToFilePatches: Boolean,
     val utocPak = modDir / (if (config.game.zen) s"${modName}_P.utoc" else if (modName.head.toString.toIntOption.nonEmpty) s"pakChunk${modName}_P.pak" else s"pakChunk888-${modName}_P.pak")
     println(s"Converting to $utocPak ...")
     val args: Seq[os.Shellable] = if (config.game.zen) retocPak(retocPakExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utocPak)
-                                  else retocPak(retocPakExe, "pack", "--version", "V11", output, utocPak)
+                                  else retocPak(retocPakExe, (Seq[os.Shellable]("pack") ++ repakPackOptions ++ Seq[os.Shellable](output, utocPak)): _*)
     val pRetocPak = os.proc(args: _*)
     if (pRetocPak.call(check = false, cwd = tempDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
       retocPakFailed(s"pack $modName", pRetocPak, tempDir)
@@ -1247,14 +1250,14 @@ def writeToml(path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[Jso
     case _ => null
   }
   os.write.append(path, s"# ... ${(for (_ <- 0 until oldValueColumn - 7) yield ' ').mkString} # Game Original Value$sep")
-  for ((name, properties) <- data if shouldInclude(name)) {
+  for ((name, properties) <- data.toSeq.sortWith((p1, p2) => p1._1 <= p2._1) if shouldInclude(name)) {
     var n = name
     if (!n.forall(c => c.isLetterOrDigit || c == '_')) n = s"'$n'"
     os.write.append(path, s"[$n]$sep")
     val obj = if (objectMap == null) null else objectMap.get(name).orNull
     for ((property, valuePair) <- properties) {
       val v = tomlString(valuePair.newValueOpt, default = "\"null\"")
-      val old = if (obj == null) valuePair.oldValueOpt else Option(obj.getJson(property))
+      val old = if (obj == null) None else Option(obj.getJson(property))
       val comment = tomlString(old, default = "N/A")
       var line = s"$property = $v"
       if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString} # $comment$sep"
@@ -1279,10 +1282,20 @@ def toml(gamePakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boo
 
   os.makeDir.all(path)
   var noPatch = true
-  for (uassetName <- updatedPatches.keys.asScala.toIndexedSeq.sortWith(_ <= _)) {
+
+  var map = TreeMap.empty[String, UAssetPropertyChanges]
+  for (entry <- updatedPatches.entrySet.asScala) {
+    val (uassetName, objName, property) = entry.getKey
+    var m = map.getOrElse(uassetName, emptyUAssetPropertyChanges)
+    var m2 = m.getOrElse(objName, emptyPropertyChanges)
+    m2 += (property -> ValuePair(Some(entry.getValue), None))
+    m += (objName -> m2)
+    map += (uassetName -> m)
+  }
+
+  for ((uassetName, data) <- map) {
     noPatch = false
     val p = path / s"$uassetName.toml"
-    val data = updatedPatches.get(uassetName)
     writeToml(p, data, Some(origMap(uassetName)))
   }
   if (noPatch) println("No patches to write")
@@ -1587,7 +1600,7 @@ def printUsage(): Nothing = {
     s"""$header
        |
        |Usage: automod [-s] [ <mod-name> [ <path-to-game> ] option*
-       |                    | .demo.[sb|soa] [ <path-to-StellarBlade> | <path-to-SandsOfAura> ]
+       |                    | .demo.[sb|soa] [ <path-to-game> ]
        |                    | .diff[.into] <from-path> <to-path> <out-path>
        |                    | .search [ <path-to-game> ] <paths-input>.sam <out-path>
        |                    | .setup[.vscode [ <path-to-vscode> ]]

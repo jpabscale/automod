@@ -54,5 +54,21 @@ NextComboCommandArray = '''=> {
   array +:= (first + ("Value" -> "P_Eve_Sword_JustEvade_DashAttack1_1"))
   array +:= (first + ("Value" -> "P_Eve_Sword_JustEvade_LightAttack1_1"))
   array +:= (first + ("Value" -> "P_Eve_Sword_JustEvade_StrongAttack1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Air_DropAttack1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Air_DropAttack2_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Normal_BackStab1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Normal_BackStab2_1"))
+  array
+}'''
+
+['.*: ^P_Eve_Sword_(Lockon|Normal)_(Evade|Guard)1_1$']
+NextComboCommandArray = '''=> {
+  assert(v.objName != "P_Eve_Sword_Lockon_Guard1_1")
+  var array = v.orig[Seq[Map[String, Any]]]
+  val first = array.head
+  array +:= (first + ("Value" -> "P_Eve_Sword_Air_DropAttack1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Air_DropAttack2_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Normal_BackStab1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_Normal_BackStab2_1"))
   array
 }'''

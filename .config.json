@@ -4,6 +4,7 @@
     "unrealEngine" : "4.26",
     "mapUri" : "https://github.com/jpabscale/UAssetCLI/releases/download/usmap/StellarBlade_1.3.1.usmap",
     "aesKey" : "",
+    "repakPackOptions" : "",
     "zen" : true
   },
   "tools" : {
