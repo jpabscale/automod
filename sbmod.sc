@@ -4,12 +4,15 @@
 //> using dep com.lihaoyi::os-lib:0.11.4
 
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, ObjectWriter}
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, ObjectNode, TextNode}
 import com.fasterxml.jackson.dataformat.toml.TomlMapper
 import com.fasterxml.jackson.core.`type`.TypeReference
 import java.util.{Map => JMap}
+import scala.beans.BeanProperty
 import scala.collection.immutable.{TreeMap, TreeSet}
+
+val header = s"Stellar Blade Auto Modding Script v2.1.1"
 
 var cliArgs = args
 //cliArgs = Array(".setup")
@@ -22,49 +25,71 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v2.1.0"
-
-def printUsage(): Unit = {
-  exit(0,
-    s"""$header
-       |
-       |Usage: scala-cli sbmod.sc -- [ <mod-name> <path-to-StellarBlade>
-       |                             | .code <path-to-jd-patch-file>
-       |                             | .diff[.into] <from-path> <to-path> <out-path>
-       |                             | .setup[.vscode [ <path-to-vscode> ]]
-       |                             | .toml <out-path>
-       |                             | .toml.all <path-to-StellarBlade> <out-path>
-       |                             ]
-       |
-       |  .code            Print Auto Modding Script patching code from a jd/TOML patch file
-       |  .diff            Recursively diff JSON files and write jd and TOML patch files
-       |  .diff.into       Use .diff between <from-path> with each sub-folder of <to-path>
-       |  .setup           Only set up modding tools
-       |  .setup.vscode    Set up modding tools and VSCode extensions
-       |  .toml            Merge existing patch files in patches as TOML patch files
-       |  .toml.all        Merge script code patches with patch files in patches as TOML""".stripMargin)
+class Game {
+  @BeanProperty var contentPaks: String = "SB/Content/Paks"
+  @BeanProperty var unrealEngine: String = "4.26"
+  @BeanProperty var mapUrl: String = "https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/0eab1b4d7c1b88dea72298f60f6bb871682d3d1f/StellarBlade_1.1.0.usmap"
 }
 
-val retocVersion = "0.1.2"
-val uassetGuiVersion = "1.0.3"
-val fmodelSha = "394bcf356f4c4774ea3edba200bc13b35e4c132c"
+class Tools {
+  @BeanProperty var retoc: String = "0.1.2"
+  @BeanProperty var uassetGui: String = "1.0.3"
+  @BeanProperty var fmodel: String = "394bcf356f4c4774ea3edba200bc13b35e4c132c"
+  @BeanProperty var jd: String = "2.2.3"
+}
+
+class Config {
+  @BeanProperty var game: Game = new Game
+  @BeanProperty var tools: Tools = new Tools
+}
+
+val workingDir = os.pwd
+val configPath = workingDir / ".config.json"
+
+
+def objectWriter: ObjectWriter = {
+  val indenter = new DefaultIndenter("  ", DefaultIndenter.SYS_LF)
+  val printer = new DefaultPrettyPrinter
+  printer.indentObjectsWith(indenter)
+  printer.indentArraysWith(indenter)
+  new ObjectMapper().writer(printer)
+}
+
+def writeConfig(config: Config): Unit = {
+  objectWriter.writeValue(configPath.toIO, config)
+  println(s"Wrote $configPath")
+  println()
+}
+
+val config = {
+  var r = new Config
+  if (os.exists(configPath)) {
+    r = new ObjectMapper().readValue(configPath.toIO, classOf[Config])
+  } else {  
+    writeConfig(r)
+  }
+  r
+}
+
+val retocVersion = config.tools.retoc
+val uassetGuiVersion = config.tools.uassetGui
+val fmodelSha = config.tools.fmodel
 val fmodelShortSha = fmodelSha.substring(0, 7)
-val jdVersion = "2.2.3"
-val sbMapVersion = "1.1.0"
-val ueVersion = "4.26"
+val jdVersion = config.tools.jd
+val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
 val retocZip = "retoc-x86_64-pc-windows-msvc.zip"
-val sbMap = s"StellarBlade_$sbMapVersion"
-val sbMapFilename = s"$sbMap.usmap"
 
 val retocUrl = s"https://github.com/trumank/retoc/releases/download/v$retocVersion/$retocZip"
 val uassetGuiUrl = s"https://github.com/atenfyr/UAssetGUI/releases/download/v$uassetGuiVersion/UAssetGUI.exe"
-val sbMapUrl = s"https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/0eab1b4d7c1b88dea72298f60f6bb871682d3d1f/$sbMapFilename"
+val sbMapUrl = config.game.mapUrl
 val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSha.zip"
 val jdUrl = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion/jd-amd64-windows.exe"
+val sbMapFilename = sbMapUrl.substring(sbMapUrl.lastIndexOf('/') + 1)
+val sbMapPath = workingDir / sbMapFilename
+val sbMap = sbMapPath.baseName
 
-val workingDir = os.pwd
 val retocExe = workingDir / "retoc.exe"
 val uassetGuiExe = workingDir / "UAssetGUI.exe"
 val fmodelExe = workingDir / "FModel.exe"
@@ -294,6 +319,11 @@ def updatePatches(): Unit = {
     map = map + (uassetName -> m)
   }
   def rec(path: os.Path): Unit =   {
+    if (path.last.headOption == Some('.')) {
+      println(s"Ignoring $path ...")
+      println()
+      return
+    }
     for (p <- os.list(path).sortWith((p1, p2) =>
       if (os.isDir(p1) && os.isDir(p2)) p1.last <= p2.last
       else if (os.isDir(p1)) false
@@ -333,15 +363,7 @@ def patches: PatchTree = {
 
 def readJson(path: os.Path): JsonNode = new ObjectMapper().readTree(path.toIO)
 
-def writeJson(path: os.Path, node: JsonNode): Unit = {
-  val indenter = new DefaultIndenter("  ", DefaultIndenter.SYS_LF)
-  val printer = new DefaultPrettyPrinter
-  printer.indentObjectsWith(indenter)
-  printer.indentArraysWith(indenter)
-  os.move.over(path, path / os.up / path.last.replace(".json", ".orig.json"))
-  os.remove.all(path)
-  new ObjectMapper().writer(printer).writeValue(path.toIO, node)
-}
+def writeJson(path: os.Path, node: JsonNode): Unit = objectWriter.writeValue(path.toIO, node)
 
 case class UAssetObject(name: String, value: JsonNode, addToPatchTree: Boolean) {
   def obj(objName: String): ObjectNode = {
@@ -470,13 +492,9 @@ def patchUasset(addToPatchTree: Boolean, name: String, file: os.Path, fOpt: Opti
   println()
 }
 
-def generateMod(pack: Boolean): () => Unit = () => {
-  val modDir = workingDir / argName
+def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () => {
+  val modDirOpt = modNameOpt.map(workingDir / _)
   val output = workingDir / "out"
-
-  if (os.exists(modDir)) {
-    exit(-1, s"$modDir already exists")
-  }
 
   def recreateDir(dir: os.Path): Unit = {
     os.remove.all(dir)
@@ -484,7 +502,7 @@ def generateMod(pack: Boolean): () => Unit = () => {
   }
 
   def unpackJson(name: String): os.Path = {
-    val uasset = output / "SB" / "Content" / "Local" / "Data" / s"$name.uasset"
+    val uasset = output / os.RelPath(config.game.contentPaks).segments.head / "Content" / "Local" / "Data" / s"$name.uasset"
     val uexp = s"$name.uexp"
     val json = s"$name.json"
     val r = workingDir / json
@@ -514,18 +532,23 @@ def generateMod(pack: Boolean): () => Unit = () => {
     println()
   }
 
-  def packMod(): os.Path = {  
-    val zip = workingDir / s"$argName.zip"
+  def packMod(modName: String): os.Path = {
+    val modDir = modDirOpt.get  
+    if (os.exists(modDir)) {
+      exit(-1, s"$modDir already exists")
+    }
+
+    val zip = workingDir / s"$modName.zip"
     os.remove.all(zip)
 
     os.makeDir.all(modDir)
-    val utoc = modDir / s"${argName}_P.utoc"
+    val utoc = modDir / s"${modName}_P.utoc"
     println(s"Converting to $utoc ...")
     os.proc(retocExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utoc).call(cwd = workingDir)
     println()
 
     println(s"Archiving $zip ...")
-    os.proc("tar", "-acf", zip.last, argName).call(cwd = workingDir)
+    os.proc("tar", "-acf", zip.last, modName).call(cwd = workingDir)
     println()
 
     zip
@@ -537,18 +560,21 @@ def generateMod(pack: Boolean): () => Unit = () => {
     "EffectTable" -> patchEffect _ // comment in this line to disable modding via code
   )
 
+  val pack = modNameOpt.nonEmpty
   val uassetNames = TreeSet.empty[String] ++ uassetCodeMap.keys ++ patches.keys
   val jsonMap = Map.empty[String, os.Path] ++ (for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName)))
   for (uassetName <- uassetNames) patchUasset(!pack, uassetName, jsonMap(uassetName), uassetCodeMap.get(uassetName))
 
-  if (pack) {
-    for ((uassetName, path) <- jsonMap) packJson(uassetName, path)
-    packMod()
+  modNameOpt match {
+    case Some(modName) =>
+      for ((uassetName, path) <- jsonMap) packJson(uassetName, path)
+      packMod(modName)
+    case _ =>
   }
 
   // comment out the following six lines to keep intermediate JSON, .uasset, .uexp, .utoc, .ucas, and .pak files
   os.remove.all(output)
-  os.remove.all(modDir)
+  modDirOpt.foreach(os.remove.all)
   for (path <- jsonMap.values) {
     os.remove.all(path)
     os.remove.all(path / os.up / s"${path.baseName}.orig.json")
@@ -631,14 +657,16 @@ def writeToml(old: Boolean, path: os.Path, data: UAssetPatchTree): Unit = {
   println(s"Wrote $path")
 }
 
-def toml(all: Boolean, path: os.Path)(): Unit = {
+def toml(sbPakDirOpt: Option[os.Path], path: os.Path)(): Unit = {
   if (os.exists(path) && !os.isDir(path)) {
     exit(-1, s"$path is not a directory")
   }
 
-  if (all) {
-    generateMod(false)()
-    updatePatches()
+  sbPakDirOpt match {
+    case Some(sbPakDir) =>
+      generateMod(None, sbPakDir)()
+      updatePatches()
+    case _ =>
   }
 
   os.makeDir.all(path)
@@ -714,41 +742,71 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
 def absPath(p: os.Path): String = p.toIO.getAbsolutePath
 def absPath(p: String): os.Path = os.Path(new java.io.File(p).getAbsolutePath)
 
-if (cliArgs.length == 0) printUsage()
-val argName = cliArgs.head
-argName match {
-  case ".setup" => if (cliArgs.length != 1) printUsage()
-  case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
-  case ".toml.all" => if (cliArgs.length != 3) printUsage()
-  case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
-  case _ => if (cliArgs.length != 2) printUsage()
+
+def printUsage(): Unit = {
+  exit(0,
+    s"""$header
+       |
+       |Usage: scala-cli sbmod.sc -- [ <mod-name> <path-to-game>
+       |                             | .code <path-to-jd-patch-file>
+       |                             | .diff[.into] <from-path> <to-path> <out-path>
+       |                             | .setup[.vscode [ <path-to-vscode> ]]
+       |                             | .toml <out-path>
+       |                             | .toml.all <path-to-game> <out-path>
+       |                             ]
+       |
+       |  .code            Print Auto Modding Script patching code from a jd/TOML patch file
+       |  .diff            Recursively diff JSON files and write jd and TOML patch files
+       |  .diff.into       Use .diff between <from-path> with each sub-folder of <to-path>
+       |  .setup           Only set up modding tools
+       |  .setup.vscode    Set up modding tools and VSCode extensions
+       |  .toml            Merge existing patch files in patches as TOML patch files
+       |  .toml.all        Merge script code patches with patch files in patches as TOML""".stripMargin)
 }
 
-lazy val argPath = absPath(cliArgs(1))
-lazy val sbPakDir = argPath / "SB" / "Content" / "Paks"
 
-val setup = setupModTools()
+def run(): Unit = {
+  if (cliArgs.length == 0) printUsage()
+  val argName = cliArgs.head
+  argName match {
+    case ".setup" => if (cliArgs.length != 1) printUsage()
+    case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
+    case ".toml.all" => if (cliArgs.length != 3) printUsage()
+    case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
+    case _ => if (cliArgs.length != 2) printUsage()
+  }
+  
+  val setup = setupModTools()
 
-argName match {
-  case ".code" => code(argPath)
-  case ".diff" => diff(argPath, absPath(cliArgs(2)), absPath(cliArgs(3)))
-  case ".diff.into" =>
-    val out = absPath(cliArgs(3))
-    for (d <- os.list(absPath(cliArgs(2))) if os.isDir(d)) diff(argPath, d, out / d.last)
-  case ".setup" => if (setup) println("All modding tools have been set up")
-  case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(argPath) else None)
-  case ".toml" => toml(all = false, argPath)()
-  case ".toml.all" => setUAssetGUIConfigAndRun(toml(all = true, absPath(cliArgs(2))))
-  case _ =>
-    if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
-    println(
-      s"""$header
-         |* Game directory: $argPath
-         |* Mod name to generate: $argName
-         |* Working directory: $workingDir
-         |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $sbMapFilename
-         |* Extra: FModel @$fmodelShortSha
-         |""".stripMargin)
-    setUAssetGUIConfigAndRun(generateMod(true))
+  argName match {
+    case ".code" => code(absPath(cliArgs(1)))
+    case ".diff" => diff(absPath(cliArgs(1)), absPath(cliArgs(2)), absPath(cliArgs(3)))
+    case ".diff.into" =>
+      val out = absPath(cliArgs(3))
+      for (d <- os.list(absPath(cliArgs(2))) if os.isDir(d)) diff(absPath(cliArgs(1)), d, out / d.last)
+    case ".setup" => if (setup) println("All modding tools have been set up")
+    case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(absPath(cliArgs(1))) else None)
+    case ".toml" => toml(None, absPath(cliArgs(1)))()
+    case ".toml.all" => 
+      val sbPakDir = absPath(cliArgs(1)) / os.RelPath(config.game.contentPaks)
+      val outDir = absPath(cliArgs(2))
+      setUAssetGUIConfigAndRun(toml(Some(sbPakDir), outDir))
+    case _ =>
+      val modName = argName
+      val gameDir = absPath(cliArgs(1))
+      val sbPakDir = gameDir / os.RelPath(config.game.contentPaks)
+      if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
+      println(
+        s"""$header
+           |* Game directory: $gameDir
+           |* Mod name to generate: $argName
+           |* Working directory: $workingDir
+           |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $sbMapFilename
+           |* Extra: FModel @$fmodelShortSha
+           |""".stripMargin)
+      setUAssetGUIConfigAndRun(generateMod(Some(modName), sbPakDir))
+  }
+  println("... done!")
 }
-println("... done!")
+
+run()
