@@ -1,0 +1,6 @@
+# based on https://www.nexusmods.com/stellarblade/mods/802
+[N_Drone_Scan]
+LifeTime = 31.0
+
+[P_Eve_SkillTree_JustEvade_BurstGauge1]
+LoopTargetFilterAlias = "Self"

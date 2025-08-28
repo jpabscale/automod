@@ -1,12 +1,15 @@
 //> using scala 2.13.16
 //> using dep com.fasterxml.jackson.core:jackson-databind:2.19.1
+//> using dep com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.19.1
 //> using dep com.lihaoyi::os-lib:0.11.4
 
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, ObjectNode, TextNode}
-
-import scala.collection.immutable.TreeMap
+import com.fasterxml.jackson.dataformat.toml.TomlMapper
+import com.fasterxml.jackson.core.`type`.TypeReference
+import java.util.{Map => JMap}
+import scala.collection.immutable.{TreeMap, TreeSet}
 
 def exit(code: Int, msg: String = null): Nothing = {
   Option(msg).foreach(println(_))
@@ -16,7 +19,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v1.4"
+val header = s"Stellar Blade Auto Modding Script v1.5"
 
 if (args.length != 2) exit(0,
   s"""$header
@@ -109,6 +112,89 @@ def setupModTools(): Unit = {
   }
 }
 
+def jdPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
+  val entryPathPrefix = """@ [0,"Rows","""
+  var map = TreeMap.empty[String, TreeMap[String, String]]
+  for (Array(entryPath, _, valueText) <- os.read(path).trim.replace("\r", "").split('\n').map(_.trim).grouped(3)) {
+    var Array(name, property) = entryPath.substring(entryPathPrefix.length, entryPath.length - 1).split(',').map(_.trim)
+    name = name.substring(1, name.length - 1)
+    property = property.substring(1, property.length - 1)
+    var value = valueText.substring(2).trim
+    if (value.contains("::")) value = "\"" + value.substring(value.lastIndexOf("::") + 2)
+    if (value(0) != '"' && (value.contains('.') && value.toIntOption.isEmpty)) value = value + "d"
+    map = map + (name -> (map.getOrElse(name, TreeMap.empty[String, String]) + (property -> value)))
+  }
+  map
+}
+
+lazy val patches: TreeMap[String, TreeMap[String, TreeMap[String, String]]] = {
+  def tomlPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
+    val toml: JMap[String, JMap[String, String]] =
+      new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, JMap[String, String]]] {})
+    import scala.jdk.CollectionConverters._
+    var map = TreeMap.empty[String, TreeMap[String, String]]
+    for (name <- toml.keySet.asScala) {
+      var m = TreeMap.empty[String, String]
+      val properties = toml.get(name)
+      for (property <- properties.keySet.asScala) {
+        val value = properties.get(property)
+        m = m + (property -> value)
+      }
+      map = map + (name -> m)
+    }
+    map
+  }
+
+  var map = TreeMap.empty[String, TreeMap[String, TreeMap[String, String]]]
+
+  def add(uassetName: String, data: TreeMap[String, TreeMap[String, String]]): Unit = {
+    var m = map.getOrElse(uassetName, TreeMap.empty[String, TreeMap[String, String]])
+    for ((name, properties) <- data) {
+      var m2 = m.getOrElse(name, TreeMap.empty[String, String])
+      for ((property, value) <- properties) {
+        val valueString = toJsonNode(value).toPrettyString
+        m2.get(property) match {
+          case Some(v) => println(s"* $name/$property: $v => $valueString")
+          case _ => println(s"* $name/$property: $valueString")
+        }
+        m2 = m2 + (property -> value)
+      }
+      m = m + (name -> m2)
+    }
+    map = map + (uassetName -> m)
+  }
+  def rec(path: os.Path): Unit =   {
+    for (p <- os.list(path).sortWith((p1, p2) =>
+      if (os.isDir(p1) && os.isDir(p2)) p1.last <= p2.last
+      else if (os.isDir(p1)) false
+      else if (os.isDir(p2)) true
+      else p1.last <= p2.last
+    )) {
+      if (os.isDir(p)) {
+        rec(p)
+      } else if (os.isFile(p)) {
+        p.ext match {
+          case "patch" =>
+            println(s"Loading $p ...")
+            val uassetName = p.baseName
+            add(uassetName, jdPatchTree(p))
+            println()
+          case "toml" =>
+            println(s"Loading $p ...")
+            val uassetName = p.baseName
+            add(uassetName, tomlPatchTree(p))
+            println()
+          case _ =>
+        }
+      }
+    }
+  }
+
+  val patchesDir = workingDir / "patches"
+  if (os.exists(patchesDir)) rec(patchesDir)
+  map
+}
+
 def readJson(path: os.Path): JsonNode = new ObjectMapper().readTree(path.toIO)
 
 def writeJson(path: os.Path, node: JsonNode): Unit = {
@@ -151,7 +237,7 @@ def patchEffect(obj: UAssetObject): Unit = {
   name match {
 
     // based on https://www.nexusmods.com/stellarblade/mods/802
-    case "N_Drone_Scan" => obj.set("LifeTime", 30d)
+    case "N_Drone_Scan" => obj.set("LifeTime", 20d)
 
     // based on https://www.nexusmods.com/stellarblade/mods/897
     case _ if name.startsWith("P_Eve_SkillTree_Just") && (name.contains("BetaGauge") || name.contains("BurstGauge")) =>
@@ -191,39 +277,69 @@ def patchTargetFilter(obj: UAssetObject): Unit = {
   }
 }
 
-def patchTable(file: os.Path, f: UAssetObject => Unit): Unit = {
+def toJsonNode(value: String): JsonNode = {
+  if (value(0) == '"') TextNode.valueOf(value.substring(1, value.length - 1))
+  value.toIntOption match {
+    case Some(v) => return IntNode.valueOf(v)
+    case _ =>
+  }
+  value.toDoubleOption match {
+    case Some(v) => return DoubleNode.valueOf(v)
+    case _ =>
+  }
+  TextNode.valueOf(value)
+}
+
+def patchFromTree(data: ArrayNode)(tree: TreeMap[String, TreeMap[String, String]]): Unit = {
+  for (i <- 0 until data.size) {
+    val obj = UAssetObject(data.get(i))
+    tree.get(obj.getName) match {
+      case Some(properties) =>
+        for ((property, value) <- properties) {
+          obj.setJson(property, toJsonNode(value))
+        }
+      case _ =>
+    }
+  }
+}
+
+def patchUasset(name: String, file: os.Path, fOpt: Option[UAssetObject => Unit]): Unit = {
   println(s"Patching $file ...")
   val ast = readJson(file)
   val data = ast.at("/Exports/0/Table/Data").asInstanceOf[ArrayNode]
   for (i <- 0 until data.size) {
-    f(UAssetObject(data.get(i)))
+    fOpt.foreach(_(UAssetObject(data.get(i))))
   }
+  patches.get(name).foreach(patchFromTree(data))
   writeJson(file, ast)
   println()
 }
 
 def generateMod(): Unit = {
-  val output = workingDir / "out"
-  val modDir = output / argName
+  val modDir = workingDir / argName
+  val output = workingDir / "output"
+
+  def recreateDir(dir: os.Path): Unit = {
+    os.remove.all(dir)
+    os.makeDir.all(dir)
+  }
 
   def unpackJson(name: String): os.Path = {
-    val sbDir = output / "SB"
-    val sbOrigDir = output / "SB.orig"
-    val uasset = sbDir / "Content" / "Local" / "Data" / s"$name.uasset"
+    val uasset = output / "SB" / "Content" / "Local" / "Data" / s"$name.uasset"
     val uexp = s"$name.uexp"
     val json = s"$name.json"
-    val r = output / "JSON" / json
-    os.makeDir.all(r / os.up)
+    val r = workingDir / json
+
+    recreateDir(output)
 
     println(s"Extracting $uasset ...")
     os.proc(retocExe, "to-legacy", "--no-parallel", "--version", ueVersionCode, "--filter", uasset.last, sbPakDir, output).call(cwd = workingDir)
-    for (p <- os.walk(sbDir) if os.isFile(p) && p.last != uasset.last && p.last != uexp) os.remove(p)
+    for (p <- os.walk(output) if os.isFile(p) && p.last != uasset.last && p.last != uexp) os.remove(p)
     println()
 
     println(s"Converting to $r ...")
-    os.proc(uassetGuiExe, "tojson", uasset, r, s"VER_$ueVersionCode", sbMap).call(cwd = workingDir)
-    os.copy(sbDir, sbOrigDir, mergeFolders = true)
-    os.remove.all(sbDir)
+    os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersionCode", sbMap).call(cwd = workingDir)
+    os.remove.all(output)
     println()
 
     r
@@ -249,31 +365,37 @@ def generateMod(): Unit = {
     println()
 
     println(s"Archiving $zip ...")
-    os.proc("tar", "-acf", s"..\\${zip.last}", argName).call(cwd = output)
+    os.proc("tar", "-acf", zip.last, argName).call(cwd = workingDir)
     println()
 
     zip
   }
 
-  os.remove.all(output)
-  os.makeDir.all(modDir)
+  recreateDir(modDir)
 
-  val uassetPatches = TreeMap(
+  val uassetCodeMap = TreeMap(
     // add more/change to uasset patching of interest here, e.g.,
     //"TargetFilterTable" -> patchTargetFilter _,
     "EffectTable" -> patchEffect _
   )
 
-  val jsonMap = Map.empty[String, os.Path] ++ (for (uassetName <- uassetPatches.keys) yield (uassetName, unpackJson(uassetName)))
+  val uassetNames = TreeSet.empty[String] ++ uassetCodeMap.keys ++ patches.keys
+  val jsonMap = Map.empty[String, os.Path] ++ (for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName)))
 
-  for ((table, f) <- uassetPatches) patchTable(jsonMap(table), f)
+  for (uassetName <- uassetNames) patchUasset(uassetName, jsonMap(uassetName), uassetCodeMap.get(uassetName))
 
-  for ((name, path) <- jsonMap) packJson(name, path)
+  for ((uassetName, path) <- jsonMap) packJson(uassetName, path)
 
   packMod()
 
-  // comment out the following line to keep intermediate JSON, .uasset, .uexp, .utoc, .ucas, and .pak files
+
+  // comment out the following six lines to keep intermediate JSON, .uasset, .uexp, .utoc, .ucas, and .pak files
   os.remove.all(output)
+  os.remove.all(modDir)
+  for (path <- jsonMap.values) {
+    os.remove.all(path)
+    os.remove.all(path / os.up / s"${path.baseName}.orig.json")
+  }
 }
 
 def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
@@ -295,15 +417,7 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
 }
 
 def code(path: os.Path): Unit = {
-  val entryPathPrefix = """@ [0,"Rows","""
-  var map = TreeMap.empty[String, TreeMap[String, String]]
-  for (Array(entryPath, _, valueText) <- os.read(path).trim.split(Array('\r', '\n')).map(_.trim).grouped(3)) {
-    val Array(name, property) = entryPath.substring(entryPathPrefix.length, entryPath.length - 1).split(',').map(_.trim)
-    var value = valueText.substring(2).trim
-    if (value.contains("::")) value = "\"" + value.substring(value.lastIndexOf("::") + 2)
-    if (value(0) != '"' && (value.contains('.') && value.toIntOption.isEmpty)) value = value + "d"
-    map = map + (name -> (map.getOrElse(name, TreeMap.empty[String, String]) + (property -> value)))
-  }
+  val map = jdPatchTree(path)
 
   val name = {
     val i = path.last.indexOf('.')
