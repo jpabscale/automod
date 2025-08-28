@@ -19,7 +19,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v1.7"
+val header = s"Stellar Blade Auto Modding Script v1.8"
 
 val argName = args.head
 
@@ -32,6 +32,7 @@ def printUsage(): Unit = {
        |                             | .diff <from-path> <to-path> <out-path>
        |                             | .setup
        |                             | .toml <out-path>
+       |                             | .toml.all <path-to-StellarBlade> <out-path>
        |                             ]
        |
        |  .code    Print Auto Modding Script patching code from a jd patch file
@@ -43,6 +44,7 @@ def printUsage(): Unit = {
 argName match {
   case ".setup" => if (args.length != 1) printUsage()
   case ".diff" => if (args.length != 4) printUsage()
+  case ".toml.all" => if (args.length != 3) printUsage()
   case _ => if (args.length != 2) printUsage()
 }
 
@@ -78,6 +80,11 @@ val jdExe = workingDir / "jd.exe"
 val uassetGuiSettingsDir = os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
+
+final case class ValuePair(newValueOpt: Option[String], oldValueOpt: Option[String])
+type PropertyMap = TreeMap[String, ValuePair]
+type UAssetPatchTree = TreeMap[String, PropertyMap]
+type PatchTree = TreeMap[String, UAssetPatchTree]
 
 def setupModTools(): Boolean = {
   var setup = true
@@ -135,10 +142,47 @@ def setupModTools(): Boolean = {
   setup
 }
 
-def jdPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
+def toJsonNode(content: String): JsonNode = new ObjectMapper().readTree(content)
+
+def jdPatchTree(path: os.Path): UAssetPatchTree = {
   val entryPathPrefix = """@ [0,"Rows","""
-  var map = TreeMap.empty[String, TreeMap[String, String]]
-  for (Array(entryPath, _, valueText) <- os.read(path).trim.replace("\r", "").split('\n').map(_.trim).grouped(3)) {
+  var map: UAssetPatchTree = TreeMap.empty
+  val lines = os.read(path).trim.replace("\r", "").split('\n').map(_.trim)
+  val grouped = {
+    var r = Vector.empty[Vector[String]]
+    var i = 0
+    def unrecognized(): Unit = println(s"Unrecognized patch form at line $i (skipped): ${lines(i)}")
+    while (i < lines.length) {
+      if (lines(i).startsWith(entryPathPrefix) && i + 1 < lines.length) {
+        if (lines(i + 1).startsWith("- ")) {
+          if (i + 2 < lines.length) {
+            if (lines(i + 2).startsWith("+ ")) {
+              r = r :+ Vector("-+", lines(i), lines(i + 1), lines(i + 2))
+              i += 3
+            } else {
+              r = r :+ Vector("-", lines(i), lines(i + 1))
+              i += 2
+            }
+          } else {
+            r = r :+ Vector("-", lines(i), lines(i + 1))
+            i += 2
+          }
+        } else if (lines(i + 1).startsWith("+ ")) {
+          r = r :+ Vector("+", lines(i), lines(i + 1))
+          i += 2
+        } else {
+          unrecognized()
+          i += 2
+        }
+      } else {
+        println(s"Unrecognized patch form at line $i (skipped): ${lines(i)}")
+        i += 1
+      }
+    }
+    r
+  }
+
+  def diff(mode: String, entryPath: String, oldValueText: String, newValueTextOpt: Option[String]): Unit = {
     var ok = false
     if (entryPath.startsWith(entryPathPrefix)) {
       entryPath.substring(entryPathPrefix.length, entryPath.length - 1).split(',').map(_.trim) match {
@@ -148,49 +192,110 @@ def jdPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
           var property = p
           name = name.substring(1, name.length - 1)
           property = property.substring(1, property.length - 1)
-          var value = valueText.substring(2).trim
-          if (value.contains("::")) value = "\"" + value.substring(value.lastIndexOf("::") + 2)
-          if (value(0) != '"' && (value.contains('.') && value.toIntOption.isEmpty)) value = value + "d"
-          map = map + (name -> (map.getOrElse(name, TreeMap.empty[String, String]) + (property -> value)))
+          val oldValue = toJsonNode(
+            if (oldValueText.contains("::")) "\"" + oldValueText.substring(oldValueText.lastIndexOf("::") + 2)
+            else oldValueText).toPrettyString
+          newValueTextOpt match {
+            case Some(newValueText) =>
+              val value =
+                if (newValueText.contains("::")) "\"" + newValueText.substring(newValueText.lastIndexOf("::") + 2)
+                else newValueText
+              val json = toJsonNode(value)
+              if (json.isObject || json.isArray) {
+                ok = false
+              } else {
+                map = map + (name -> (map.getOrElse(name, TreeMap.empty: PropertyMap) +
+                  (property -> ValuePair(Some(json.toPrettyString), Some(oldValue)))))
+              }
+            case _ =>
+              map = map + (name -> (map.getOrElse(name, TreeMap.empty: PropertyMap) +
+                (property -> ValuePair(None, Some(oldValueText)))))
+          }
+        case Array(n) if mode == "-" =>
+          ok = true
+          var name = n
+          name = name.substring(1, name.length - 1)
+          val oldObj = toJsonNode(oldValueText).asInstanceOf[ObjectNode]
+          var m: PropertyMap = TreeMap.empty
+          import scala.jdk.CollectionConverters._
+          for (fieldName <- oldObj.fieldNames.asScala) {
+            val oldValue = oldObj.get(fieldName).toPrettyString
+            m = m + (fieldName -> ValuePair(None, Some(oldValue)))
+          }
+          map = map + (name -> m)
+        case Array(n) if mode == "+" =>
+          ok = true
+          var name = n
+          name = name.substring(1, name.length - 1)
+          val newObjObj = toJsonNode(oldValueText).asInstanceOf[ObjectNode]
+          var m: PropertyMap = TreeMap.empty
+          import scala.jdk.CollectionConverters._
+          for (fieldName <- newObjObj.fieldNames.asScala) {
+            val newValue = newObjObj.get(fieldName).toPrettyString
+            m = m + (fieldName -> ValuePair(Some(newValue), None))
+          }
+          map = map + (name -> m)
         case _ =>
       }
     }
     if (!ok) println(s"The script currently does not handle the patch entry (skipped): $entryPath")
   }
+
+  for (d <- grouped) {
+    d match {
+      case Vector(mode, entryPath, oldValueText) => diff(mode, entryPath, oldValueText.substring(2).trim, None)
+      case Vector(mode, entryPath, oldValueText, newValueText) => diff(mode, entryPath, oldValueText.substring(2).trim,
+        Some(newValueText.substring(2).trim))
+      case _ =>
+    }
+  }
+
   map
 }
 
-lazy val patches: TreeMap[String, TreeMap[String, TreeMap[String, String]]] = {
-  def tomlPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
+var _patches: PatchTree = null
+def updatePatches(): Unit = {
+  def tomlPatchTree(path: os.Path): UAssetPatchTree = {
     val toml: JMap[String, JMap[String, String]] =
       new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, JMap[String, String]]] {})
     import scala.jdk.CollectionConverters._
-    var map = TreeMap.empty[String, TreeMap[String, String]]
+    var map: UAssetPatchTree = TreeMap.empty
     for (name <- toml.keySet.asScala) {
-      var m = TreeMap.empty[String, String]
+      var m: PropertyMap = TreeMap.empty
       val properties = toml.get(name)
       for (property <- properties.keySet.asScala) {
         val value = properties.get(property)
-        m = m + (property -> value)
+        val json = value.toIntOption match {
+          case Some(n) => IntNode.valueOf(n)
+          case _ => value.toDoubleOption match {
+            case Some(n) => DoubleNode.valueOf(n)
+            case _ => TextNode.valueOf(value)
+          }
+        }
+        m = m + (property -> ValuePair(if (value.isEmpty) None else Some(json.toPrettyString), None))
       }
       map = map + (name -> m)
     }
     map
   }
 
-  var map = TreeMap.empty[String, TreeMap[String, TreeMap[String, String]]]
+  var map: PatchTree = if (_patches == null) TreeMap.empty else _patches
 
-  def add(uassetName: String, data: TreeMap[String, TreeMap[String, String]]): Unit = {
-    var m = map.getOrElse(uassetName, TreeMap.empty[String, TreeMap[String, String]])
+  def add(uassetName: String, data: UAssetPatchTree): Unit = {
+    var m = map.getOrElse(uassetName, TreeMap.empty: UAssetPatchTree)
     for ((name, properties) <- data) {
-      var m2 = m.getOrElse(name, TreeMap.empty[String, String])
-      for ((property, value) <- properties) {
-        val valueString = toJsonNode(value).toPrettyString
-        m2.get(property) match {
-          case Some(v) => println(s"* $name/$property: $v => $valueString")
-          case _ => println(s"* $name/$property: $valueString")
+      var m2 = m.getOrElse(name, TreeMap.empty: PropertyMap)
+      for ((property, valuePair) <- properties) {
+        val valueString = toJsonPrettyString(valuePair.newValueOpt)
+        val oldValueOpt = m2.get(property) match {
+          case Some(v) =>
+            println(s"* $name/$property: ${toJsonPrettyString(v.newValueOpt)} => $valueString")
+            v.newValueOpt
+          case _ =>
+            println(s"* $name/$property: $valueString")
+            None
         }
-        m2 = m2 + (property -> value)
+        m2 = m2 + (property -> ValuePair(valuePair.newValueOpt, oldValueOpt))
       }
       m = m + (name -> m2)
     }
@@ -225,7 +330,13 @@ lazy val patches: TreeMap[String, TreeMap[String, TreeMap[String, String]]] = {
 
   val patchesDir = workingDir / "patches"
   if (os.exists(patchesDir)) rec(patchesDir)
-  map
+  _patches = map
+}
+
+def patches: PatchTree = {
+  if (_patches != null) return _patches
+  updatePatches()
+  _patches
 }
 
 def readJson(path: os.Path): JsonNode = new ObjectMapper().readTree(path.toIO)
@@ -235,29 +346,56 @@ def writeJson(path: os.Path, node: JsonNode): Unit = {
   val printer = new DefaultPrettyPrinter
   printer.indentObjectsWith(indenter)
   printer.indentArraysWith(indenter)
-  os.move(path, path / os.up / path.last.replace(".json", ".orig.json"))
+  os.move.over(path, path / os.up / path.last.replace(".json", ".orig.json"))
+  os.remove.all(path)
   new ObjectMapper().writer(printer).writeValue(path.toIO, node)
 }
 
-case class UAssetObject(value: JsonNode) {
-  def obj(name: String): ObjectNode = {
+case class UAssetObject(name: String, value: JsonNode, addToPatchTree: Boolean) {
+  def obj(objName: String): ObjectNode = {
     val values = value.get("Value").asInstanceOf[ArrayNode]
     for (j <- 0 until values.size) {
       val element = values.get(j).asInstanceOf[ObjectNode]
-      if (element.get("Name").asText == name) {
+      if (element.get("Name").asText == objName) {
         return element
       }
     }
-    exit(-1, s"Could not find '$name' in $getName")
-  }
-  def setJson(name: String, value: JsonNode): JsonNode = {
-    val r = obj(name).replace("Value", value)
-    println(s"* $getName/$name: ${r.toPrettyString} => ${value.toPrettyString}")
+    val r = toJsonNode(
+      s"""{
+         |  "$$type": "UAssetAPI.PropertyTypes.Structs.StructPropertyData, UAssetAPI",
+         |  "StructType": "SB${name}Property",
+         |  "SerializeNone": true,
+         |  "StructGUID": "{00000000-0000-0000-0000-000000000000}",
+         |  "SerializationControl": "NoExtension",
+         |  "Operation": "None",
+         |  "Name": "$objName",
+         |  "ArrayIndex": 0,
+         |  "IsZero": false,
+         |  "PropertyTagFlags": "None",
+         |  "PropertyTagExtensions": "NoExtension",
+         |  "Value": []
+         |}""".stripMargin
+    ).asInstanceOf[ObjectNode]
+    values.add(r)
     r
   }
-  def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).asInt
-  def set(name: String, value: Double): Double = setJson(name, DoubleNode.valueOf(value)).asDouble
-  def set(name: String, value: String): String = setJson(name, TextNode.valueOf(value)).asText
+  def setJson(name: String, value: JsonNode): Option[JsonNode] = {
+    val rOpt = Option(obj(name).replace("Value", value))
+    val rStringOpt = rOpt.map(_.toPrettyString)
+    val valueStringOpt = Option(value).map(_.toPrettyString)
+    println(s"* $getName/$name: ${rStringOpt.getOrElse("")} => ${valueStringOpt.getOrElse("")}")
+    if (addToPatchTree) {
+      var map = _patches.getOrElse(this.name, TreeMap.empty: UAssetPatchTree)
+      var m = map.getOrElse(getName, TreeMap.empty: PropertyMap)
+      m = m + (name -> ValuePair(valueStringOpt, rStringOpt))
+      map = map + (getName -> m)
+      _patches = _patches + (this.name -> map)
+    }
+    rOpt
+  }
+  def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).map(_.asInt).getOrElse(0)
+  def set(name: String, value: Double): Double = setJson(name, DoubleNode.valueOf(value)).map(_.asDouble).getOrElse(0d)
+  def set(name: String, value: String): String = setJson(name, TextNode.valueOf(value)).map(_.asText).orNull
   def getName: String = value.get("Name").asText
   def getJson(name: String): JsonNode = obj(name).get("Value")
   def getInt(name: String): Int = getJson(name).asInt
@@ -310,45 +448,35 @@ def patchTargetFilter(obj: UAssetObject): Unit = {
   }
 }
 
-def toJsonNode(value: String): JsonNode = {
-  if (value(0) == '"') return TextNode.valueOf(value.substring(1, value.length - 1))
-  value.toIntOption match {
-    case Some(v) => return IntNode.valueOf(v)
-    case _ =>
-  }
-  value.toDoubleOption match {
-    case Some(v) => return DoubleNode.valueOf(v)
-    case _ =>
-  }
-  TextNode.valueOf(value)
-}
+def toJsonPrettyString(valueOpt: Option[String], default: String = "") =
+  valueOpt.map(toJsonNode).map(_.toPrettyString).getOrElse(default)
 
-def patchFromTree(data: ArrayNode)(tree: TreeMap[String, TreeMap[String, String]]): Unit = {
+def patchFromTree(uassetName: String, data: ArrayNode)(tree: UAssetPatchTree): Unit = {
   for (i <- 0 until data.size) {
-    val obj = UAssetObject(data.get(i))
+    val obj = UAssetObject(uassetName, data.get(i), addToPatchTree = false)
     tree.get(obj.getName) match {
       case Some(properties) =>
-        for ((property, value) <- properties) {
-          obj.setJson(property, toJsonNode(value))
+        for ((property, valueOldValuePair) <- properties) {
+          obj.setJson(property, valueOldValuePair.newValueOpt.map(toJsonNode).orNull)
         }
       case _ =>
     }
   }
 }
 
-def patchUasset(name: String, file: os.Path, fOpt: Option[UAssetObject => Unit]): Unit = {
+def patchUasset(addToPatchTree: Boolean, name: String, file: os.Path, fOpt: Option[UAssetObject => Unit]): Unit = {
   println(s"Patching $file ...")
   val ast = readJson(file)
   val data = ast.at("/Exports/0/Table/Data").asInstanceOf[ArrayNode]
   for (i <- 0 until data.size) {
-    fOpt.foreach(_(UAssetObject(data.get(i))))
+    fOpt.foreach(_(UAssetObject(name, data.get(i), addToPatchTree)))
   }
-  patches.get(name).foreach(patchFromTree(data))
+  patches.get(name).foreach(patchFromTree(name, data))
   writeJson(file, ast)
   println()
 }
 
-def generateMod(): Unit = {
+def generateMod(pack: Boolean): () => Unit = () => {
   val modDir = workingDir / argName
   val output = workingDir / "out"
 
@@ -414,13 +542,12 @@ def generateMod(): Unit = {
 
   val uassetNames = TreeSet.empty[String] ++ uassetCodeMap.keys ++ patches.keys
   val jsonMap = Map.empty[String, os.Path] ++ (for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName)))
+  for (uassetName <- uassetNames) patchUasset(!pack, uassetName, jsonMap(uassetName), uassetCodeMap.get(uassetName))
 
-  for (uassetName <- uassetNames) patchUasset(uassetName, jsonMap(uassetName), uassetCodeMap.get(uassetName))
-
-  for ((uassetName, path) <- jsonMap) packJson(uassetName, path)
-
-  packMod()
-
+  if (pack) {
+    for ((uassetName, path) <- jsonMap) packJson(uassetName, path)
+    packMod()
+  }
 
   // comment out the following six lines to keep intermediate JSON, .uasset, .uexp, .utoc, .ucas, and .pak files
   os.remove.all(output)
@@ -463,10 +590,10 @@ def code(path: os.Path): Unit = {
   )
   for ((name, properties) <- map) {
     if (properties.size == 1) {
-      for ((property, value) <- properties) lines = lines :+ s"    case \"$name\" => obj.set($property, $value)"
+      for ((property, value) <- properties) lines = lines :+ s"    case \"$name\" => obj.set(\"$property\", ${toJsonPrettyString(value.newValueOpt)})"
     } else {
       lines = lines :+ s"    case \"$name\" =>"
-      for ((property, value) <- properties) lines = lines :+ s"      obj.set($property, $value)"
+      for ((property, value) <- properties) lines = lines :+ s"      obj.set(\"$property\", ${toJsonPrettyString(value.newValueOpt)})"
     }
     lines = lines :+ ""
   }
@@ -476,29 +603,49 @@ def code(path: os.Path): Unit = {
   println(lines.mkString(util.Properties.lineSeparator))
 }
 
-def writeToml(path: os.Path, data: TreeMap[String, TreeMap[String, String]]): Unit = {
+def writeToml(old: Boolean, path: os.Path, data: UAssetPatchTree): Unit = {
+  val oldValueColumn = 61
   os.remove.all(path)
   val sep = util.Properties.lineSeparator
+  if (old) os.write.append(path, s"# ... ${(for (_ <- 0 until oldValueColumn - 7) yield ' ').mkString} # Old Value$sep")
   for ((name, properties) <- data) {
     os.write.append(path, s"[$name]$sep")
-    for ((property, value) <- properties) {
-      val v = toJsonNode(value).toPrettyString
-      os.write.append(path, s"$property = $v$sep")
+    for ((property, valuePair) <- properties) {
+      val v = toJsonPrettyString(valuePair.newValueOpt, default = "\"\"")
+      if (v(0) == '[' || v(0) == '{') {
+        println(s"Unsupported TOML patch form for $name/$property: $v")
+        return
+      } else {
+        val comment = toJsonPrettyString(valuePair.oldValueOpt, default = "N/A")
+        var line = s"$property = $v"
+        if (old) {
+          if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString} # $comment$sep"
+          else line = s"$line    # $comment$sep"
+        } else {
+          line = s"$line$sep"
+        }
+        os.write.append(path, line)
+      }
     }
     os.write.append(path, sep)
   }
   println(s"Wrote $path")
 }
 
-def toml(path: os.Path): Unit = {
+def toml(all: Boolean, path: os.Path)(): Unit = {
   if (os.exists(path) && !os.isDir(path)) {
     exit(-1, s"$path is not a directory")
+  }
+
+  if (all) {
+    generateMod(false)
+    updatePatches()
   }
 
   os.makeDir.all(path)
   for ((uassetName, data) <- patches) {
     val p = path / s"$uassetName.toml"
-    writeToml(p, data)
+    writeToml(old = false, p, data)
   }
   if (patches.isEmpty) println("No patches to write")
   else println()
@@ -514,7 +661,7 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
           println("No changes found")
         case 1 =>
           println(s"Wrote $patch")
-          writeToml(out / s"${f.baseName}.toml", jdPatchTree(patch))
+          writeToml(old = true, out / s"${f.baseName}.toml", jdPatchTree(patch))
         case code => exit(code, s"Error occurred when running jd")
       }
       println()
@@ -538,7 +685,8 @@ argName match {
   case ".code" => code(argPath)
   case ".diff" => diff(argPath, absPath(args(2)), absPath(args(3)))
   case ".setup" => if (setup) println("All modding tools have been set up")
-  case ".toml" => toml(argPath)
+  case ".toml" => toml(all = false, argPath)()
+  case ".toml.all" => setUAssetGUIConfigAndRun(toml(all = true, absPath(args(2))))
   case _ =>
     if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
     println(
@@ -546,8 +694,8 @@ argName match {
          |* Game directory: $argPath
          |* Mod name to generate: $argName
          |* Working directory: $workingDir
-         |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, $sbMapFilename
-         |* Extra: FModel @$fmodelShortSha, jd v$jdVersion
+         |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $sbMapFilename
+         |* Extra: FModel @$fmodelShortSha
          |""".stripMargin)
-    setUAssetGUIConfigAndRun(generateMod _)
+    setUAssetGUIConfigAndRun(generateMod(true))
 }
