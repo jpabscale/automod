@@ -19,7 +19,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v1.6"
+val header = s"Stellar Blade Auto Modding Script v1.7"
 
 val argName = args.head
 
@@ -41,9 +41,9 @@ def printUsage(): Unit = {
 }
 
 argName match {
-  case ".setup" if args.length != 1 => printUsage()
-  case ".diff" if args.length != 4 => printUsage()
-  case _ =>
+  case ".setup" => if (args.length != 1) printUsage()
+  case ".diff" => if (args.length != 4) printUsage()
+  case _ => if (args.length != 2) printUsage()
 }
 
 def absPath(p: String): os.Path = os.Path(new java.io.File(p).getAbsolutePath)
@@ -139,13 +139,23 @@ def jdPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
   val entryPathPrefix = """@ [0,"Rows","""
   var map = TreeMap.empty[String, TreeMap[String, String]]
   for (Array(entryPath, _, valueText) <- os.read(path).trim.replace("\r", "").split('\n').map(_.trim).grouped(3)) {
-    var Array(name, property) = entryPath.substring(entryPathPrefix.length, entryPath.length - 1).split(',').map(_.trim)
-    name = name.substring(1, name.length - 1)
-    property = property.substring(1, property.length - 1)
-    var value = valueText.substring(2).trim
-    if (value.contains("::")) value = "\"" + value.substring(value.lastIndexOf("::") + 2)
-    if (value(0) != '"' && (value.contains('.') && value.toIntOption.isEmpty)) value = value + "d"
-    map = map + (name -> (map.getOrElse(name, TreeMap.empty[String, String]) + (property -> value)))
+    var ok = false
+    if (entryPath.startsWith(entryPathPrefix)) {
+      entryPath.substring(entryPathPrefix.length, entryPath.length - 1).split(',').map(_.trim) match {
+        case Array(n, p) =>
+          ok = true
+          var name = n
+          var property = p
+          name = name.substring(1, name.length - 1)
+          property = property.substring(1, property.length - 1)
+          var value = valueText.substring(2).trim
+          if (value.contains("::")) value = "\"" + value.substring(value.lastIndexOf("::") + 2)
+          if (value(0) != '"' && (value.contains('.') && value.toIntOption.isEmpty)) value = value + "d"
+          map = map + (name -> (map.getOrElse(name, TreeMap.empty[String, String]) + (property -> value)))
+        case _ =>
+      }
+    }
+    if (!ok) println(s"The script currently does not handle the patch entry (skipped): $entryPath")
   }
   map
 }
@@ -453,9 +463,9 @@ def code(path: os.Path): Unit = {
   )
   for ((name, properties) <- map) {
     if (properties.size == 1) {
-      for ((property, value) <- properties) lines = lines :+ s"    case $name => obj.set($property, $value)"
+      for ((property, value) <- properties) lines = lines :+ s"    case \"$name\" => obj.set($property, $value)"
     } else {
-      lines = lines :+ s"    case $name =>"
+      lines = lines :+ s"    case \"$name\" =>"
       for ((property, value) <- properties) lines = lines :+ s"      obj.set($property, $value)"
     }
     lines = lines :+ ""

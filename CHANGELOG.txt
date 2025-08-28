@@ -1,3 +1,5 @@
+1.7: Better usage & patch form checks and some fixes.
+
 1.6: Added .toml and .diff command with some bug fixes.
 
 1.5: Added dynamic patch file loading. Fixed a breaking bug in v1.3 and v1.4.
