@@ -1,4 +1,4 @@
-# ...                                                        # Old Value
+# ...                                                        # Game Original Value
 [M_Scarlet_AirDashSpaceCut_Cast1]
 StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}, {\"Alias\":\"M_Scarlet_PlayTheater01\"}]"
 

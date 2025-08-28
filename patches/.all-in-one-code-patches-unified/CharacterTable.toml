@@ -1,4 +1,4 @@
-# ...                                                        # Old Value
+# ...                                                        # Game Original Value
 [Player]
 AttackSpeed = 1.5                                            # 1.0
 DamageReductionPerShieldBock = 0.25                          # 0.17499999701976776

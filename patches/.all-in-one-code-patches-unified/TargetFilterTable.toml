@@ -1,4 +1,4 @@
-# ...                                                        # Old Value
+# ...                                                        # Game Original Value
 [N_Drone_Normal_Scan1_1_Target_Enemy]
 FarDistance = 30000.0                                        # 10000.0
 TargetCheckValue1 = 3000.0                                   # 1000.0

@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, NullNode, ObjectNode, TextNode}
+import com.jayway.jsonpath
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
@@ -21,7 +22,7 @@ def checkPatches(uassetName: String, map: sbmod.UAssetPropertyChanges): sbmod.UA
   for ((objName, properties) <- map) {
     def checkAddProperties: Boolean = {
       def checkObject(o: JsonNode): Boolean = if (o.isObject) {
-        o.get(UAssetApi.Constants.typeKey) match {
+        o.get(uassetapi.Constants.typeKey) match {
           case _: TextNode => true
           case _ => false
         }
@@ -39,7 +40,7 @@ def checkPatches(uassetName: String, map: sbmod.UAssetPropertyChanges): sbmod.UA
     }
     isKeyPrefix(uassetName, objName)
     getKeyPrefix(objName) match {
-      case Some(`addPrefix`) if !checkAddProperties => sbmod.exit(-1, s"Expecting a single inline table value with a '${UAssetApi.Constants.typeKey}' String property for $uassetName: $objName")
+      case Some(`addPrefix`) if !checkAddProperties => sbmod.exit(-1, s"Expecting a single inline table value with a '${uassetapi.Constants.typeKey}' String property for $uassetName: $objName")
       case _ =>
     }
     for ((property, value) <- properties) {
@@ -84,24 +85,24 @@ type CodeContext = {
 sealed trait FilteredChanges {
   def addToDataTableFilePatches: Boolean
   def uassetName: String
-  def orig: () => JsonNode
+  def orig: sbmod.JsonAst
   def dataMap: () => collection.mutable.Map[String, ObjectNode]
   def changes: sbmod.PropertyChanges 
   def codeContext(_path: String, _objName: String, _current: JsonNode, _orig: JsonNode): CodeContext = (new {
     def objName: String = _objName
-    def orig[T]: T = UAssetApi.toValue[T](_orig).get
-    def current[T]: Option[T] = UAssetApi.toValue[T](_current)
+    def orig[T]: T = uassetapi.toValue[T](_orig).get
+    def current[T]: Option[T] = uassetapi.toValue[T](_current)
     def valueOf[T](objName: String, property: String): Option[T] = {
       dataMap().get(objName) match {
         case Some(node) =>
-          val obj = UAssetApi.Struct(uassetName, node, addToDataTableFilePatches)
-          UAssetApi.toValue[T](obj.getJson(property))
+          val obj = uassetapi.Struct(uassetName, node, addToDataTableFilePatches)
+          uassetapi.toValue[T](obj.getJson(property))
         case _ => None
       }
     }
   }: CodeContext)
-  def applyPathChanges(path: String, node: JsonNode): Unit = {
-    val obj = UAssetApi.Struct(uassetName, node, addToDataTableFilePatches)
+  def applyPathChanges(path: String, node: JsonNode, orig: JsonNode): Unit = {
+    val obj = uassetapi.Struct(uassetName, node, addToDataTableFilePatches)
     for ((property, valueOldValuePair) <- changes) {
       var value = valueOldValuePair.newValueOpt.get
       value match {
@@ -121,10 +122,10 @@ sealed trait FilteredChanges {
                   |  calc() 
                   |}""".stripMargin)
             val currentValue = obj.getJson(property)
-            val origValue = UAssetApi.Struct(uassetName, orig().at(path), addToDataTableFilePatches = false).getJson(property)
+            val origValue = uassetapi.Struct(uassetName, orig, addToDataTableFilePatches = false).getJson(property)
             val ctx = codeContext(path, obj.name, currentValue, origValue)
             try {
-              value = UAssetApi.fromValue(propertyF(ctx))
+              value = uassetapi.fromValue(propertyF(ctx))
             } catch {
               case t: Throwable =>
                 t.printStackTrace 
@@ -144,14 +145,38 @@ sealed trait FilteredChanges {
 case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
                              uassetName: String,
                              isAdd: Boolean,
-                             orig: () => JsonNode,
+                             orig: sbmod.JsonAst,
                              dataMap: () => collection.mutable.Map[String, ObjectNode],
                              path: String, 
                              changes: sbmod.PropertyChanges) extends FilteredChanges {
-  def applyChanges(ast: JsonNode): Unit = {
-    val node = ast.at(path)
-    if (node.isMissingNode) sbmod.exit(-1, s"Could not find $uassetName's path: $path")
+  def applyChanges(ast: sbmod.JsonAst): Unit = {
+    val nodes: Seq[(JsonNode, JsonNode)] = if (path.isEmpty) {
+      sbmod.exit(-1, s"The path for $uassetName name cannot be empty")
+    } else if (path.head == '/') {
+      val node = ast.json[JsonNode].at(path)
+      if (node.isMissingNode) sbmod.exit(-1, s"Could not find $uassetName's path: $path")
+      Seq((node, orig.json[JsonNode].at(path)))
+    } else if (path.head == '$') {
+      def checkStruct(o: JsonNode): Boolean = o match {
+        case o: ObjectNode => Option(o.get("Value")).map(_.isArray).getOrElse(false)
+        case _ => false
+      }
+      try {
+        val array = ast.read[ArrayNode](path)
+        val origArray = orig.read[ArrayNode](path)
+        for (i <- 0 until array.size if checkStruct(array.get(i))) yield (array.get(i), origArray.get(i))
+      } catch {
+        case t: Throwable => sbmod.exit(-1, 
+          s"""Failed to search $uassetName path: $path
+             |  reason: ${t.getMessage}""".stripMargin)
+      }
+    } else {
+      sbmod.exit(-1, s"Unrecognized path for $uassetName: $path")
+    }
+    if (nodes.isEmpty) sbmod.exit(-1, s"Could not find objects for $uassetName: $path")
     if (isAdd) {
+      if (nodes.size != 1) sbmod.exit(-1, s"The path evaluates to multiple objects: $path")
+      val (node, _) = nodes.head
       node match {
         case node: ArrayNode => 
           var first = true
@@ -171,29 +196,32 @@ case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
               val offset = node.size
               val p = path.split('/').toVector
               for (i <- 0 until value.size) {
-                add(UAssetApi.newData(p, (offset + i).toString, value.get(i)))
+                add(uassetapi.newData(p, (offset + i).toString, value.get(i)))
               }
-            case _ => add(UAssetApi.newData(path.split('/').toVector, node.size.toString, value))
+            case _ => add(uassetapi.newData(path.split('/').toVector, node.size.toString, value))
           }          
         case _ => sbmod.exit(1, s"Expecting an array for $uassetName at: $path")
       }
     } else {
-      if (!node.get("Value").isInstanceOf[ArrayNode]) sbmod.exit(-1, s"$uassetName @$path is not a UAssetAPI's struct")
-      applyPathChanges(path, node)
+      for ((node, orig) <- nodes) {
+        if (!node.get("Value").isInstanceOf[ArrayNode]) sbmod.exit(-1, s"$uassetName @$path is not a UAssetAPI's struct")
+        applyPathChanges(path, node, orig)
+      }
     }
   }
 }
 
 case class KeyFilteredChanges(addToDataTableFilePatches: Boolean,
                               uassetName: String,
-                              orig: () => JsonNode,
+                              orig: sbmod.JsonAst,
                               dataMap: () => collection.mutable.Map[String, ObjectNode],
                               f: String => Boolean, 
                               changes: sbmod.PropertyChanges) extends FilteredChanges {
   def apply(key: String): Boolean = f(key)
 }
 
-def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: JsonNode, data: ArrayNode, t: sbmod.UAssetPropertyChanges): (collection.mutable.TreeMap[String, KeyFilteredChanges], collection.mutable.TreeMap[String, AtFilteredChanges], sbmod.UAssetPropertyChanges) = {
+def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: sbmod.JsonAst, origAst: sbmod.JsonAst, 
+           data: ArrayNode, t: sbmod.UAssetPropertyChanges): (collection.mutable.TreeMap[String, KeyFilteredChanges], collection.mutable.TreeMap[String, AtFilteredChanges], sbmod.UAssetPropertyChanges) = {
   var r1 = collection.mutable.TreeMap.empty[String, KeyFilteredChanges]
   var r2 = collection.mutable.TreeMap.empty[String, AtFilteredChanges]
   var rt: sbmod.UAssetPropertyChanges = collection.immutable.TreeMap.empty 
@@ -205,9 +233,8 @@ def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: JsonNode
     }
     r
   }
-  lazy val _orig = ast.deepCopy[JsonNode]
+  lazy val _orig = ast.json[JsonNode].deepCopy[JsonNode]
   val dataMap = () => _dataMap
-  val orig = () => _orig
   for ((key, properties) <- t) {
     r1.get(key) match {
       case Some(_) => sbmod.exit(-1, s"Redefined key for $uassetName: $key")
@@ -226,22 +253,22 @@ def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: JsonNode
           }
           try {
             val fun = eval[String => Boolean](s"{ (v: String) => def predicate(): Boolean = { $code }; predicate() }".stripMargin)  
-            r1.put(key, KeyFilteredChanges(addToDataTableFilePatches, uassetName, orig, dataMap, fun, props))
+            r1.put(key, KeyFilteredChanges(addToDataTableFilePatches, uassetName, origAst, dataMap, fun, props))
           } catch {
             case _: Throwable => sbmod.exit(-1, s"Invalid code for $uassetName: $code")
           }
         case `atPrefix` =>
           val path = key.substring(atPrefix.length).trim
-          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = false, orig, dataMap, path, properties))
+          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = false, origAst, dataMap, path, properties))
         case `addPrefix` =>
           val path = key.substring(addPrefix.length).trim
-          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = true, orig, dataMap, path, properties))
+          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = true, origAst, dataMap, path, properties))
         case `javaRegexPrefix` =>
           val regexText = key.substring(javaRegexPrefix.length).trim
           try {
             val regex = regexText.r
             val fun = (s: String) => regex.matches(s)
-            r1.put(key, KeyFilteredChanges(addToDataTableFilePatches, uassetName, orig, dataMap, fun, properties))
+            r1.put(key, KeyFilteredChanges(addToDataTableFilePatches, uassetName, origAst, dataMap, fun, properties))
           } catch {
             case _: Throwable => sbmod.exit(-1, s"Invalid Java regex for $uassetName: $regexText")
           }

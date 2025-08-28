@@ -1,4 +1,4 @@
-# ...                                                        # Old Value
+# ...                                                        # Game Original Value
 [M_Scarlet_AirDashCut_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
 
