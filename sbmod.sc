@@ -36,7 +36,7 @@ val sbMapFilename = s"$sbMap.usmap"
 
 val retocUrl = s"https://github.com/trumank/retoc/releases/download/v$retocVersion/$retocZip"
 val uassetGuiUrl = s"https://github.com/atenfyr/UAssetGUI/releases/download/v$uassetGuiVersion/UAssetGUI.exe"
-val sbMapUrl = s"https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/refs/heads/main/$sbMapFilename"
+val sbMapUrl = s"https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/0eab1b4d7c1b88dea72298f60f6bb871682d3d1f/$sbMapFilename"
 
 val workingDir = os.pwd
 val retocExe = workingDir / "retoc.exe"
@@ -121,11 +121,13 @@ def patchEffectTableJson(file: os.Path): Unit = {
     val obj = RichObjectNode(data.get(i))
     val name = obj.getName
     name match {
+
+      // based on https://www.nexusmods.com/stellarblade/mods/802
       case "N_Drone_Scan" =>
-        // based on https://www.nexusmods.com/stellarblade/mods/802
         obj.setValue("LifeTime", 30d)
-      case _ if name.startsWith("P_Eve_SkillTree_Just") && (name.contains("BetaGauge") || name.contains("BurstGauge"))=>
-        // based on https://www.nexusmods.com/stellarblade/mods/897
+
+      // based on https://www.nexusmods.com/stellarblade/mods/897
+      case _ if name.startsWith("P_Eve_SkillTree_Just") && (name.contains("BetaGauge") || name.contains("BurstGauge")) =>
         name match {
           case "P_Eve_SkillTree_JustParry_BetaGauge1" => obj.setValue("CalculationMultipleValue", 8d)
           case "P_Eve_SkillTree_JustParry_BetaGauge2" => obj.setValue("CalculationMultipleValue", 6d)
@@ -140,6 +142,7 @@ def patchEffectTableJson(file: os.Path): Unit = {
         obj.setValue("LoopIntervalTime", 1d)
         obj.setValue("ActiveTargetFilterAlias", "Self")
         obj.setValue("LoopTargetFilterAlias", "Self")
+        
       case _ =>
     }
   }
@@ -172,7 +175,7 @@ def generateMod(): Unit = {
     }
     println()
 
-    println(s"Converting $json ...")
+    println(s"Converting to $r ...")
     os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersion", sbMap).call(cwd = workingDir)
     os.remove.all(output)
     println()
@@ -194,7 +197,7 @@ def generateMod(): Unit = {
     os.remove.all(zip)
 
     val utoc = dir / s"${modName}_P.utoc"
-    println(s"Converting $utoc ...")
+    println(s"Converting to $utoc ...")
     os.proc(retocExe, "to-zen", "--no-parallel", "--version", ueVersion, output, utoc).call(cwd = workingDir)
     println()
 
