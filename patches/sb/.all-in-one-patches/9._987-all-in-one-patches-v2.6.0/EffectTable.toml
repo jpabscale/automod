@@ -1,22 +1,5 @@
-[N_Drone_Scan]                                               # based on https://www.nexusmods.com/stellarblade/mods/802
-LifeTime = 30.0
-
-['.*: ^P_Eve_SkillTree_Just(.*BetaGauge|.*BurstGauge).*$']   # based on https://www.nexusmods.com/stellarblade/mods/897
-CalculationMultipleValue = '''=> v.objName match {
-  case "P_Eve_SkillTree_JustParry_BetaGauge1" => 8
-  case "P_Eve_SkillTree_JustParry_BetaGauge2" => 6
-  case "P_Eve_SkillTree_JustEvade_BurstGauge1" => 4
-  case "P_Eve_SkillTree_JustEvade_BurstGauge2" => 3
-}'''
-OverlapCount = 1
-LifeTime = 11
-StartDelayTime = 1
-LoopIntervalTime = 1
-ActiveTargetFilterAlias = 'Self'
-LoopTargetFilterAlias = 'Self'
-
 ['.*: ^Gear_(?!BetaCrystalAdditiveRate)(?!.*_HitDmgUp).*$']  # or, [ '=> v.startsWith("Gear_") && v.startsWith("Gear_BetaCrystalAdditiveRate") && !v.contains("_HitDmgUp")' ]
-CalculationValue = '=> v.orig[Double] * 2'
+CalculationMultipleValue = 2
 
 ['.*: ^Gear_.*_HitDmgUp.*$']
 CalculationMultipleValue = 0.5

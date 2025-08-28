@@ -1,45 +1,45 @@
 # ...                                                        # Game Original Value
 [Gear_AdditiveFixedDamage_1]
-CalculationValue = 130.0                                     # 65.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_1_Damage]
-CalculationValue = 130.0                                     # 65.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_1_MK2]
-CalculationValue = 200.0                                     # 100.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_1_MK2_Damage]
-CalculationValue = 200.0                                     # 100.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_2]
-CalculationValue = 180.0                                     # 90.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_2_Damage]
-CalculationValue = 180.0                                     # 90.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_2_MK2]
-CalculationValue = 280.0                                     # 140.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_2_MK2_Damage]
-CalculationValue = 280.0                                     # 140.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_3]
-CalculationValue = 220.0                                     # 110.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_3_Damage]
-CalculationValue = 220.0                                     # 110.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_3_MK2]
-CalculationValue = 340.0                                     # 170.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveFixedDamage_3_MK2_Damage]
-CalculationValue = 340.0                                     # 170.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_1_AtkPwrUp_Melee]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_1_AtkPwrUp_Range]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_1_HitDmgUp_Melee]
 CalculationMultipleValue = 0.5                               # 1.0
@@ -48,10 +48,10 @@ CalculationMultipleValue = 0.5                               # 1.0
 CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_1_MK2_AtkPwrUp_Melee]
-CalculationValue = 0.46000000834465027                       # 0.23000000417232513
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_1_MK2_AtkPwrUp_Range]
-CalculationValue = 0.46000000834465027                       # 0.23000000417232513
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_1_MK2_HitDmgUp_Melee]
 CalculationMultipleValue = 0.5                               # 1.0
@@ -60,10 +60,10 @@ CalculationMultipleValue = 0.5                               # 1.0
 CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_2_AtkPwrUp_Melee]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_2_AtkPwrUp_Range]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_2_HitDmgUp_Melee]
 CalculationMultipleValue = 0.5                               # 1.0
@@ -72,10 +72,10 @@ CalculationMultipleValue = 0.5                               # 1.0
 CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_2_MK2_AtkPwrUp_Melee]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_2_MK2_AtkPwrUp_Range]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_2_MK2_HitDmgUp_Melee]
 CalculationMultipleValue = 0.5                               # 1.0
@@ -84,10 +84,10 @@ CalculationMultipleValue = 0.5                               # 1.0
 CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_AtkPwrUp_Melee]
-CalculationValue = 0.5                                       # 0.25
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_AtkPwrUp_Range]
-CalculationValue = 0.5                                       # 0.25
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_HitDmgUp_Melee]
 CalculationMultipleValue = 0.5                               # 1.0
@@ -96,107 +96,106 @@ CalculationMultipleValue = 0.5                               # 1.0
 CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_AtkPwrUp_Melee]
-CalculationValue = 0.7599999904632568                        # 0.3799999952316284
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_AtkPwrUp_Range]
-CalculationValue = 0.7599999904632568                        # 0.3799999952316284
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_HitDmgUp_Melee]
 CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_HitDmgUp_Range]
 CalculationMultipleValue = 0.5                               # 1.0
-CalculationValue = -1.1399999856948853                       # -0.5699999928474426
 
 [Gear_AdditiveSkillDamageGroup5_1_Beta]
-CalculationValue = 0.09000000357627869                       # 0.04500000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_1_BetaCombo]
-CalculationValue = 0.09000000357627869                       # 0.04500000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_1_MK2_Beta]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_1_MK2_BetaCombo]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_2_Beta]
-CalculationValue = 0.12999999523162842                       # 0.06499999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_2_BetaCombo]
-CalculationValue = 0.12999999523162842                       # 0.06499999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_2_MK2_Beta]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_2_MK2_BetaCombo]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_3_Beta]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_3_BetaCombo]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_3_MK2_Beta]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_3_MK2_BetaCombo]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_1_Burst]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_1_BurstCombo]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_1_MK2_Burst]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_1_MK2_BurstCombo]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_2_Burst]
-CalculationValue = 0.3799999952316284                        # 0.1899999976158142
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_2_BurstCombo]
-CalculationValue = 0.3799999952316284                        # 0.1899999976158142
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_2_MK2_Burst]
-CalculationValue = 0.5799999833106995                        # 0.28999999165534973
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_2_MK2_BurstCombo]
-CalculationValue = 0.5799999833106995                        # 0.28999999165534973
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_3_Burst]
-CalculationValue = 0.4699999988079071                        # 0.23499999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_3_BurstCombo]
-CalculationValue = 0.4699999988079071                        # 0.23499999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_3_MK2_Burst]
-CalculationValue = 0.699999988079071                         # 0.3499999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_3_MK2_BurstCombo]
-CalculationValue = 0.699999988079071                         # 0.3499999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_1]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_1_MK2]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_2]
-CalculationValue = 0.25                                      # 0.125
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_2_MK2]
-CalculationValue = 0.3199999928474426                        # 0.1599999964237213
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_3]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_3_MK2]
-CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaCrystalAdditiveRate_1]
 CalculationValue = 0.147                                     # 0.4000000059604645
@@ -241,547 +240,547 @@ StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculatio
 StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaGaugeAdditiveRate_1]
-CalculationValue = 0.11999999731779099                       # 0.05999999865889549
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaGaugeAdditiveRate_1_MK2]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaGaugeAdditiveRate_2]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaGaugeAdditiveRate_2_MK2]
-CalculationValue = 0.2199999988079071                        # 0.10999999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaGaugeAdditiveRate_3]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaGaugeAdditiveRate_3_MK2]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_1]
-CalculationValue = 0.3199999928474426                        # 0.1599999964237213
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_1_MK2]
-CalculationValue = 0.47999998927116394                       # 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_2]
-CalculationValue = 0.4399999976158142                        # 0.2199999988079071
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_2_MK2]
-CalculationValue = 0.6600000262260437                        # 0.33000001311302185
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_3]
-CalculationValue = 0.5400000214576721                        # 0.27000001072883606
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_3_MK2]
-CalculationValue = 0.8199999928474426                        # 0.4099999964237213
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_1_BetaCombo]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_1_BurstCombo]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_1_Combo]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_1_MK2_BetaCombo]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_1_MK2_BurstCombo]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_1_MK2_Combo]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_2_BetaCombo]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_2_BurstCombo]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_2_Combo]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_2_MK2_BetaCombo]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_2_MK2_BurstCombo]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_2_MK2_Combo]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_BetaCombo]
-CalculationValue = 0.47999998927116394                       # 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_BurstCombo]
-CalculationValue = 0.47999998927116394                       # 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_Combo]
-CalculationValue = 0.47999998927116394                       # 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_MK2_BetaCombo]
-CalculationValue = 0.7200000286102295                        # 0.36000001430511475
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_MK2_BurstCombo]
-CalculationValue = 0.7200000286102295                        # 0.36000001430511475
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_MK2_Combo]
-CalculationValue = 0.7200000286102295                        # 0.36000001430511475
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_1]
-CalculationValue = 9.0                                       # 4.5
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_1_ForStatViewer]
-CalculationValue = 0.09000000357627869                       # 0.04500000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_1_MK2]
-CalculationValue = 14.0                                      # 7.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_1_MK2_ForStatViewer]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_2]
-CalculationValue = 13.0                                      # 6.5
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_2_ForStatViewer]
-CalculationValue = 0.12999999523162842                       # 0.06499999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_2_MK2]
-CalculationValue = 20.0                                      # 10.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_2_MK2_ForStatViewer]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_3]
-CalculationValue = 16.0                                      # 8.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_3_ForStatViewer]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_3_MK2]
-CalculationValue = 24.0                                      # 12.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_3_MK2_ForStatViewer]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_1]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_1_MK2]
-CalculationValue = 0.27000001072883606                       # 0.13500000536441803
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_2]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_2_MK2]
-CalculationValue = 0.38999998569488525                       # 0.19499999284744263
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_3]
-CalculationValue = 0.3100000023841858                        # 0.1550000011920929
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_3_MK2]
-CalculationValue = 0.4699999988079071                        # 0.23499999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_1]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_1_MK2]
-CalculationValue = 500.0                                     # 250.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_2]
-CalculationValue = 600.0                                     # 300.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_2_MK2]
-CalculationValue = 700.0                                     # 350.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_3]
-CalculationValue = 800.0                                     # 400.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_3_MK2]
-CalculationValue = 900.0                                     # 450.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_1]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_1_MK2]
-CalculationValue = 700.0                                     # 350.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_2]
-CalculationValue = 600.0                                     # 300.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_2_MK2]
-CalculationValue = 900.0                                     # 450.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_3]
-CalculationValue = 800.0                                     # 400.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_3_MK2]
-CalculationValue = 1100.0                                    # 550.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_1]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_1_MK2]
-CalculationValue = 0.2199999988079071                        # 0.10999999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_2]
-CalculationValue = 0.1899999976158142                        # 0.0949999988079071
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_2_MK2]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_3]
-CalculationValue = 0.23000000417232513                       # 0.11500000208616257
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_3_MK2]
-CalculationValue = 0.3400000035762787                        # 0.17000000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_1_Condition]
-CalculationValue = 0.11999999731779099                       # 0.05999999865889549
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_1_MK2_Condition]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_1_MK2_Melee]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_1_MK2_Range]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_1_Melee]
-CalculationValue = 0.11999999731779099                       # 0.05999999865889549
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_1_Range]
-CalculationValue = 0.11999999731779099                       # 0.05999999865889549
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_2_Condition]
-CalculationValue = 0.17000000178813934                       # 0.08500000089406967
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_2_MK2_Condition]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_2_MK2_Melee]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_2_MK2_Range]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_2_Melee]
-CalculationValue = 0.17000000178813934                       # 0.08500000089406967
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_2_Range]
-CalculationValue = 0.17000000178813934                       # 0.08500000089406967
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_Condition]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_MK2_Condition]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_MK2_Melee]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_MK2_Range]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_Melee]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_Range]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_Show]
-CalculationValue = 0.0                                       # "+0"
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_1_Condition]
-CalculationValue = 180.0                                     # 90.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_1_Effect]
-CalculationValue = 180.0                                     # 90.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_1_MK2_Condition]
-CalculationValue = 280.0                                     # 140.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_1_MK2_Effect]
-CalculationValue = 280.0                                     # 140.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_2_Condition]
-CalculationValue = 270.0                                     # 135.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_2_Effect]
-CalculationValue = 270.0                                     # 135.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_2_MK2_Condition]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_2_MK2_Effect]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_3_Condition]
-CalculationValue = 320.0                                     # 160.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_3_Effect]
-CalculationValue = 320.0                                     # 160.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_3_MK2_Condition]
-CalculationValue = 480.0                                     # 240.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_3_MK2_Effect]
-CalculationValue = 480.0                                     # 240.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_1]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_1_MK2]
-CalculationValue = 0.27000001072883606                       # 0.13500000536441803
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_2]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_2_MK2]
-CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_3]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_3_MK2]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_1]
-CalculationValue = 200.0                                     # 100.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_1_MK2]
-CalculationValue = 0.0                                       # "+0"
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_2]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_2_MK2]
-CalculationValue = 800.0                                     # 400.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_3]
-CalculationValue = 800.0                                     # 400.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_3_MK2]
-CalculationValue = 1200.0                                    # 600.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_MK2_MaxShield]
-CalculationValue = 300.0                                     # 150.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_MK2_Shield]
-CalculationValue = 300.0                                     # 150.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_MK2_ShieldRegen]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_MK2_ShieldRegenWhenBattle]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_MaxShield]
-CalculationValue = 200.0                                     # 100.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_Shield]
-CalculationValue = 200.0                                     # 100.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_ShieldRegen]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_1_ShieldRegenWhenBattle]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_MK2_MaxShield]
-CalculationValue = 600.0                                     # 300.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_MK2_Shield]
-CalculationValue = 600.0                                     # 300.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_MK2_ShieldRegen]
-CalculationValue = 1.2000000476837158                        # 0.6000000238418579
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_MK2_ShieldRegenWhenBattle]
-CalculationValue = 1.2000000476837158                        # 0.6000000238418579
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_MaxShield]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_Shield]
-CalculationValue = 400.0                                     # 200.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_ShieldRegen]
-CalculationValue = 0.800000011920929                         # 0.4000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_2_ShieldRegenWhenBattle]
-CalculationValue = 0.800000011920929                         # 0.4000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_MK2_MaxShield]
-CalculationValue = 900.0                                     # 450.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_MK2_Shield]
-CalculationValue = 900.0                                     # 450.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_MK2_ShieldRegen]
-CalculationValue = 1.7999999523162842                        # 0.8999999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_MK2_ShieldRegenWhenBattle]
-CalculationValue = 1.7999999523162842                        # 0.8999999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_MaxShield]
-CalculationValue = 600.0                                     # 300.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_Shield]
-CalculationValue = 600.0                                     # 300.0
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_ShieldRegen]
-CalculationValue = 1.2000000476837158                        # 0.6000000238418579
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_ShieldRegenWhenBattle]
-CalculationValue = 1.2000000476837158                        # 0.6000000238418579
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_1]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_1_MK2]
-CalculationValue = 0.2199999988079071                        # 0.10999999940395355
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_2]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_2_MK2]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_3]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_3_MK2]
-CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_1_MK2_Melee]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_1_MK2_Range]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_1_Melee]
-CalculationValue = 0.09000000357627869                       # 0.04500000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_1_Range]
-CalculationValue = 0.09000000357627869                       # 0.04500000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_2_MK2_Melee]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_2_MK2_Range]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_2_Melee]
-CalculationValue = 0.12999999523162842                       # 0.06499999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_2_Range]
-CalculationValue = 0.12999999523162842                       # 0.06499999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_3_MK2_Melee]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_3_MK2_Range]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_3_Melee]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_3_Range]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_1]
-CalculationValue = 0.09000000357627869                       # 0.04500000178813934
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_1_MK2]
-CalculationValue = 0.14000000059604645                       # 0.07000000029802322
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_2]
-CalculationValue = 0.12999999523162842                       # 0.06499999761581421
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_2_MK2]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_3]
-CalculationValue = 0.1599999964237213                        # 0.07999999821186066
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_3_MK2]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_1]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_1_MK2]
-CalculationValue = 0.27000001072883606                       # 0.13500000536441803
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_2]
-CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_2_MK2]
-CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_3]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_3_MK2]
-CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_1]
-CalculationValue = 0.20000000298023224                       # 0.10000000149011612
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_1_MK2]
-CalculationValue = 0.3199999928474426                        # 0.1599999964237213
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_2]
-CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_2_MK2]
-CalculationValue = 0.46000000834465027                       # 0.23000000417232513
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_3]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_3_MK2]
-CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_1]
-CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_1_MK2]
-CalculationValue = 0.5400000214576721                        # 0.27000001072883606
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_2]
-CalculationValue = 0.5199999809265137                        # 0.25999999046325684
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_2_MK2]
-CalculationValue = 0.7799999713897705                        # 0.38999998569488525
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_3]
-CalculationValue = 0.6399999856948853                        # 0.3199999928474426
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_3_MK2]
-CalculationValue = 0.9599999785423279                        # 0.47999998927116394
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_1]
-CalculationValue = 0.18000000715255737                       # 0.09000000357627869
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_1_MK2]
-CalculationValue = 0.2800000011920929                        # 0.14000000059604645
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_2]
-CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_2_MK2]
-CalculationValue = 0.4000000059604645                        # 0.20000000298023224
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_3]
-CalculationValue = 0.3199999928474426                        # 0.1599999964237213
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_3_MK2]
-CalculationValue = 0.47999998927116394                       # 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
 
 [LV_Dead_DesertSandTrap]
 Action1 = "EffectAction_None"                                # "EffectAction_ImmediateDeath"
@@ -802,7 +801,6 @@ LifeTime = 30.0                                              # 3.5
 ActiveTargetFilterAlias = "Self"                             # "Self"
 CalculationMultipleValue = 4                                 # 1.0
 LifeTime = 11                                                # 1.0
-LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
 LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
@@ -812,7 +810,6 @@ StartDelayTime = 1                                           # "+0"
 ActiveTargetFilterAlias = "Self"                             # "Self"
 CalculationMultipleValue = 3                                 # 1.0
 LifeTime = 11                                                # 1.0
-LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
 LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
@@ -822,7 +819,6 @@ StartDelayTime = 1                                           # "+0"
 ActiveTargetFilterAlias = "Self"                             # "Self"
 CalculationMultipleValue = 8                                 # 1.0
 LifeTime = 11                                                # 1.0
-LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
 LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
@@ -832,7 +828,6 @@ StartDelayTime = 1                                           # "+0"
 ActiveTargetFilterAlias = "Self"                             # "Self"
 CalculationMultipleValue = 6                                 # 1.0
 LifeTime = 11                                                # 1.0
-LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
 LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0

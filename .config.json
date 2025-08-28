@@ -2,7 +2,7 @@
   "game" : {
     "contentPaks" : "SB/Content/Paks",
     "unrealEngine" : "4.26",
-    "mapUrl" : "https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/0eab1b4d7c1b88dea72298f60f6bb871682d3d1f/StellarBlade_1.1.0.usmap",
+    "mapUri" : "tools/StellarBlade_1.3.1.usmap",
     "aesKey" : ""
   },
   "tools" : {

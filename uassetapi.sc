@@ -60,7 +60,7 @@ def fromValue(v: Any): JsonNode = {
   }
 }
 
-case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches: Boolean) {
+case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean) {
   var objectMap: HashMap[String, ObjectNode] = {
     var r = HashMap.empty[String, ObjectNode]
     val values = value.get("Value").asInstanceOf[ArrayNode]
@@ -94,7 +94,7 @@ case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches
         (oldValueOpt, Option(value))
     }
     sbmod.logPatch(uassetName, s"* $name/$property: ${sbmod.toJsonPrettyString(rOpt)} => ${sbmod.toJsonPrettyString(valueOpt)}", console = false)
-    if (addToDataTableFilePatches) sbmod.updatePatch(uassetName, name, property, sbmod.ValuePair(valueOpt, rOpt))
+    if (addToFilePatches) sbmod.updatePatch(uassetName, name, property, sbmod.ValuePair(valueOpt, rOpt))
     rOpt
   }
   

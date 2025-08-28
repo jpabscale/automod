@@ -1,0 +1,3 @@
+['.*: ^N_Drone_Normal_Scan1_1_Target.*$']                    # based on https://www.nexusmods.com/stellarblade/mods/802
+FarDistance = 30000
+TargetCheckValue1 = 3000

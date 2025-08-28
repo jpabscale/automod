@@ -10,7 +10,6 @@
 //> using dep org.slf4j:slf4j-nop:2.0.17
 //> using file sbmod.sc
 //> using file patchCustom.sc
-//> using file patchSB.sc
 //> using file patchlet.sc
 //> using file uassetapi.sc
 //> using mainClass sbmod
