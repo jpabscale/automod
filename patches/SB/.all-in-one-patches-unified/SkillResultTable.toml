@@ -1,4 +1,37 @@
 # ...                                                        # Game Original Value
+[M_Scarlet_MoveBackShot_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.8}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_MoveBackShot2_Hit1]
+HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "Hit_Back_050_100"
+HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # 'null'
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
+ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # "Hit/Result_Hit_Airborne"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_EveRange\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"},{\"Alias\":\"HitStun\",\"Time\":1}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_StrongAttack_SwordAura"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_MoveBackShot2_Hit2]
+HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "Hit_Back_050_100"
+HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # 'null'
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
+ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # "Hit/Result_Hit_Airborne"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_EveRange\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_StrongAttack_SwordAura"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
 [M_Scarlet_MoveBackShot2_Hit3]
 HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.8}]"
@@ -67,39 +100,6 @@ HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"    
 
 [M_Scarlet_AirDashSpaceCut_Hit6]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}]"
-
-[M_Scarlet_MoveBackShot_Hit2]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.8}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
-
-[M_Scarlet_MoveBackShot2_Hit1]
-HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
-HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "Hit_Back_050_100"
-HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # 'null'
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
-ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # "Hit/Result_Hit_Airborne"
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_EveRange\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"},{\"Alias\":\"HitStun\",\"Time\":1}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_StrongAttack_SwordAura"    # "Hit/Result_Hit_Stand_LightAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_MoveBackShot2_Hit2]
-HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
-HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "Hit_Back_050_100"
-HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # 'null'
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
-ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # "Hit/Result_Hit_Airborne"
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_EveRange\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_StrongAttack_SwordAura"    # "Hit/Result_Hit_Stand_LightAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
 [M_Scarlet_SwingCombo_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.4}]"
@@ -188,9 +188,6 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Res
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[P_Eve_Sword_Beta_ChainStab1_1_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":1.0}]"
-
 [M_Scarlet_BlinkShot_Projectile2_Hit1]
 HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
@@ -206,9 +203,6 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Res
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[P_Eve_Sword_Beta_ChainStab1_1_Hit2]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":0.5}]"    # 'null'
-
 [M_Scarlet_BlinkShot_Projectile3_Hit1]
 HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
@@ -223,6 +217,15 @@ ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[P_Eve_Sword_Beta_ChainStab1_1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Beta_ChainStab1_1_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":0.5}]"    # 'null'
+
+[P_Eve_Sword_Beta_ChainStab1_1_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
 
 [P_Eve_Sword_Beta_ChainStab1_Ex_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
@@ -310,6 +313,16 @@ ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\
 ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
 
+[P_Eve_Sword_Normal_StrongAttack7_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Tachy_Skill_SwordAura_Projectile3_Hit1]
+HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
+HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # "Hit_Back_0"
+ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
+ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+
 [P_Eve_Sword_Normal_DashAttack1_2_Ex_Hit1]
 HitLevelResultTargetCommonMoveAlias = 'null'                 # "Hit_Back_030_200"
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
@@ -357,12 +370,29 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 
-[P_Eve_Tachy_Skill_SwordAura_Projectile3_Hit1]
+[P_Eve_Sword_Beta_SwordAuraCombo1_Projectile1_Hit1]
 HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
 HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # "Hit_Back_0"
 ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
 ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
+
+[P_Eve_Sword_JustParry_LightAttackCombo1_1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"SkillDamage_Eve\"}]"
+
+[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
+[P_Eve_Tachy_Skill_ParrySlash1_1_Hit1]
+ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"DisableDeadSkill_Lurker\"}, {\"Alias\":\"SkillDamage_Eve\"}]"
+
+[P_Eve_Sword_Beta_SwordAuraCombo1_Projectile1_Ex_Hit1]
+HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
+HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # "Hit_Back_0"
+ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
+ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 
 [P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit2]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
@@ -374,6 +404,12 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 
+[P_Eve_Tachy_Skill_ScrewAttack1_1_Hit3]
+ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"DisableDeadSkill_Lurker\"}, {\"Alias\":\"SkillDamage_Eve\"}]"
+
+[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
 [P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit3]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
 HitLevelResultTargetCommonMoveAlias = 'null'                 # "Hit_Back_030_200"
@@ -383,61 +419,6 @@ ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # "Hit/R
 ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-
-[P_Eve_Tachy_Skill_ParrySlash1_1_Hit1]
-ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"DisableDeadSkill_Lurker\"}, {\"Alias\":\"SkillDamage_Eve\"}]"
-
-[P_Eve_Sword_Normal_DashAttackCombo2_1_Hit1]
-HitLevelResultTargetCommonMoveAlias = 'null'                 # "Hit_Back_030_200"
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_Sword_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # "Hit/Result_Hit_Stand_Sword_Critical"
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-
-[P_Eve_Tachy_Skill_ScrewAttack1_1_Hit3]
-ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"DisableDeadSkill_Lurker\"}, {\"Alias\":\"SkillDamage_Eve\"}]"
-
-[P_Eve_Sword_Normal_FinishAttack3_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack10_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_FinishAttack4_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit2]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit3]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit2]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_Normal_StrongAttack7_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
-
-[P_Eve_Sword_JustParry_LightAttackCombo1_1_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
-ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"SkillDamage_Eve\"}]"
-
-[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
-
-[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit2]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
 
 [P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit3]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
@@ -451,23 +432,21 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 
-[P_Eve_Sword_Beta_SwordAuraCombo1_Projectile1_Hit1]
-HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
-HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # "Hit_Back_0"
-ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
-ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-
-[P_Eve_Sword_Beta_SwordAuraCombo1_Projectile1_Ex_Hit1]
-HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
-HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # "Hit_Back_0"
-ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
-ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
-
 [P_Eve_Sword_Burst_MeleeCombatBuff1_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
 ResultTargetCommonEffect = "[{\"Alias\":\"Stun\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Eve\"}]"    # "[{\"Alias\":\"DisableDeadSkill_Lurker\"}, {\"Alias\":\"SkillDamage_Eve\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo2_1_Hit1]
+HitLevelResultTargetCommonMoveAlias = 'null'                 # "Hit_Back_030_200"
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_Sword_StrongAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # "Hit/Result_Hit_Stand_Sword_Critical"
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
+
+[P_Eve_Sword_Normal_FinishAttack3_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
 
 [P_Eve_Tachy_JustEvade_LightAttack1_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
@@ -502,6 +481,30 @@ ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # "Hit/R
 ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_Sword_StrongAttack_NoAnim"
+
+[P_Eve_Sword_Normal_StrongAttack10_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
 
 [P_Eve_Sword_Normal_LightAttack1_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
@@ -696,17 +699,24 @@ ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"   
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
 [M_Scarlet_Swing_Hit1]
-HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.8}]"
 HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "Hit_Back_050_100"
 HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"       # 'null'
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetAirborneEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05}]"    # 'null'
 ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"     # "Hit/Result_Hit_Airborne"
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillCancel\"},{\"Alias\":\"BlockSkill\",\"Time\":3},{\"Alias\":\"BlockAction\",\"Time\":3},{\"Alias\":\"SkillDamage_EveRange\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_StrongAttack_SwordAura"    # "Hit/Result_Hit_Stand_LightAttack"
 ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_AreaCombo_Hit4]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
@@ -719,10 +729,10 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_AreaCombo_Hit4]
+[M_Scarlet_AreaCombo_Hit5]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
 ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
@@ -751,42 +761,6 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Res
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_AreaCombo_Hit5]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_JumpStampSlash_Hit4]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactBlunt_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactBlunt_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_Blunt_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_JumpStampSlash_Hit5]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_Skill_KnockDown\",\"startDelayTime\":0.05},{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_AreaCombo_Hit6]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactBlunt_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactBlunt_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_Blunt_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
 [M_Scarlet_SwingTriple_Hit2]
 HitLevelResultTargetAirborneMoveAlias = "Hit_Back_020_150"   # 'null'
 HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "Hit_Back_050_100"
@@ -801,19 +775,19 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Res
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_AreaCombo_Hit7]
+[M_Scarlet_JumpStampSlash_Hit4]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactBlunt_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactBlunt_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_Blunt_StrongAttack"
 ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_BlinkCombo_Hit1]
+[M_Scarlet_AreaCombo_Hit6]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactBlunt_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactBlunt_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_Blunt_StrongAttack"
 ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
@@ -833,16 +807,7 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"    # "Hit/Res
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_BlinkCombo_Hit2]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_BackDashSpaceCut_Hit3]
+[M_Scarlet_AreaCombo_Hit7]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
@@ -851,7 +816,16 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_BlinkCombo_Hit3]
+[M_Scarlet_JumpStampSlash_Hit5]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_Skill_KnockDown\",\"startDelayTime\":0.05},{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_BlinkCombo_Hit1]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
@@ -870,7 +844,7 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_BlinkCombo_Hit4]
+[M_Scarlet_BlinkCombo_Hit2]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
@@ -889,7 +863,52 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
+[M_Scarlet_BlinkCombo_Hit3]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_BackDashSpaceCut_Hit3]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_BlinkCombo_Hit4]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_AirDashCut_Hit2]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
 [M_Scarlet_BlinkCombo_Hit5]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_AirDashCut_Hit3]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
@@ -934,24 +953,6 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_SwingFast_Hit3]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_AirDashCut_Hit2]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
 [M_Scarlet_BlinkCombo_Hit8]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
@@ -961,16 +962,7 @@ ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    #
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 
-[M_Scarlet_AirDashCut_Hit3]
-ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
-ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
-ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
-ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
-ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
-
-[M_Scarlet_SwingFast_Hit4]
+[M_Scarlet_SwingFast_Hit3]
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
@@ -983,6 +975,15 @@ ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim" 
 ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
 ResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_Skill_KnockDown\",\"startDelayTime\":0.05},{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Strong\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
 ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_StrongAttack"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
+
+[M_Scarlet_SwingFast_Hit4]
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # 'null'
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Eve\"},{\"Alias\":\"DisableDeadSkill_Lurker\"},{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactSlash_Light\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"    # "Hit/Result_Hit_Stand_LightAttack"
 ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"    # 'null'
 ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"
 ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"    # "Hit/Result_Hit_Stand_LightAttack_NoAnim"

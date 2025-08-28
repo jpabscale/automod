@@ -25,7 +25,7 @@ def toValue[T](node: JsonNode): Option[T] = {
     case node: ObjectNode => 
       var r = Map[String, Any]()
       for (property <- node.fieldNames.asScala) {
-        r = r + (property -> toValue[Any](node.get(property)).get)
+        r = r + (property -> toValue[Any](node.get(property)).getOrElse(null))
       }
       Some(toT(r))
     case node: TextNode => 

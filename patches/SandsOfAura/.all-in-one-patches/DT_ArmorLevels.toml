@@ -1,0 +1,4 @@
+['.*: ^.*$']
+health = 135
+armor = 135
+numArmorRuneSlots = 6

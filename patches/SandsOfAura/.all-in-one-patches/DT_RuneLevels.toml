@@ -1,0 +1,11 @@
+['.*: ^.*$']
+armorPercent = 0.5
+healthPercent = 0.5
+critDamagePercent = 0.4
+hastePercent = 1.6
+armorPenetrationPercent = 0.2
+specialAttackDamagePercent = 0.4
+spellBladeDamagePercent = 1.0
+runeDustValue = 1000000
+runeDustRequired = 0
+glintRequired = 0

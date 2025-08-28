@@ -1,0 +1,14 @@
+['.*: ^.*$']
+tiers = '''=> {
+  var r = Seq[Map[String, Any]]()
+  val orig = v.orig[Seq[Map[String, Any]]]
+  r = r :+ orig.head
+
+  for (i <- 1 until orig.length) {
+    val m: Map[String, Any] = orig(i)
+    val mValue = m("Value").asInstanceOf[Seq[Map[String, Any]]]
+    assert(mValue.length == 3, s"${v.objName}: orig.length = ${orig.length}")
+    r = r :+ (m + ("Value" -> Seq[Map[String, Any]](mValue.head, mValue(1) + ("Value" -> Seq[Map[String, Any]]()), mValue(2))))
+  }
+  r
+}'''

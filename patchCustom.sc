@@ -3,6 +3,8 @@ import scala.collection.immutable.{TreeMap, TreeSet}
 
 lazy val uassetNames: TreeSet[String] = TreeSet(
   // insert the uasset name that you want to handle in the patch method here (without file extension)
+
+  // Stellar Blade Data Tables
   // "AchievementTable",
   // "AcquisitionSkillTable",
   // "ActivityTable",
@@ -156,6 +158,21 @@ lazy val uassetNames: TreeSet[String] = TreeSet(
   // "ZonePhaseEventTable",
   // "ZoneTable",
   // "ZoneTriggerTable"
+
+  // Sands of Aura Data Tables
+  // "DT_ArmorLevels",
+  // "DT_ArmorUpgradeCosts",
+  // "DT_RuneLevels",
+  // "DT_SpellBladeLevels",
+  // "DT_WeaponUpgradeCosts",
+  // "DT_Items",
+  // "DT_MerchantItems_Everything",
+  // "DT_DestructibleObjects",
+  // "DT_NPCStats",
+  // "DT_NPCStats_HardMode",
+  // "DT_Talisman",
+  // "DT_Upgrades",
+  // "DA_SpellBladeEffects"
 ) 
 
 // This method will be called for any uasset in the uassetNames, as well as for uasset not handled by the script code

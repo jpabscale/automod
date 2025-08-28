@@ -1,0 +1,17 @@
+['.*: ^.*$']
+fire_Attack_TickDamage = 67
+fire_Block_Damage = 684
+fire_Dodge_TickDamage = 166
+lighting_Block_Duration = 9.8
+lightning_Attack_Damage = 588
+lightning_Dodge_Damage = 572
+frost_Attack_Duration = 7.8
+frost_Attack_DamageDownPercentModifier = 4.9
+frost_Dodge_Duration = 35
+temporal_Attack_BonusAttackDamage = 354
+temporal_Dodge_Duration = 11.8
+temporal_Block_ReflectDamagePercent = 7
+simple_Attack_BonusAttackDamage = 684
+simple_Dodge_HasteModifier = 0.6
+simple_Block_NegateAttackDuration = 31
+glintRequired = 0
