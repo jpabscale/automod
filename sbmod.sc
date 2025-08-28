@@ -19,22 +19,37 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v1.5"
-
-if (args.length != 2) exit(0,
-  s"""$header
-     |
-     |Usage: scala-cli sbmod.sc -- ( <mod-name> <path-to-StellarBlade>
-     |                             | .code <path-to-jd-patch-file>
-     |                             | .setup
-     |                             )
-     |
-     |  .code    Print Auto Modding Script patching code from a jd patch file
-     |  .setup   Only set up modding tools""".stripMargin)
+val header = s"Stellar Blade Auto Modding Script v1.6"
 
 val argName = args.head
-val argPath = os.Path(new java.io.File(args.last).getAbsolutePath)
-val sbPakDir = argPath / "SB" / "Content" / "Paks"
+
+def printUsage(): Unit = {
+  exit(0,
+    s"""$header
+       |
+       |Usage: scala-cli sbmod.sc -- [ <mod-name> <path-to-StellarBlade>
+       |                             | .code <path-to-jd-patch-file>
+       |                             | .diff <from-path> <to-path> <out-path>
+       |                             | .setup
+       |                             | .toml <out-path>
+       |                             ]
+       |
+       |  .code    Print Auto Modding Script patching code from a jd patch file
+       |  .diff    Recursively diff JSON files and write jd and TOML patch files
+       |  .setup   Only set up modding tools
+       |  .toml    Merge existing patch files in patches as TOML patch files""".stripMargin)
+}
+
+argName match {
+  case ".setup" if args.length != 1 => printUsage()
+  case ".diff" if args.length != 4 => printUsage()
+  case _ =>
+}
+
+def absPath(p: String): os.Path = os.Path(new java.io.File(p).getAbsolutePath)
+
+lazy val argPath = absPath(args(1))
+lazy val sbPakDir = argPath / "SB" / "Content" / "Paks"
 
 val retocVersion = "0.1.2"
 val uassetGuiVersion = "1.0.3"
@@ -64,8 +79,10 @@ val uassetGuiSettingsDir = os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
 
-def setupModTools(): Unit = {
+def setupModTools(): Boolean = {
+  var setup = true
   if (!os.exists(retocExe)) {
+    setup = false
     println(s"Please wait while setting up retoc v$retocVersion in $workingDir ...")
     os.proc("curl", "-JLO", retocUrl).call(cwd = workingDir)
     os.proc("tar", "-xf", retocZip).call(cwd = workingDir)
@@ -76,12 +93,14 @@ def setupModTools(): Unit = {
   }
 
   if (!os.exists(uassetGuiExe)) {
+    setup = false
     println(s"Please wait while setting up UAssetGUI v$uassetGuiVersion in $workingDir ...")
     os.proc("curl", "-JLO", uassetGuiUrl).call(cwd = workingDir)
     println()
   }
 
   if (!os.exists(workingDir / sbMapFilename)) {
+    setup = false
     println(s"Please wait while setting up $sbMapFilename in $workingDir ...")
     os.proc("curl", "-JLO", sbMapUrl).call(cwd = workingDir)
     println()
@@ -97,6 +116,7 @@ def setupModTools(): Unit = {
   }
 
   if (!os.exists(fmodelExe)) {
+    setup = false
     val fmodelZip = s"${fmodelExe.last}.zip"
     println(s"Please wait while setting up FModel @$fmodelShortSha in $workingDir ...")
     os.proc("curl", "-JLo", fmodelZip, fmodelUrl).call(cwd = workingDir)
@@ -106,10 +126,13 @@ def setupModTools(): Unit = {
   }
 
   if (!os.exists(jdExe)) {
+    setup = false
     println(s"Please wait while setting up jd v$jdVersion in $workingDir ...")
     os.proc("curl", "-JLo", jdExe.last, jdUrl).call(cwd = workingDir)
     println()
   }
+
+  setup
 }
 
 def jdPatchTree(path: os.Path): TreeMap[String, TreeMap[String, String]] = {
@@ -278,7 +301,7 @@ def patchTargetFilter(obj: UAssetObject): Unit = {
 }
 
 def toJsonNode(value: String): JsonNode = {
-  if (value(0) == '"') TextNode.valueOf(value.substring(1, value.length - 1))
+  if (value(0) == '"') return TextNode.valueOf(value.substring(1, value.length - 1))
   value.toIntOption match {
     case Some(v) => return IntNode.valueOf(v)
     case _ =>
@@ -317,7 +340,7 @@ def patchUasset(name: String, file: os.Path, fOpt: Option[UAssetObject => Unit])
 
 def generateMod(): Unit = {
   val modDir = workingDir / argName
-  val output = workingDir / "output"
+  val output = workingDir / "out"
 
   def recreateDir(dir: os.Path): Unit = {
     os.remove.all(dir)
@@ -376,7 +399,7 @@ def generateMod(): Unit = {
   val uassetCodeMap = TreeMap(
     // add more/change to uasset patching of interest here, e.g.,
     //"TargetFilterTable" -> patchTargetFilter _,
-    "EffectTable" -> patchEffect _
+    "EffectTable" -> patchEffect _ // comment in this line to disable modding via code
   )
 
   val uassetNames = TreeSet.empty[String] ++ uassetCodeMap.keys ++ patches.keys
@@ -443,24 +466,78 @@ def code(path: os.Path): Unit = {
   println(lines.mkString(util.Properties.lineSeparator))
 }
 
-setupModTools()
+def writeToml(path: os.Path, data: TreeMap[String, TreeMap[String, String]]): Unit = {
+  os.remove.all(path)
+  val sep = util.Properties.lineSeparator
+  for ((name, properties) <- data) {
+    os.write.append(path, s"[$name]$sep")
+    for ((property, value) <- properties) {
+      val v = toJsonNode(value).toPrettyString
+      os.write.append(path, s"$property = $v$sep")
+    }
+    os.write.append(path, sep)
+  }
+  println(s"Wrote $path")
+}
+
+def toml(path: os.Path): Unit = {
+  if (os.exists(path) && !os.isDir(path)) {
+    exit(-1, s"$path is not a directory")
+  }
+
+  os.makeDir.all(path)
+  for ((uassetName, data) <- patches) {
+    val p = path / s"$uassetName.toml"
+    writeToml(p, data)
+  }
+  if (patches.isEmpty) println("No patches to write")
+  else println()
+}
+
+def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
+  def rec(f: os.Path, t: os.Path): Unit = {
+    if (os.isFile(f) && os.isFile(t) && f.ext.toLowerCase == "json" && t.ext.toLowerCase == "json") {
+      val patch = out / s"${f.baseName}.patch"
+      println(s"Diffing $f => $t ...")
+      os.proc(jdExe, "-o", patch, f, t).call(cwd = workingDir, check = false).exitCode match {
+        case 0 =>
+          println("No changes found")
+        case 1 =>
+          println(s"Wrote $patch")
+          writeToml(out / s"${f.baseName}.toml", jdPatchTree(patch))
+        case code => exit(code, s"Error occurred when running jd")
+      }
+      println()
+    } else if (os.isDir(f) && os.isDir(t)) {
+      for (p <- os.list(f)) {
+        rec(f / p.last, t / p.last)
+      }
+    }
+  }
+  if (os.exists(out) && !os.isDir(out)) {
+    exit(-1, s"$out is not a directory")
+  }
+  os.makeDir.all(out)
+  rec(from, to)
+  println()
+}
+
+val setup = setupModTools()
 
 argName match {
   case ".code" => code(argPath)
-
-  case ".setup" => // skip
-
+  case ".diff" => diff(argPath, absPath(args(2)), absPath(args(3)))
+  case ".setup" => if (setup) println("All modding tools have been set up")
+  case ".toml" => toml(argPath)
   case _ =>
-
     if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
-
-    println(header)
-    println(s"* Game directory: $argPath")
-    println(s"* Mod name to generate: $argName")
-    println(s"* Working directory: $workingDir")
-    println(s"* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, $sbMapFilename")
-    println(s"* Extra: FModel @$fmodelShortSha, jd v$jdVersion")
-    println()
-
+    println(
+      s"""$header
+         |* Game directory: $argPath
+         |* Mod name to generate: $argName
+         |* Working directory: $workingDir
+         |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, $sbMapFilename
+         |* Extra: FModel @$fmodelShortSha, jd v$jdVersion
+         |""".stripMargin)
     setUAssetGUIConfigAndRun(generateMod _)
 }
