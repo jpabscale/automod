@@ -199,22 +199,46 @@ CalculationValue = 0.30000001192092896                       # 0.150000005960464
 CalculationValue = 0.36000001430511475                       # 0.18000000715255737
 
 [Gear_BetaCrystalAdditiveRate_1]
-CalculationValue = 0.800000011920929                         # 0.4000000059604645
+CalculationValue = 0.147                                     # 0.4000000059604645
+LifeTime = 0                                                 # "+0"
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_Infinite"
+StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculationType_Static"
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaCrystalAdditiveRate_1_MK2]
-CalculationValue = 1.2000000476837158                        # 0.6000000238418579
+CalculationValue = 0.294                                     # 0.6000000238418579
+LifeTime = 0                                                 # "+0"
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_Infinite"
+StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculationType_Static"
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaCrystalAdditiveRate_2]
-CalculationValue = 1.399999976158142                         # 0.699999988079071
+CalculationValue = 0.15                                      # 0.699999988079071
+LifeTime = 0                                                 # "+0"
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_Infinite"
+StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculationType_Static"
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaCrystalAdditiveRate_2_MK2]
-CalculationValue = 2.0999999046325684                        # 1.0499999523162842
+CalculationValue = 0.3                                       # 1.0499999523162842
+LifeTime = 0                                                 # "+0"
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_Infinite"
+StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculationType_Static"
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaCrystalAdditiveRate_3]
-CalculationValue = 2.0                                       # 1.0
+CalculationValue = 0.153                                     # 1.0
+LifeTime = 0                                                 # "+0"
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_Infinite"
+StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculationType_Static"
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaCrystalAdditiveRate_3_MK2]
-CalculationValue = 3.0                                       # 1.5
+CalculationValue = 0.306                                     # 1.5
+LifeTime = 0                                                 # "+0"
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_Infinite"
+StatCalculationType = "EffectCalculationType_Static"         # "EffectCalculationType_Static"
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ActorStatType_BetaCrystalAdditiveRate"
 
 [Gear_BetaGaugeAdditiveRate_1]
 CalculationValue = 0.11999999731779099                       # 0.05999999865889549
@@ -816,6 +840,9 @@ StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_TachyGaugeReduceConsumeRate]
 CalculationValue = 0.8                                       # 0.20000000298023224
+
+[P_Eve_Stance_GunGorgon]
+ActorState1 = "ActorState_None"                              # "ActorState_BlockRotation"
 
 [P_Protector_Burst1]
 CalculationMultipleValue = 2                                 # 1.0

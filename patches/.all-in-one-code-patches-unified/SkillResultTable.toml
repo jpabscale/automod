@@ -37,6 +37,9 @@ HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # 
 [M_Scarlet_BackDashSpaceCut_Hit6]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}]"
 
+[M_Scarlet_BlinkCombo_Hit9]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05},{\"Alias\":\"HitStun\",\"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
 [M_Scarlet_BlinkCut_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}]"
 
@@ -130,6 +133,9 @@ HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # 'null'
 
 [P_Eve_Sword_Beta_SwordAura1_Projectile2_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # 'null'
+
+[P_Eve_Sword_Burst_MeleeCombatBuff1_1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
 
 [P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"

@@ -1,9 +1,9 @@
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable.HashMap
+import scala.jdk.CollectionConverters._
 import scala.reflect.runtime.universe._
-import sbmod._
 
 object Constants {
   val typeKey = ".type" 
@@ -55,12 +55,12 @@ def newData(path: Vector[String], property: String, value: JsonNode): ObjectNode
             case `nameKey` =>
               Option(value.get(valueKey)) match {
                 case Some(v: TextNode) => newName(property, v)
-                case _ => exit(-1, s"""Expecting a string $valueKey field for ${path.mkString("/")}""")
+                case _ => sbmod.exit(-1, s"""Expecting a string $valueKey field for ${path.mkString("/")}""")
               }
             case `uint32Key` =>
               Option(value.get(valueKey)) match {
                 case Some(v: IntNode) => newUInt32(property, v)
-                case _ => exit(-1, s"""Expecting a string $valueKey field for ${path.mkString("/")}""")
+                case _ => sbmod.exit(-1, s"""Expecting a string $valueKey field for ${path.mkString("/")}""")
               }
             case structType =>
               val r = newStruct(property, structType)
@@ -71,14 +71,14 @@ def newData(path: Vector[String], property: String, value: JsonNode): ObjectNode
               }
               r
           }
-        case _ => exit(-1, 
+        case _ => sbmod.exit(-1, 
           s"""Expecting a $typeKey field for ${path.mkString("/")} (whose value either "$nameKey", "$uint32Key", or the struct type name)""")
       }
     case null => null
   }
 }
 
-def newStruct(name: String, structType: String): ObjectNode = toJsonNode(
+def newStruct(name: String, structType: String): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Structs.StructPropertyData, UAssetAPI",
      |  "StructType": "$structType",
@@ -95,7 +95,7 @@ def newStruct(name: String, structType: String): ObjectNode = toJsonNode(
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newEnum(name: String, enumType: String, jsonValue: TextNode): ObjectNode = toJsonNode(
+def newEnum(name: String, enumType: String, jsonValue: TextNode): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.EnumPropertyData, UAssetAPI",
      |  "EnumType": "$enumType",
@@ -109,7 +109,7 @@ def newEnum(name: String, enumType: String, jsonValue: TextNode): ObjectNode = t
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newString(name: String, jsonValue: TextNode): ObjectNode = toJsonNode(
+def newString(name: String, jsonValue: TextNode): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.StrPropertyData, UAssetAPI",
      |  "Name": "$name",
@@ -121,7 +121,7 @@ def newString(name: String, jsonValue: TextNode): ObjectNode = toJsonNode(
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newBoolean(name: String, jsonValue: BooleanNode): ObjectNode = toJsonNode(
+def newBoolean(name: String, jsonValue: BooleanNode): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.BoolPropertyData, UAssetAPI",
      |  "Name": "$name",
@@ -133,7 +133,7 @@ def newBoolean(name: String, jsonValue: BooleanNode): ObjectNode = toJsonNode(
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newName(name: String, jsonValue: TextNode): ObjectNode = toJsonNode(
+def newName(name: String, jsonValue: TextNode): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI",
      |  "Name": "$name",
@@ -145,7 +145,7 @@ def newName(name: String, jsonValue: TextNode): ObjectNode = toJsonNode(
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newUAssetApiFloatPropertyData(name: String, jsonValue: DoubleNode): ObjectNode = toJsonNode(
+def newUAssetApiFloatPropertyData(name: String, jsonValue: DoubleNode): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.FloatPropertyData, UAssetAPI",
      |  "Value": "+0",
@@ -158,7 +158,7 @@ def newUAssetApiFloatPropertyData(name: String, jsonValue: DoubleNode): ObjectNo
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newUAssetApiArrayPropertyData(name: String): ObjectNode = toJsonNode(
+def newUAssetApiArrayPropertyData(name: String): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.ArrayPropertyData, UAssetAPI",
      |  "ArrayType": null,
@@ -172,7 +172,7 @@ def newUAssetApiArrayPropertyData(name: String): ObjectNode = toJsonNode(
      |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newUAssetApiIntPropertyData(name: String, jsonValue: IntNode): ObjectNode = toJsonNode(
+def newUAssetApiIntPropertyData(name: String, jsonValue: IntNode): ObjectNode = sbmod.toJsonNode(
   s"""{
       |  "$$type": "UAssetAPI.PropertyTypes.Objects.IntPropertyData, UAssetAPI",
       |  "Name": "$name",
@@ -184,7 +184,7 @@ def newUAssetApiIntPropertyData(name: String, jsonValue: IntNode): ObjectNode = 
       |}""".stripMargin
 ).asInstanceOf[ObjectNode]
 
-def newUInt32(name: String, jsonValue: IntNode): ObjectNode = toJsonNode(
+def newUInt32(name: String, jsonValue: IntNode): ObjectNode = sbmod.toJsonNode(
   s"""{
      |  "$$type": "UAssetAPI.PropertyTypes.Objects.UInt32PropertyData, UAssetAPI",
      |  "Name": "$name",
@@ -203,14 +203,22 @@ def toValue[T](node: JsonNode): Option[T] = {
     case node: BooleanNode => Some(toT(node.booleanValue))
     case node: IntNode => Some(toT(node.doubleValue))
     case node: DoubleNode => Some(toT(node.doubleValue))
+    case node: ArrayNode => Some(toT((for (i <- 0 until node.size) yield toValue[Any](node.get(i)).get).toSeq))
+    case node: ObjectNode => 
+      var r = Map[String, Any]()
+      for (property <- node.fieldNames.asScala) {
+        r = r + (property -> toValue[Any](node.get(property)).get)
+      }
+      Some(toT(r))
     case node: TextNode => 
       val text = node.textValue
-      var r: Any = text
-      for (v <- text.toBooleanOption) r = v
-      for (v <- text.toDoubleOption) r = v
-      Some(toT(r))
-    case null => None
-    case _ => exit(-1, s"Unsupported value: '${node.toPrettyString}'")
+      text match {
+        case "+0.0" | "-0.0" | "+0" | "-0" => Some(toT(0d))
+        case _ => Some(toT(text))
+      }
+    case node: NullNode => Some(toT(null))
+    case null => Some(toT(null))
+    case _ => sbmod.exit(-1, s"Unsupported value: '${node.toPrettyString}'")
   }
 }
 
@@ -220,8 +228,18 @@ def fromValue(v: Any): JsonNode = {
     case v: Int => IntNode.valueOf(v)
     case v: Double => DoubleNode.valueOf(v)
     case v: String => TextNode.valueOf(v)
-    case null => null
-    case _ => exit(-1, s"Unsupported value: '$v'")
+    case v: Seq[_] => 
+      val r = JsonNodeFactory.instance.arrayNode
+      for (o <- v) {
+        r.add(fromValue(o))
+      }
+      r
+    case v: Map[_, _] =>
+      val r = JsonNodeFactory.instance.objectNode
+      for ((k, v) <- v) r.set[JsonNode](k.toString, fromValue(v))
+      r
+    case null => NullNode.instance
+    case _ => sbmod.exit(-1, s"Unsupported value: '$v'")
   }
 }
 
@@ -240,13 +258,11 @@ case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches
   def obj(objName: String): ObjectNode = {
     objectMap.get(objName) match {
       case Some(obj) => return obj
-      case _ => exit(-1, s"Could not find $objName in $uassetName")
+      case _ => sbmod.exit(-1, s"Could not find $objName in $uassetName")
     }
   }
 
   def setJson(property: String, value: JsonNode): Option[JsonNode] = {
-    if (value != null && ((value.isArray && value.asInstanceOf[ArrayNode].size != 0) || 
-      value.isObject)) exit(-1, s"Unsupported patch value for $name/$property: ${value.toPrettyString}")
     def toEnumPrettyString(enumType: TextNode)(node: JsonNode): JsonNode = TextNode.valueOf(s"${enumType.asText}::${node.asText}")
     val (rOpt, valueOpt) = value match {
       case value: TextNode if value.asText.contains("::") => 
@@ -254,20 +270,20 @@ case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches
         val enumType = TextNode.valueOf(text.substring(0, text.indexOf("::")))
         val oldEnumOpt = Option(obj(property).replace("EnumType", enumType)).map(_.toPrettyString)
         val newValue = TextNode.valueOf(text.substring(text.indexOf("::") + 2))
-        val oldValueOpt = Option(obj(property).replace("Value", value))
+        val oldValueOpt = Option(obj(property).replace("Value", newValue))
         (oldValueOpt, Some(toEnumPrettyString(enumType)(newValue)))
       case _ =>
         val oldValueOpt = Option(obj(property).replace("Value", value))  
         (oldValueOpt, Option(value))
     }
-    println(s"* $name/$property: ${toJsonPrettyString(rOpt)} => ${toJsonPrettyString(valueOpt)}")
+    println(s"* $name/$property: ${sbmod.toJsonPrettyString(rOpt)} => ${sbmod.toJsonPrettyString(valueOpt)}")
     if (addToDataTableFilePatches) {
       val key = sbmod.OrderedString(uassetName, "", 0)
-      var map = _patches.getOrElse(key, TreeMap.empty: UAssetPropertyChanges)
-      var m = map.getOrElse(name, TreeMap.empty: PropertyChanges)
-      m = m + (property -> ValuePair(valueOpt, rOpt))
+      var map = sbmod._patches.getOrElse(key, TreeMap.empty: sbmod.UAssetPropertyChanges)
+      var m = map.getOrElse(name, TreeMap.empty: sbmod.PropertyChanges)
+      m = m + (property -> sbmod.ValuePair(valueOpt, rOpt))
       map = map + (name -> m)
-      _patches = _patches + (key -> map)
+      sbmod._patches = sbmod._patches + (key -> map)
     }
     rOpt
   }

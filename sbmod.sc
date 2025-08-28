@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.4.3"
+val header = s"Auto Modding Script v2.4.4"
 
 val dataTablePath = "/Exports/0/Table/Data"
 val noCodePatching = "--no-code-patching"
@@ -515,7 +515,7 @@ def patches: DataTableFilePatches = {
 def writeJson(path: os.Path, node: JsonNode): Unit = objectWriter.writeValue(path.toIO, node)
 
 def toJsonPrettyString(valueOpt: Option[JsonNode], default: String = ""): String =
-  valueOpt.map(_.toPrettyString).getOrElse(default)
+  valueOpt.map(_.toString).getOrElse(default)
 
 def toDataMap(data: ArrayNode): collection.Map[String, ObjectNode] = {
   val r = collection.mutable.HashMap.empty[String, ObjectNode]
@@ -657,14 +657,19 @@ def generateMod(addToDataTableFilePatches: Boolean,
        |Try to see if this is a known issue (or filing a new one) at:
        |https://github.com/trumank/retoc/issues""".stripMargin)
 
-  def uassetGuiFailed(title: String, pUassetGui: os.proc, at: os.Path): Nothing = exit(-1, 
-    s"""Failed to use UAssetGUI to $title with the following command in $at:
-       |
-       |${pUassetGui.commandChunks.mkString(" ")}
-       |
-       |Try to see if this is a known issue (or filing a new one) at:
-       |https://github.com/atenfyr/UAssetAPI/issues, or
-       |https://github.com/atenfyr/UAssetGUI/issues""".stripMargin)
+  def uassetGuiFailed(title: String, pUassetGui: os.proc, at: os.Path, repack: Boolean): Nothing = {
+    val moreInfo = if (!repack) "T" else 
+      s"""First, check that the patched JSON file has been changed as intended with correct values. 
+         |If everyhing looks proper, t""".stripMargin
+    exit(-1, 
+      s"""Failed to use UAssetGUI to $title with the following command in $at:
+         |
+         |${pUassetGui.commandChunks.mkString(" ")}
+         |
+         |${moreInfo}ry to see if this is a known UAssetGUI issue (or filing a new one) at:
+         |https://github.com/atenfyr/UAssetAPI/issues, or
+         |https://github.com/atenfyr/UAssetGUI/issues""".stripMargin)
+  }
 
   def unpackDataTableJson(name: String): os.Path = {
     val json = s"$name.json"
@@ -694,7 +699,7 @@ def generateMod(addToDataTableFilePatches: Boolean,
     println(s"Converting to $r ...")
     val pUassetGui = os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersionCode", usmap)
     if (pUassetGui.call(check = false, cwd = cwd, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) 
-      uassetGuiFailed(s"convert $uasset to JSON", pUassetGui, cwd)
+      uassetGuiFailed(s"convert $uasset to JSON", pUassetGui, cwd, repack = false)
     os.remove.all(output)
     println()
 
@@ -710,7 +715,7 @@ def generateMod(addToDataTableFilePatches: Boolean,
     println(s"Regenerating $uasset ...")
     val pUassetGui = os.proc(uassetGuiExe, "fromjson", path, uasset, usmap)
     if (pUassetGui.call(check = false, cwd = cwd, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
-      uassetGuiFailed(s"convert $uasset from JSON", pUassetGui, cwd)
+      uassetGuiFailed(s"convert $uasset from JSON", pUassetGui, cwd, repack = true)
     println()
   }
 
@@ -881,7 +886,7 @@ def code(path: os.Path): Unit = {
 def tomlString(valueOpt: Option[JsonNode], default: String): String = valueOpt match {
   case Some(value: ObjectNode) =>
     var elements = Vector[String]()
-    for (fieldName <- value.fieldNames.asScala) elements :+= s"$fieldName = ${tomlString(Option(value.get(fieldName)), default)}"
+    for (fieldName <- value.fieldNames.asScala) elements :+= s"\"$fieldName\" = ${tomlString(Option(value.get(fieldName)), default)}"
     s"{ ${elements.mkString(", ")} }"
   case Some(value: ArrayNode) =>
     var elements = Vector[String]()

@@ -15,7 +15,7 @@ LoopIntervalTime = 1
 ActiveTargetFilterAlias = 'Self'
 LoopTargetFilterAlias = 'Self'
 
-['.*: ^Gear_(?!.*_HitDmgUp).*$']                             # or, [ '=> v.startsWith("Gear_") && !v.contains("_HitDmgUp")' ]
+['.*: ^Gear_(?!BetaCrystalAdditiveRate)(?!.*_HitDmgUp).*$']  # or, [ '=> v.startsWith("Gear_") && v.startsWith("Gear_BetaCrystalAdditiveRate") && !v.contains("_HitDmgUp")' ]
 CalculationValue = '=> v.orig[Double] * 2'
 
 ['.*: ^Gear_.*_HitDmgUp.*$']
@@ -41,3 +41,18 @@ ActorState1 = "ActorState_None"                              # "ActorState_Block
 LifeTime = -1                                                # 0.5
 LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_IndependentTime"
 ActiveTargetFilterAlias = "None"                             # "Self"
+
+[P_Eve_Stance_GunGorgon]
+ActorState1 = "ActorState_None"                              # "ESBActorState::ActorState_BlockRotation"
+
+['.*: ^Gear_BetaCrystalAdditiveRate_.*$']
+StatType = "ActorStatType_DrainHpByAttackPowerRate"          # "ESBActorStatType::ActorStatType_HP"
+StatCalculationType = "EffectCalculationType_Static"         # "ESBEffectCalculationType::EffectCalculationType_HealStatic"
+CalculationValue = '''=> {
+  val prefix = "Gear_BetaCrystalAdditiveRate_"
+  var n = 0.003 * v.objName(prefix.length).toDouble
+  if (v.objName.contains("MK2")) n = n * 2
+  n
+}'''                                                         # 90.0
+LifeType = "EffectLifeType_Infinite"                         # "ESBEffectLifeType::EffectLifeType_IndependentTime",
+LifeTime = 0                                                 # 0.1

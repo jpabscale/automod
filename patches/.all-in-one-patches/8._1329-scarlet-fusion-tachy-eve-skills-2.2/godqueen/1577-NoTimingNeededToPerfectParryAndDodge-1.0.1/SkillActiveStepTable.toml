@@ -1,0 +1,55 @@
+# ...                                                        # Game Original Value
+[P_Eve_Fusion_Lockon_Evade1_1_Cast2]
+Duration = 99                                                # 0.1
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Fusion_Normal_Evade1_1_Cast2]
+Duration = 99                                                # 0.1
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Fusion_Normal_Guard1_1_Parry1]
+Duration = 99                                                # 0.2
+NextStepAliasWhenHoldRelease = "P_Eve_Fusion_Normal_Guard1_1_Finish1"    # "None"
+
+[P_Eve_Sword_Evade_Evade1_1_Cast2]
+Duration = 99999                                             # 0.2
+NextStepAliasWhenHoldRelease = "P_Eve_Sword_Evade_Evade1_1_Finish1"    # "None"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.2}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Sword_LockonEvade_Evade1_1_Cast2]
+Duration = 99999                                             # 0.2
+NextStepAliasWhenHoldRelease = "P_Eve_Sword_LockonEvade_Evade1_1_Finish1"    # "None"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.2}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Sword_Lockon_Evade1_1_Cast2]
+Duration = 99999                                             # 0.1
+NextStepAliasWhenHoldRelease = "P_Eve_Sword_Lockon_Evade1_1_Finish1"    # "None"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Sword_Normal_Evade1_1_Cast2]
+Duration = 99999                                             # 0.1
+NextStepAliasWhenHoldRelease = "P_Eve_Sword_Normal_Evade1_1_Finish1"    # "None"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Sword_Normal_Guard2_1_Guard1]
+NextStepAliasWhenHit = "P_Eve_Sword_Normal_Guard2_1_Guard2"    # "None"
+ShowPath = "CH_P_EVE_01/Skill/P_Eve_Sword_Normal_Guard3_Fast"    # "None"
+Type = "ESBSkillActiveStepType::SkillActiveStepType_Parry"   # "ESBSkillActiveStepType::SkillActiveStepType_Guard"
+
+[P_Eve_Sword_Normal_Guard2_1_Parry1]
+NextStepAliasWhenHit = "P_Eve_Sword_Normal_Guard2_1_Guard2"    # "P_Eve_Sword_Normal_Guard2_1_Guard1"
+
+[P_Eve_Tachy_Lockon_Evade1_1_Cast2]
+Duration = 99                                                # 0.1
+NextStepAliasWhenHoldRelease = "P_Eve_Tachy_Lockon_Evade1_1_Finish1"    # "None"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Tachy_Normal_Evade1_1_Cast2]
+Duration = 99                                                # 0.1
+NextStepAliasWhenHoldRelease = "P_Eve_Tachy_Normal_Evade1_1_Finish1"    # "None"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
+
+[P_Eve_Tachy_Normal_Guard1_1_Parry1]
+Duration = 99                                                # 0.2
+NextStepAliasWhenHoldRelease = "P_Eve_Tachy_Normal_Guard1_1_Finish1"    # "None"
+

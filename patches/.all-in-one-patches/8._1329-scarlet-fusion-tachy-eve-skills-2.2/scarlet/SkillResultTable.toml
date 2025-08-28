@@ -1,0 +1,12 @@
+[M_Scarlet_BlinkCombo_Hit9]
+HitLevelResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_SkillTree_SwordAura_KnockDown" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''

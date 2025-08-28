@@ -1,0 +1,58 @@
+# ...                                                        # Game Original Value
+[P_Eve_Fusion_JustEvade_LightAttack1_1]
+InputDuration = 99                                           # 1.5
+
+[P_Eve_Fusion_JustEvade_StrongAttack1_1]
+InputDuration = 99                                           # 1.5
+
+[P_Eve_Fusion_JustParry_LightAttack1_1]
+InputDuration = 99                                           # 1.2
+
+[P_Eve_Fusion_JustParry_StrongAttack1_1]
+InputDuration = 99                                           # 1.2
+
+[P_Eve_Sword_Combo_DashAttack1_1]
+InputDuration = 0                                            # 1
+
+[P_Eve_Sword_Combo_LightAttack1_1]
+InputDuration = 0                                            # 1
+
+[P_Eve_Sword_Combo_StrongAttack1_1]
+InputDuration = 0                                            # 1
+
+[P_Eve_Sword_JustEvade_DashAttack1_1]
+InputDuration = 99999                                        # 1.5
+
+[P_Eve_Sword_JustEvade_LightAttack1_1]
+InputDuration = 99999                                        # 1.5
+
+[P_Eve_Sword_JustEvade_StrongAttack1_1]
+InputDuration = 99999                                        # 1.5
+
+[P_Eve_Sword_JustParry_LightAttack1_1]
+InputDuration = 99999                                        # 1.2
+
+[P_Eve_Sword_JustParry_StrongAttack1_1]
+InputDuration = 99999                                        # 1.2
+
+[P_Eve_Tachy_JustEvade_LightAttack1_1]
+InputDuration = 99                                           # 1.5
+
+[P_Eve_Tachy_JustEvade_StrongAttack1_1]
+InputDuration = 99                                           # 1.5
+
+[P_Eve_Tachy_JustParry_LightAttack1_1]
+InputDuration = 99                                           # 1.2
+
+[P_Eve_Tachy_JustParry_StrongAttack1_1]
+InputDuration = 99                                           # 1.2
+
+['.*: ^P_Eve_Sword_(Lockon)?Evade_Evade1_1']
+NextComboCommandArray = '''=> {
+  var array = v.orig[Seq[Map[String, Any]]]
+  val first = array.head
+  array +:= (first + ("Value" -> "P_Eve_Sword_JustEvade_DashAttack1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_JustEvade_LightAttack1_1"))
+  array +:= (first + ("Value" -> "P_Eve_Sword_JustEvade_StrongAttack1_1"))
+  array
+}'''

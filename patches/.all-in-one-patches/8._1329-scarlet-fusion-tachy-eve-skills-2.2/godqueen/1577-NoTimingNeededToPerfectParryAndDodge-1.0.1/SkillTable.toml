@@ -1,0 +1,48 @@
+# ...                                                        # Game Original Value
+[P_Eve_Fusion_Lockon_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # "None"
+ExpansionValue1 = "99"                                       # ""
+
+[P_Eve_Fusion_Normal_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # "None"
+ExpansionValue1 = "99"                                       # ""
+
+[P_Eve_Fusion_Normal_Guard1_1]
+ExpansionFromAcquisitionAlias1 = "ParryUpgrade2_1"           # "None"
+ExpansionValue1 = "99"                                       # ""
+
+[P_Eve_Sword_Evade_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # "None"
+ExpansionValue1 = "99999"                                    # ""
+JustActionTime = 0.15                                        # 0
+JustActionTime_StoryMode = 0.3                               # 0
+JustSkillActiveAlias = "P_Eve_Sword_Normal_JustEvade1_1_Cast1"    # "None"
+
+[P_Eve_Sword_LockonEvade_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # "None"
+ExpansionValue1 = "99999"                                    # ""
+JustActionTime = 0.15                                        # 0
+JustActionTime_StoryMode = 0.3                               # 0
+JustSkillActiveAlias = "P_Eve_Sword_Lockon_JustEvade1_1_Cast1"    # "None"
+
+[P_Eve_Sword_Lockon_Evade2_1]
+ExpansionValue1 = "99999"                                    # "0.04"
+
+[P_Eve_Sword_Normal_Evade2_1]
+ExpansionValue1 = "99999"                                    # "0.04"
+
+[P_Eve_Sword_Normal_Guard2_1]
+ExpansionValue1 = "99999"                                    # "0.04"
+
+[P_Eve_Tachy_Lockon_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # "None"
+ExpansionValue1 = "99"                                       # ""
+
+[P_Eve_Tachy_Normal_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # "None"
+ExpansionValue1 = "99"                                       # ""
+
+[P_Eve_Tachy_Normal_Guard1_1]
+ExpansionFromAcquisitionAlias1 = "ParryUpgrade2_1"           # "None"
+ExpansionValue1 = "99"                                       # ""
+

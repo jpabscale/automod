@@ -98,38 +98,19 @@ ShieldAttackDamageRate = 3                                   # 2.0
 FirstSkillActiveAlias = "P_Eve_Tachy_Normal_Guard1_1_Parry1"
 TargetFilterAlias = "P_Eve_Tachy_Normal_Guard1_1_Target"
 
-['.*: ^P_Eve_Sword_Beta_ShieldBreak.*$'] # Shield Break -> Overdrive + Scarlet 1 Hit ~KO~ Shield Breaker: L1+X
-AttackDamageRate = 8.0                                       # 8.0
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak2_1_Cast1"
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
-ShieldAttackDamageRate = 7.0                                 # 7.0
-StartDelayTick = 1                                           # 1
-
-['.*: ^P_Eve_Sword_Beta_ChargeSlashCombo.*$'] # Slash + Blink Combo: L1+△
-AttackDamageRate = 9.0                                       # 2.0
-FirstSkillActiveAlias = "M_Scarlet_BlinkCombo_Cast1"         # "P_Eve_Sword_Beta_ChargeSlashCombo1_1_Cast1"
-TargetFilterAlias = "M_Scarlet_BlinkCombo_Target"            # "P_Eve_Sword_0500_180_500_Target"
-ShieldAttackDamageRate = 9.0                                 # 1.0
-
-['.*: ^P_Eve_Sword_Burst_MassiveAttack[1-2]_1$'] # Tempest -> Scarlet Judgement Cut: R1+◯
-AttackDamageRate = 12                                        # 12
-FirstSkillActiveAlias = "P_Eve_Tachy_Start2_Cast1"           # "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"
-ShieldAttackDamageRate = 12                                  # 12
-TargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"            # "P_Eve_Sword_0800_360_500_Target"
-
-['.*: ^P_Eve_Sword_Burst_SpinAttack[1-2]_1$'] # Descending Break -> Ex Combo I + Scarlet Move Back Shot II: R1+☐
+['.*: ^P_Eve_Sword_Burst_SpinAttack[1-2]_1$'] # Descending Break -> Ex Combo I + Scarlet Move Back Shot II/Fusion Blade Fury: R1+☐
 FirstSkillActiveAlias = "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"    # "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
 AttackDamageRate = 8                                         # 8
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0600_360_500_Target"
 ShieldAttackDamageRate = 8                                   # 8
 
-['.*: ^P_Eve_Sword_Burst_FinishAttack[1-3]_1$'] # Punishing Edge -> Ex Combo II + Scarlet Back Dash Cut: R1+△
+['.*: ^P_Eve_Sword_Burst_FinishAttack[1-3]_1$'] # Punishing Edge -> Ex Combo II + Scarlet Back Dash Cut/Fusion Judgement Rave: R1+△
 FirstSkillActiveAlias = "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast1"    # "P_Eve_Sword_Burst_FinishAttack1_1_Cast1"
 AttackDamageRate = 8                                         # 8
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_360_500_Target"
 ShieldAttackDamageRate = 8                                   # 8
 
-[P_Eve_Sword_Burst_MeleeCombatBuff1_1] # Overdrive -> Ex Combo III + Scarlet Air Dash Space Cut: R1+X
+[P_Eve_Sword_Burst_MeleeCombatBuff1_1] # Overdrive -> Ex Combo III + Scarlet Air Dash Space Cut/Fusion Judgement Wave: R1+X
 AttackDamageRate = 8                                         # 3.0
 FirstSkillActiveAlias = "P_Eve_Sword_Normal_LightAttack4_1_Ex_Cast1"    # "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"
 ShieldAttackDamageRate = 12                                  # 3.0

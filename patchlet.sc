@@ -85,6 +85,8 @@ type CodeContext = {
 
 def evalProperty(uassetName: String, addToDataTableFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
                  code: String, obj: uassetapi.Struct, property: String, orig: JsonNode): JsonNode = {
+  val currentValue = obj.getJson(property)
+  val origValue = uassetapi.Struct(uassetName, orig, addToDataTableFilePatches = false).getJson(property)
   try {
     val nil = """"null""""
     val propertyF = eval[CodeContext => Any](
@@ -108,8 +110,6 @@ def evalProperty(uassetName: String, addToDataTableFilePatches: Boolean, dataMap
         |  }
         |  calc() 
         |}""".stripMargin)              
-    val origValue = uassetapi.Struct(uassetName, orig, addToDataTableFilePatches = false).getJson(property)
-    val currentValue = obj.getJson(property)
     val ctx = (new {
       def objName: String = obj.name
       def orig[T]: T = uassetapi.toValue[T](origValue).get
@@ -127,8 +127,9 @@ def evalProperty(uassetName: String, addToDataTableFilePatches: Boolean, dataMap
   } catch {
     case t: Throwable =>
       sbmod.exit(-1, 
-    s"""Evaluation failed for ${obj.name}/$property using $code:
-       |  ${t.getMessage}""".stripMargin)
+        s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
+           |the current value ${currentValue} using $code:
+           |  ${t.getMessage}""".stripMargin)
   }
 }
 sealed trait FilteredChanges {

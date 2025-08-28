@@ -1,3 +1,5 @@
+2.4.4: Fixed UAssetGUI-breaking '... :: ...' enum property value patching. Added support for general UAssetAPI JSON objects and arrays for property value patching (use inline tables/objects in TOML). Added a more helpful message in the case UAssetGUI fails to repack .uasset. AIOs: updated to use 1329 v2.2 godqueen; effect-table: made Gold Gears as heal-on-hit.
+
 2.4.3: Fixed regex/patchlet merging wrt. patch file load order. Fixed null properly value handling when loading patch files. Removed .demo.aio.base[.hard] because 1329 v2 work for both the base game and NG+. AIOs: Updated to use 1329 v2.0; effect-table: ignored desert quicksand and reduced Tachy gauge consumption to 20%.
 
 2.4.2: Various fixes for .toml/.toml.all and property value patchlets. Added .demo.all to generate all demo mods in one go. AIOs: updated to use 1329 v1.3.
