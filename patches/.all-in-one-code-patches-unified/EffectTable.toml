@@ -759,6 +759,13 @@ CalculationValue = 0.3199999928474426                        # 0.159999996423721
 [Gear_ShieldIgnorePercentage_3_MK2]
 CalculationValue = 0.47999998927116394                       # 0.23999999463558197
 
+[LV_Dead_DesertSandTrap]
+Action1 = "EffectAction_None"                                # "EffectAction_ImmediateDeath"
+ActiveTargetFilterAlias = "None"                             # "Self"
+ActorState1 = "ActorState_None"                              # "ActorState_BlockRevival"
+LifeTime = -1                                                # 0.5
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_IndependentTime"
+
 [LV_Dead_Ocean]
 ActionValue1 = ""                                            # "DeadZoneAlert"
 LifeTime = -1                                                # 5.0
@@ -769,43 +776,46 @@ LifeTime = 30.0                                              # 3.5
 
 [P_Eve_SkillTree_JustEvade_BurstGauge1]
 ActiveTargetFilterAlias = "Self"                             # "Self"
-CalculationMultipleValue = 4.0                               # 1.0
-LifeTime = 11.0                                              # 1.0
+CalculationMultipleValue = 4                                 # 1.0
+LifeTime = 11                                                # 1.0
 LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0                                       # "+0"
+LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
-StartDelayTime = 1.0                                         # "+0"
+StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_JustEvade_BurstGauge2]
 ActiveTargetFilterAlias = "Self"                             # "Self"
-CalculationMultipleValue = 3.0                               # 1.0
-LifeTime = 11.0                                              # 1.0
+CalculationMultipleValue = 3                                 # 1.0
+LifeTime = 11                                                # 1.0
 LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0                                       # "+0"
+LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
-StartDelayTime = 1.0                                         # "+0"
+StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_JustParry_BetaGauge1]
 ActiveTargetFilterAlias = "Self"                             # "Self"
-CalculationMultipleValue = 8.0                               # 1.0
-LifeTime = 11.0                                              # 1.0
+CalculationMultipleValue = 8                                 # 1.0
+LifeTime = 11                                                # 1.0
 LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0                                       # "+0"
+LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
-StartDelayTime = 1.0                                         # "+0"
+StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_JustParry_BetaGauge2]
 ActiveTargetFilterAlias = "Self"                             # "Self"
-CalculationMultipleValue = 6.0                               # 1.0
-LifeTime = 11.0                                              # 1.0
+CalculationMultipleValue = 6                                 # 1.0
+LifeTime = 11                                                # 1.0
 LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0                                       # "+0"
+LoopIntervalTime = 1                                         # "+0"
 LoopTargetFilterAlias = "Self"                               # 'null'
 OverlapCount = 1                                             # 0
-StartDelayTime = 1.0                                         # "+0"
+StartDelayTime = 1                                           # "+0"
+
+[P_Eve_SkillTree_TachyGaugeReduceConsumeRate]
+CalculationValue = 0.8                                       # 0.20000000298023224
 
 [P_Protector_Burst1]
 CalculationMultipleValue = 2                                 # 1.0

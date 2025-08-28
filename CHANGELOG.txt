@@ -1,3 +1,5 @@
+2.4.3: Fixed regex/patchlet merging wrt. patch file load order. Fixed null properly value handling when loading patch files. Removed .demo.aio.base[.hard] because 1329 v2 work for both the base game and NG+. AIOs: Updated to use 1329 v2.0; effect-table: ignored desert quicksand and reduced Tachy gauge consumption to 20%.
+
 2.4.2: Various fixes for .toml/.toml.all and property value patchlets. Added .demo.all to generate all demo mods in one go. AIOs: updated to use 1329 v1.3.
 
 2.4.1: Fixed .uasset JSON redundant patching. Added JSON API (serialization/deserialization, etc.) to property value patchlets  useful for manipulating embedded JSON data inside string values (e.g.,  StartSelfEffect in SkillActiveStepTable). AIO and effect-table: fixed _MK2 gear effectiveness (fixed from quadruple to double).

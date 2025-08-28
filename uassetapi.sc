@@ -262,11 +262,12 @@ case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches
     }
     println(s"* $name/$property: ${toJsonPrettyString(rOpt)} => ${toJsonPrettyString(valueOpt)}")
     if (addToDataTableFilePatches) {
-      var map = _patches.getOrElse(uassetName, TreeMap.empty: UAssetPropertyChanges)
+      val key = sbmod.OrderedString(uassetName, "", 0)
+      var map = _patches.getOrElse(key, TreeMap.empty: UAssetPropertyChanges)
       var m = map.getOrElse(name, TreeMap.empty: PropertyChanges)
       m = m + (property -> ValuePair(valueOpt, rOpt))
       map = map + (name -> m)
-      _patches = _patches + (uassetName -> map)
+      _patches = _patches + (key -> map)
     }
     rOpt
   }

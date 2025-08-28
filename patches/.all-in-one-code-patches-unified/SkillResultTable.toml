@@ -82,6 +82,15 @@ HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"    
 [M_Scarlet_SwingCombo_Hit4]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
 
+[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
+[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
+[P_Eve_Sword_Air_RollingAttack1_1_Ex_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
 [P_Eve_Sword_Beta_ChainStab1_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":1.0}]"
 
@@ -122,6 +131,21 @@ HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # 'null'
 [P_Eve_Sword_Beta_SwordAura1_Projectile2_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # 'null'
 
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_FinishAttack3_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
 [P_Eve_Sword_Normal_LightAttack1_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
 
@@ -130,6 +154,9 @@ HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.899999999
 
 [P_Eve_Sword_Normal_LightAttack3_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[P_Eve_Sword_Normal_LightAttack4_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
 
 [P_Eve_Sword_Normal_LightAttack4_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
@@ -149,6 +176,9 @@ HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.899999999
 [P_Eve_Sword_Normal_LightAttackChain1_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
 
+[P_Eve_Sword_Normal_StrongAttack10_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
 [P_Eve_Sword_Normal_StrongAttack10_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
 
@@ -161,14 +191,35 @@ HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.899999999
 [P_Eve_Sword_Normal_StrongAttack3_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
 
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
 [P_Eve_Sword_Normal_StrongAttack5_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
 
 [P_Eve_Sword_Normal_StrongAttack6_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
 
+[P_Eve_Sword_Normal_StrongAttack7_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
 [P_Eve_Sword_Normal_StrongAttack7_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
 
 [P_Eve_Sword_Normal_StrongAttack8_1_Hit1]
 HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\",\"Time\":0.8999999999999999}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"

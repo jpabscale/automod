@@ -1,0 +1,13 @@
+['.*: ^P_Eve_Sword_(Normal_(Light|Strong|Finish|DashAttackCombo)|Air_RollingAttack).*Ex_Hit.*$']
+HitLevelResultTargetCommonEffect = '''=> {
+  var hitStunTime = 1.0d
+  val newArray = JsonNodeFactory.instance.arrayNode
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "HitStun" => hitStunTime = array.get(i).get("Time").asDouble
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": ${hitStunTime * 3} }"""))
+  newArray.toString
+}'''

@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.4.2"
+val header = s"Auto Modding Script v2.4.3"
 
 val dataTablePath = "/Exports/0/Table/Data"
 val noCodePatching = "--no-code-patching"
@@ -37,7 +37,7 @@ class Game {
 class Tools {
   @BeanProperty var retoc: String = "0.1.2"
   @BeanProperty var uassetGui: String = "1.0.3"
-  @BeanProperty var fmodel: String = "4a9a44139d54c9c426e19564021507d7f3edacbb"
+  @BeanProperty var fmodel: String = "4e7646916982f8d5a0fcd3890f91699b291a6ec2"
   @BeanProperty var jd: String = "2.2.3"
 }
 
@@ -47,9 +47,29 @@ class Config {
 }
 
 final case class ValuePair(newValueOpt: Option[JsonNode], oldValueOpt: Option[JsonNode])
+final case class OrderedString(value: String, path: String, order: Int = OrderedString.claimOrder()) extends Comparable[OrderedString] {
+  override def compareTo(o: OrderedString): Int = {
+    val r = order.compareTo(o.order)
+    if (r == 0) value.compareTo(o.value) else r
+  }
+  override def hashCode: Int = value.hashCode
+  override def equals(other: Any): Boolean = other match {
+    case other: OrderedString => compareTo(other) == 0
+    case _ => false
+  }
+  override def toString: String = if (order == 0) value else s"$value ($order)"
+}
+object OrderedString {
+  private var currentOrder: Int = 1
+  def claimOrder(): Int = {
+    val r = currentOrder
+    currentOrder += 1
+    r
+  }
+}
 type PropertyChanges = TreeMap[String, ValuePair]
 type UAssetPropertyChanges = TreeMap[String, PropertyChanges]
-type DataTableFilePatches = TreeMap[String, UAssetPropertyChanges]
+type DataTableFilePatches = TreeMap[OrderedString, UAssetPropertyChanges]
 type DataTableCodePatches = TreeMap[String, uassetapi.Struct => Unit]
 type JsonAst = com.jayway.jsonpath.DocumentContext
 
@@ -382,12 +402,13 @@ def tomlDataTableFilePatches(path: os.Path): UAssetPropertyChanges = {
     var m: PropertyChanges = TreeMap.empty
     val properties = toml.get(name)
     for (property <- properties.keySet.asScala) {
-      def add(value: JsonNode): Unit = m = m + (property -> ValuePair(Some(value), None))
+      def add(value: JsonNode): Unit = m = m + (property -> ValuePair(Option(value), None))
       def valueOf(value: Object): JsonNode = value match {
         case value: java.lang.Boolean => BooleanNode.valueOf(value.booleanValue)
         case value: java.lang.Integer => IntNode.valueOf(value.intValue)
         case value: java.math.BigDecimal => DoubleNode.valueOf(value.doubleValue)
-        case value: String => if (value == "null") null else TextNode.valueOf(value)
+        case value: String => if (value == "null") NullNode.instance else TextNode.valueOf(value)
+        case null => null
       }
       def rec(value: Object): JsonNode = {
         value match {
@@ -417,8 +438,9 @@ def tomlDataTableFilePatches(path: os.Path): UAssetPropertyChanges = {
 var patchesInitialized = false
 var _patches: DataTableFilePatches = TreeMap.empty
 
-def applyChanges(map: DataTableFilePatches, uassetName: String, data: UAssetPropertyChanges): DataTableFilePatches = {
-  var m = map.getOrElse(uassetName, TreeMap.empty: UAssetPropertyChanges)
+def applyChanges(path: String, map: DataTableFilePatches, uassetName: String, data: UAssetPropertyChanges): DataTableFilePatches = {
+  val key = OrderedString(uassetName, path)
+  var m = map.getOrElse(key, TreeMap.empty: UAssetPropertyChanges)
   for ((name, properties) <- data) {
     var m2 = m.getOrElse(name, TreeMap.empty: PropertyChanges)
     for ((property, valuePair) <- properties) {
@@ -435,10 +457,11 @@ def applyChanges(map: DataTableFilePatches, uassetName: String, data: UAssetProp
     }
     m = m + (name -> m2)
   }
-  map + (uassetName -> m)
+  map + (key -> m)
 }
 
 def updatePatches(): Unit = {
+  val patchesDir = workingDir / "patches"
   var map: DataTableFilePatches = if (_patches == null) TreeMap.empty else _patches
 
   def rec(path: os.Path): Unit =   {
@@ -464,12 +487,12 @@ def updatePatches(): Unit = {
             case "patch" =>
               println(s"Loading $p ...")
               val uassetName = p.baseName
-              map = applyChanges(map, uassetName, jdDataTableFilePatches(p)())
+              map = applyChanges(p.relativeTo(patchesDir).toString, map, uassetName, jdDataTableFilePatches(p)())
               println()
             case "toml" =>
               println(s"Loading $p ...")
               val uassetName = p.baseName
-              map = applyChanges(map, uassetName, tomlDataTableFilePatches(p))
+              map = applyChanges(p.relativeTo(patchesDir).toString, map, uassetName, tomlDataTableFilePatches(p))
               println()
             case _ =>
           }
@@ -478,7 +501,6 @@ def updatePatches(): Unit = {
     }
   }
 
-  val patchesDir = workingDir / "patches"
   if (os.exists(patchesDir)) rec(patchesDir)
   _patches = map
 }
@@ -552,24 +574,24 @@ def patchDataTable(addToDataTableFilePatches: Boolean, name: String, file: os.Pa
                    origAst: JsonAst, fOpt: Option[uassetapi.Struct => Unit], disableCodePatching: Boolean): Unit = {
   val json = ast.json[JsonNode]
   if (disableCodePatching) {
-    patches.get(name) match {
-      case Some(tree) => 
-        println(s"Patching $file ...")
-        val data = json.at(dataTablePath).asInstanceOf[ArrayNode]
-        val origData = origAst.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
-        patchFromTree(addToDataTableFilePatches, name, ast, origAst, data, origData)(tree)
-        writeJson(file, json)
-        println()
-      case _ =>
+    for ((uassetName, tree) <- patches if uassetName.order != 0 && uassetName.value == name) {
+      println(s"Patching $file from ${uassetName.path} ...")
+      val data = json.at(dataTablePath).asInstanceOf[ArrayNode]
+      val origData = origAst.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
+      patchFromTree(addToDataTableFilePatches, name, ast, origAst, data, origData)(tree)
+      writeJson(file, json)
+      println()
     }
   } else {
-    println(s"Patching $file ...")
     val data = json.at(dataTablePath).asInstanceOf[ArrayNode]
     val origData = origAst.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
     for (i <- 0 until data.size) {
       fOpt.foreach(_(uassetapi.Struct(name, data.get(i), addToDataTableFilePatches)))
     }
-    patches.get(name).foreach(patchFromTree(addToDataTableFilePatches, name, ast, origAst, data, origData))
+    for ((uassetName, tree) <- patches if uassetName.order != 0 && uassetName.value == name) {
+      println(s"Patching $file from ${uassetName.path} ...")
+      patchFromTree(addToDataTableFilePatches, name, ast, origAst, data, origData)(tree)
+    }
     writeJson(file, json)
     println()
   }
@@ -730,7 +752,7 @@ def generateMod(addToDataTableFilePatches: Boolean,
   val shouldPack = modNameOpt.nonEmpty
   var uassetNames = dataTableCodePatches.keySet ++ uassetNameRequests
   if (!disableFilePatching) {
-    uassetNames = uassetNames ++ patches.keys
+    uassetNames = uassetNames ++ (for (key <- patches.keys) yield key.value)
   }
   if (!disableCodePatching) {
     uassetNames = uassetNames ++ patchCustom.uassetNames
@@ -782,7 +804,14 @@ def generateMod(addToDataTableFilePatches: Boolean,
         case _ =>
       }
     }
-    if (custom && !patchCustom.patch(uassetName, json, patches.get(uassetName))) skipUasset(uassetName)
+    def getAllPatches(uassetName: String): Seq[UAssetPropertyChanges] = {
+      var r = Seq.empty[UAssetPropertyChanges]
+      for ((name, changes) <- patches if name.value == uassetName) {
+        r :+= changes
+      } 
+      r
+    }
+    if (custom && !patchCustom.patch(uassetName, json, getAllPatches(uassetName))) skipUasset(uassetName)
   }
 
   modNameOpt match {
@@ -912,9 +941,9 @@ def toml(sbPakDir: os.Path, path: os.Path, disableCodePatching: Boolean)(): Unit
   generateMod(addToDataTableFilePatches = true, None, sbPakDir, disableFilePatching = false, disableCodePatching, dryRun = true, currMap, origMap)()
 
   os.makeDir.all(path)
-  for ((uassetName, data) <- patches) {
+  for ((uassetName, data) <- patches if uassetName.order == 0) {
     val p = path / s"$uassetName.toml"
-    writeToml(p, data, Some(origMap.get(uassetName).get))
+    writeToml(p, data, Some(origMap.get(uassetName.value).get))
   }
   if (patches.isEmpty) println("No patches to write")
   else println()
@@ -989,15 +1018,14 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
   exit(-1, "Could not find a suitable VSCode/VSCodium to install into")
 }
 
-def demo(isAIO: Boolean, isBase: Boolean, isHard: Boolean, isEffect: Boolean, gameDir: os.Path): Unit = {
+def demo(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDir: os.Path): Unit = {
   def execute(p: os.proc): Unit = {
     println(s"Executing: ${p.commandChunks.mkString(" ")} ...")
     println()
     if (p.call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) exit(-1)
   }
 
-  var modName = if (isAIO) if (isBase) "base-all-in-one" 
-                           else "all-in-one" 
+  var modName = if (isAIO) "all-in-one" 
                 else if (isEffect) "effect-table" 
                      else "beta-burst-recovery-scan"
   if (isHard) modName = s"$modName-hard"
@@ -1009,15 +1037,6 @@ def demo(isAIO: Boolean, isBase: Boolean, isHard: Boolean, isEffect: Boolean, ga
     os.remove.all(modPatches)
     println()
     execute(os.proc("xcopy", "/e", s"$dotAIO\\", s"$modPatches\\"))
-    if (isBase) {
-      def base: os.Path = {
-        for (p <- os.list(workingDir / "patches" / ".all-in-one-patches") if p.last.contains("1329") && os.exists(p / ".base")) 
-          return p / ".base"
-        exit(-1, s"Could not find the .base patch")
-      }
-      println()
-      execute(os.proc("xcopy", "/e", s"$base\\", s"$modPatches\\base\\"))
-    }
     if (isHard) {
       def hard: os.Path = {
         for (p <- os.list(workingDir / "patches" / ".all-in-one-patches") if p.last.contains("987") && os.exists(p / ".hard")) 
@@ -1140,7 +1159,7 @@ def printUsage(): Unit = {
        |
        |Usage: automod [ <mod-name> <path-to-game> option*
        |               | .code <path-to-jd-patch-file>
-       |               | .demo[.aio[[.base].hard]|.all|.effect] <path-to-StellarBlade>
+       |               | .demo[.aio|.all|.effect] <path-to-StellarBlade>
        |               | .diff[.into] <from-path> <to-path> <out-path>
        |               | .search <path-to-game> <paths-input>.sam <out-path>
        |               | .setup[.vscode [ <path-to-vscode> ]]
@@ -1153,10 +1172,8 @@ def printUsage(): Unit = {
        |
        |.code                 Print Auto Modding Script patching code from a jd/TOML patch file
        |.demo                 Generate the beta-burst-recovery-scan demo mod
-       |.demo.aio             Generate the all-in-one demo mod for NG+
-       |.demo.aio.base        Generate the all-in-one demo mod for the base game
-       |.demo.aio.base.hard   Generate the all-in-one demo mod for the base game (harder mode)
-       |.demo.aio.hard        Generate the all-in-one demo mod for NG+ (harder mode)
+       |.demo.aio             Generate the all-in-one demo mod
+       |.demo.aio.hard        Generate the all-in-one demo mod (harder mode)
        |.demo.all             Generate all demo mods
        |.demo.effect          Generate the effect-table demo mod
        |.diff                 Recursively diff JSON files and write jd and TOML patch files
@@ -1186,20 +1203,16 @@ def run(): Unit = {
   
   val setup = setupModTools()
 
-  def demoFirst(): Unit = demo(isAIO = false, isBase = false, isHard = false, isEffect = false, checkDir(absPath(cliArgs(1))))
-  def demoAio(): Unit = demo(isAIO = true, isBase = false, isHard = false, isEffect = false, checkDir(absPath(cliArgs(1))))
-  def demoAioBase(): Unit = demo(isAIO = true, isBase = true, isHard = false, isEffect = false, checkDir(absPath(cliArgs(1))))
-  def demoAioBaseHard(): Unit = demo(isAIO = true, isBase = true, isHard = true, isEffect = false, checkDir(absPath(cliArgs(1))))
-  def demoAioHard(): Unit = demo(isAIO = true, isBase = false, isHard = true, isEffect = false, checkDir(absPath(cliArgs(1))))
-  def demoEffect(): Unit = demo(isAIO = false, isBase = false, isHard = false, isEffect = true, checkDir(absPath(cliArgs(1))))
-  def demoAll(): Unit = { demoFirst(); demoAio(); demoAioBase(); demoAioBaseHard(); demoAioHard(); demoEffect() }
+  def demoFirst(): Unit = demo(isAIO = false, isHard = false, isEffect = false, checkDir(absPath(cliArgs(1))))
+  def demoAio(): Unit = demo(isAIO = true, isHard = false, isEffect = false, checkDir(absPath(cliArgs(1))))
+  def demoAioHard(): Unit = demo(isAIO = true, isHard = true, isEffect = false, checkDir(absPath(cliArgs(1))))
+  def demoEffect(): Unit = demo(isAIO = false, isHard = false, isEffect = true, checkDir(absPath(cliArgs(1))))
+  def demoAll(): Unit = { demoFirst(); demoAio(); demoAioHard(); demoEffect() }
 
   argName match {
     case ".code" => code(absPath(cliArgs(1)))
     case ".demo" => demoFirst()
     case ".demo.aio" => demoAio()
-    case ".demo.aio.base" => demoAioBase()
-    case ".demo.aio.base.hard" => demoAioBaseHard()
     case ".demo.aio.hard" => demoAioHard()
     case ".demo.all" => demoAll()
     case ".demo.effect" => demoEffect()

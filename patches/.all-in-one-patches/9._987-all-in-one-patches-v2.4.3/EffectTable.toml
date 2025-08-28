@@ -27,7 +27,17 @@ CalculationMultipleValue = '''=>
   if (orig == 0) 0 else 2
 ''' 
 
+[P_Eve_SkillTree_TachyGaugeReduceConsumeRate]
+CalculationValue = 0.8                                       # 0.2
+
 [LV_Dead_Ocean]
 ActionValue1 = ""                                            # "DeadZoneAlert"
 LifeTime = -1                                                # 5
 LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_IndependentTime"
+
+[LV_Dead_DesertSandTrap]
+Action1 = "EffectAction_None"                                # "EffectAction_ImmediateDeath"
+ActorState1 = "ActorState_None"                              # "ActorState_BlockRevival"
+LifeTime = -1                                                # 0.5
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_IndependentTime"
+ActiveTargetFilterAlias = "None"                             # "Self"
