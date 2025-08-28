@@ -1,6 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode, TextNode}
-import scala.reflect.runtime.universe.runtimeMirror
+import com.fasterxml.jackson.databind.node.{ArrayNode, NullNode, ObjectNode, TextNode}
+import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
 
@@ -10,9 +10,12 @@ object Constants {
   val addPrefix = ".@+:"
   val javaRegexPrefix = ".*:"
   val addValueKey = "value"
+  lazy val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
 }
 
 import Constants._
+
+def eval[T](exp: String): T = tb.eval(tb.parse(exp)).asInstanceOf[T]
 
 def checkPatches(uassetName: String, map: sbmod.UAssetPropertyChanges): sbmod.UAssetPropertyChanges = {
   for ((objName, properties) <- map) {
@@ -53,11 +56,6 @@ def checkPatches(uassetName: String, map: sbmod.UAssetPropertyChanges): sbmod.UA
   map
 }
 
-def eval[T](exp: String): T = {
-  val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
-  tb.eval(tb.parse(exp)).asInstanceOf[T]
-}
-
 def getKeyPrefix(key: String): Option[String] = {
   if (key.isEmpty) return None
   val i = key.indexOf(':')
@@ -84,6 +82,7 @@ type CodeContext = {
 }
 
 sealed trait FilteredChanges {
+  def addToDataTableFilePatches: Boolean
   def uassetName: String
   def orig: () => JsonNode
   def dataMap: () => collection.mutable.Map[String, ObjectNode]
@@ -95,14 +94,14 @@ sealed trait FilteredChanges {
     def valueOf[T](objName: String, property: String): Option[T] = {
       dataMap().get(objName) match {
         case Some(node) =>
-          val obj = UAssetApi.Struct(uassetName, node, addToDataTableFilePatches = false)
+          val obj = UAssetApi.Struct(uassetName, node, addToDataTableFilePatches)
           UAssetApi.toValue[T](obj.getJson(property))
         case _ => None
       }
     }
   }: CodeContext)
-  def applyChanges(path: String, node: JsonNode): Unit = {
-    val obj = UAssetApi.Struct(uassetName, node, addToDataTableFilePatches = false)
+  def applyPathChanges(path: String, node: JsonNode): Unit = {
+    val obj = UAssetApi.Struct(uassetName, node, addToDataTableFilePatches)
     for ((property, valueOldValuePair) <- changes) {
       var value = valueOldValuePair.newValueOpt.get
       value match {
@@ -127,7 +126,11 @@ sealed trait FilteredChanges {
             try {
               value = UAssetApi.fromValue(propertyF(ctx))
             } catch {
-              case _: Throwable => sbmod.exit(-1, s"Evaluation failed for ${obj.name}/$property with value ${Option(origValue).map(_.toPrettyString).getOrElse("")} using $code")
+              case t: Throwable =>
+                t.printStackTrace 
+                sbmod.exit(-1, 
+              s"""Evaluation failed for ${obj.name}/$property with value ${Option(origValue).map(_.toPrettyString).getOrElse("")} using $code:
+                 |  ${t.getMessage}""".stripMargin)
             }
           case _ =>
         }
@@ -138,7 +141,8 @@ sealed trait FilteredChanges {
   }
 }
 
-case class AtFilteredChanges(uassetName: String,
+case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
+                             uassetName: String,
                              isAdd: Boolean,
                              orig: () => JsonNode,
                              dataMap: () => collection.mutable.Map[String, ObjectNode],
@@ -175,12 +179,13 @@ case class AtFilteredChanges(uassetName: String,
       }
     } else {
       if (!node.get("Value").isInstanceOf[ArrayNode]) sbmod.exit(-1, s"$uassetName @$path is not a UAssetAPI's struct")
-      applyChanges(path, node)
+      applyPathChanges(path, node)
     }
   }
 }
 
-case class KeyFilteredChanges(uassetName: String,
+case class KeyFilteredChanges(addToDataTableFilePatches: Boolean,
+                              uassetName: String,
                               orig: () => JsonNode,
                               dataMap: () => collection.mutable.Map[String, ObjectNode],
                               f: String => Boolean, 
@@ -188,7 +193,7 @@ case class KeyFilteredChanges(uassetName: String,
   def apply(key: String): Boolean = f(key)
 }
 
-def kfcMap(uassetName: String, ast: JsonNode, data: ArrayNode, t: sbmod.UAssetPropertyChanges): (collection.mutable.TreeMap[String, KeyFilteredChanges], collection.mutable.TreeMap[String, AtFilteredChanges], sbmod.UAssetPropertyChanges) = {
+def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: JsonNode, data: ArrayNode, t: sbmod.UAssetPropertyChanges): (collection.mutable.TreeMap[String, KeyFilteredChanges], collection.mutable.TreeMap[String, AtFilteredChanges], sbmod.UAssetPropertyChanges) = {
   var r1 = collection.mutable.TreeMap.empty[String, KeyFilteredChanges]
   var r2 = collection.mutable.TreeMap.empty[String, AtFilteredChanges]
   var rt: sbmod.UAssetPropertyChanges = collection.immutable.TreeMap.empty 
@@ -221,22 +226,22 @@ def kfcMap(uassetName: String, ast: JsonNode, data: ArrayNode, t: sbmod.UAssetPr
           }
           try {
             val fun = eval[String => Boolean](s"{ (v: String) => def predicate(): Boolean = { $code }; predicate() }".stripMargin)  
-            r1.put(key, KeyFilteredChanges(uassetName, orig, dataMap, fun, props))
+            r1.put(key, KeyFilteredChanges(addToDataTableFilePatches, uassetName, orig, dataMap, fun, props))
           } catch {
             case _: Throwable => sbmod.exit(-1, s"Invalid code for $uassetName: $code")
           }
         case `atPrefix` =>
           val path = key.substring(atPrefix.length).trim
-          r2.put(key, AtFilteredChanges(uassetName, isAdd = false, orig, dataMap, path, properties))
+          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = false, orig, dataMap, path, properties))
         case `addPrefix` =>
           val path = key.substring(addPrefix.length).trim
-          r2.put(key, AtFilteredChanges(uassetName, isAdd = true, orig, dataMap, path, properties))
+          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = true, orig, dataMap, path, properties))
         case `javaRegexPrefix` =>
           val regexText = key.substring(javaRegexPrefix.length).trim
           try {
             val regex = regexText.r
             val fun = (s: String) => regex.matches(s)
-            r1.put(key, KeyFilteredChanges(uassetName, orig, dataMap, fun, properties))
+            r1.put(key, KeyFilteredChanges(addToDataTableFilePatches, uassetName, orig, dataMap, fun, properties))
           } catch {
             case _: Throwable => sbmod.exit(-1, s"Invalid Java regex for $uassetName: $regexText")
           }

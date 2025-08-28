@@ -66,7 +66,7 @@ TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0600
 ShieldAttackDamageRate = 6                                   # 8
 
 [P_Eve_Sword_Burst_SpinAttack2_1] # Descending Break -> Fusion Blady Fury
-FirstSkillActiveAlias = "P_Eve_Fusion_Skill_ScrewAttack1_1_Cast1"    # "P_Eve_Sword_Burst_SpinAttack2_1_Cast1"
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_ScrewAttack1_1_Cast1"    # "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
 AttackDamageRate = 6                                         # 8
 TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0600_360_500_Target"
 ShieldAttackDamageRate = 6                                   # 8
@@ -79,7 +79,7 @@ TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800
 
 [P_Eve_Sword_Burst_MassiveAttack2_1] # Tempest -> Fusion Judgement Rave
 AttackDamageRate = 6                                         # 12
-FirstSkillActiveAlias = "P_Eve_Fusion_Skill_Chainstab1_1_Cast1"    # P_Eve_Sword_Burst_MassiveAttack2_1_Cast1
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_Chainstab1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"
 ShieldAttackDamageRate = 6                                   # 12
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
 
@@ -122,47 +122,16 @@ AttackDamageRate = 6                                         # 2.2
 FirstSkillActiveAlias = "P_Eve_Tachy_Skill_ScrewAttack1_1_Cast1"    # "P_Eve_Sword_Air_LightAttack4_1_Cast1"
 ShieldAttackDamageRate = 6                                   # 1.1
 
-[P_Eve_Sword_Normal_DashAttack1_1] # Fusion Judgement Rush
+['.*: ^P_Eve_Sword_Normal_DashAttack[^C].*'] # Fusion Judgement Rush
 AttackDamageRate = 3                                         # 1.7
 FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack1_1_Cast1"
 ShieldAttackDamageRate = 3                                   # 0.9
 
-[P_Eve_Sword_Normal_DashAttack1_2]
-AttackDamageRate = 3                                         # 2.2
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack1_2_Cast1"
-ShieldAttackDamageRate = 3                                   # 1.1
-
-[P_Eve_Sword_Normal_DashAttack1_2_Ex]
-AttackDamageRate = 3                                         # 4.1
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack1_2_Ex_Cast1"
-ShieldAttackDamageRate = 3                                   # 2.1
-
-[P_Eve_Sword_Normal_DashAttack2_1]
-AttackDamageRate = 3                                         # 12.0
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack2_1_Cast1"
-ShieldAttackDamageRate = 3                                   # 12.0
-
-[P_Eve_Sword_Normal_DashAttack3_1]
-AttackDamageRate = 3                                         # 2.2
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack3_1_Cast1"
-ShieldAttackDamageRate = 3                                   # 1.1
-
-[P_Eve_Sword_Normal_DashAttack4_1]
-AttackDamageRate = 3                                         # 2.7
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack4_1_Cast1"
-ShieldAttackDamageRate = 3                                   # 1.4
-
-[P_Eve_Sword_Normal_DashAttackCombo1_1]
+['.*: ^P_Eve_Sword_Normal_DashAttackCombo1_1.*']
 AttackDamageRate = 3                                         # 4.0
 FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo1_1_Cast1"
 ShieldAttackDamageRate = 3                                   # 2.0
 
-[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex]
-AttackDamageRate = 3                                         # 4.3
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast1"
-ShieldAttackDamageRate = 3                                   # 2.2
-
-[P_Eve_Sword_Normal_DashAttackCombo2_1]
-AttackDamageRate = 3                                        # 2.9
-FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo2_1_Cast1"
-ShieldAttackDamageRate = 3                                   # 1.5
+['.*: ^P_Eve_Sword_Normal_Guard[1-2]_1$']
+FirstSkillActiveAlias = "P_Eve_Fusion_Normal_Guard1_1_Parry1"
+TargetFilterAlias = "P_Eve_Tachy_Normal_Guard1_1_Target"

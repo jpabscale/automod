@@ -1,15 +1,16 @@
+# ...                                                        # Old Value
 [BS_Nier_01]
-IsEnableLowAngleEvent = false
-Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"
+IsEnableLowAngleEvent = false                                # true
+Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"    # "Nier"
 
 [BS_Nier_02]
-IsEnableLowAngleEvent = false
-Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"
+IsEnableLowAngleEvent = false                                # true
+Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"    # "Nier"
 
 [BS_Nier_03]
-IsEnableLowAngleEvent = false
-Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"
+IsEnableLowAngleEvent = false                                # true
+Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"    # "Nier"
 
 [BS_Nier_04]
-Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"
+Tag = "/Game/Art/Character/Monster/CH_M_NA_17/BluePrints/M_SkullSword_WP_AnimBP.M_SkullSword_WP_AnimBP_C"    # "Nier"
 

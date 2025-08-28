@@ -198,15 +198,15 @@ def newUInt32(name: String, jsonValue: IntNode): ObjectNode = toJsonNode(
 
 def toValue[T](node: JsonNode): Option[T] = {
   def toT(o: Any): T = o.asInstanceOf[T]
+
   node match {
     case node: BooleanNode => Some(toT(node.booleanValue))
-    case node: IntNode => Some(toT(node.intValue))
+    case node: IntNode => Some(toT(node.doubleValue))
     case node: DoubleNode => Some(toT(node.doubleValue))
     case node: TextNode => 
       val text = node.textValue
       var r: Any = text
       for (v <- text.toBooleanOption) r = v
-      for (v <- text.toIntOption) r = v
       for (v <- text.toDoubleOption) r = v
       Some(toT(r))
     case null => None

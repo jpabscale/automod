@@ -1,166 +1,1362 @@
+# ...                                                        # Old Value
+[Gear_AdditiveFixedDamage_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_1_Damage]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_1_MK2_Damage]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_2_Damage]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_2_MK2_Damage]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveFixedDamage_3_Damage]
+CalculationMultipleValue = 2                                 # 1.0
+
 [Gear_AdditiveFixedDamage_3_MK2]
-CalculationValue = 340.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 340.0                                     # 170.0
 
 [Gear_AdditiveFixedDamage_3_MK2_Damage]
-CalculationValue = 340.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 340.0                                     # 170.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_AtkPwrUp_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_AtkPwrUp_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_HitDmgUp_Melee]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_HitDmgUp_Range]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_MK2_AtkPwrUp_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_MK2_AtkPwrUp_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_MK2_HitDmgUp_Melee]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_1_MK2_HitDmgUp_Range]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_AtkPwrUp_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_AtkPwrUp_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_HitDmgUp_Melee]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_HitDmgUp_Range]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_MK2_AtkPwrUp_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_MK2_AtkPwrUp_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_MK2_HitDmgUp_Melee]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_2_MK2_HitDmgUp_Range]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_AtkPwrUp_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_AtkPwrUp_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_HitDmgUp_Melee]
+CalculationMultipleValue = 0.5                               # 1.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_HitDmgUp_Range]
+CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_AtkPwrUp_Melee]
-CalculationValue = 0.7599999904632568
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.7599999904632568                        # 0.3799999952316284
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_AtkPwrUp_Range]
-CalculationValue = 0.7599999904632568
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.7599999904632568                        # 0.3799999952316284
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_MK2_HitDmgUp_Melee]
+CalculationMultipleValue = 0.5                               # 1.0
 
 [Gear_AdditiveGiveAndReciveDamageRate_3_MK2_HitDmgUp_Range]
-CalculationValue = -1.1399999856948853
+CalculationMultipleValue = 0.5                               # 1.0
+CalculationValue = -1.1399999856948853                       # -0.5699999928474426
+
+[Gear_AdditiveSkillDamageGroup5_1_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_1_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_1_MK2_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_1_MK2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_2_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_2_MK2_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_2_MK2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_3_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup5_3_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup5_3_MK2_Beta]
-CalculationValue = 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.23999999463558197                       # 0.11999999731779099
 
 [Gear_AdditiveSkillDamageGroup5_3_MK2_BetaCombo]
-CalculationValue = 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+
+[Gear_AdditiveSkillDamageGroup6_1_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_1_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_1_MK2_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_1_MK2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_2_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_2_MK2_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_2_MK2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_3_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AdditiveSkillDamageGroup6_3_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AdditiveSkillDamageGroup6_3_MK2_Burst]
-CalculationValue = 0.699999988079071
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.699999988079071                         # 0.3499999940395355
 
 [Gear_AdditiveSkillDamageGroup6_3_MK2_BurstCombo]
-CalculationValue = 0.699999988079071
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.699999988079071                         # 0.3499999940395355
+
+[Gear_AttackSpeed_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AttackSpeed_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AttackSpeed_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AttackSpeed_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_AttackSpeed_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_AttackSpeed_3_MK2]
-CalculationValue = 0.36000001430511475
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+
+[Gear_BetaCrystalAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaCrystalAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaCrystalAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaCrystalAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaCrystalAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaCrystalAdditiveRate_3_MK2]
-CalculationValue = 3.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 3.0                                       # 1.5
+
+[Gear_BetaGaugeAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaGaugeAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaGaugeAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaGaugeAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BetaGaugeAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BetaGaugeAdditiveRate_3_MK2]
-CalculationValue = 0.25999999046325684
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.25999999046325684                       # 0.12999999523162842
+
+[Gear_BurstGaugeAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BurstGaugeAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BurstGaugeAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BurstGaugeAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_BurstGaugeAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_BurstGaugeAdditiveRate_3_MK2]
-CalculationValue = 0.8199999928474426
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.8199999928474426                        # 0.4099999964237213
+
+[Gear_ComboAttackAdditiveDamage_1_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_1_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_1_Combo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_1_MK2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_1_MK2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_1_MK2_Combo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_2_Combo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_2_MK2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_2_MK2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_2_MK2_Combo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_3_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_3_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ComboAttackAdditiveDamage_3_Combo]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ComboAttackAdditiveDamage_3_MK2_BetaCombo]
-CalculationValue = 0.7200000286102295
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.7200000286102295                        # 0.36000001430511475
 
 [Gear_ComboAttackAdditiveDamage_3_MK2_BurstCombo]
-CalculationValue = 0.7200000286102295
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.7200000286102295                        # 0.36000001430511475
 
 [Gear_ComboAttackAdditiveDamage_3_MK2_Combo]
-CalculationValue = 0.7200000286102295
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.7200000286102295                        # 0.36000001430511475
+
+[Gear_CriticalPercentage_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_1_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_1_MK2_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_2_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_2_MK2_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalPercentage_3_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalPercentage_3_MK2]
-CalculationValue = 24.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 24.0                                      # 12.0
 
 [Gear_CriticalPercentage_3_MK2_ForStatViewer]
-CalculationValue = 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+
+[Gear_CriticalValueRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalValueRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalValueRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalValueRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_CriticalValueRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_CriticalValueRate_3_MK2]
-CalculationValue = 0.4699999988079071
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.4699999988079071                        # 0.23499999940395355
+
+[Gear_GainBetaGaugeValueOnDamaged_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBetaGaugeValueOnDamaged_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBetaGaugeValueOnDamaged_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBetaGaugeValueOnDamaged_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBetaGaugeValueOnDamaged_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBetaGaugeValueOnDamaged_3_MK2]
-CalculationValue = 900.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 900.0                                     # 450.0
+
+[Gear_GainBurstGaugeValueOnDamaged_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBurstGaugeValueOnDamaged_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBurstGaugeValueOnDamaged_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBurstGaugeValueOnDamaged_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_GainBurstGaugeValueOnDamaged_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_GainBurstGaugeValueOnDamaged_3_MK2]
-CalculationValue = 1100.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 1100.0                                    # 550.0
+
+[Gear_HighHpDamageAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_HighHpDamageAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_HighHpDamageAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_HighHpDamageAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_HighHpDamageAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_HighHpDamageAdditiveRate_3_MK2]
-CalculationValue = 0.3400000035762787
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.3400000035762787                        # 0.17000000178813934
+
+[Gear_KillEnemyAdditiveDamageRate_1_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_1_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_1_MK2_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_1_MK2_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_1_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_1_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_2_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_2_MK2_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_2_MK2_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_2_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_2_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_3_Condition]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyAdditiveDamageRate_3_MK2_Condition]
-CalculationValue = 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.30000001192092896                       # 0.15000000596046448
 
 [Gear_KillEnemyAdditiveDamageRate_3_MK2_Melee]
-CalculationValue = 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.30000001192092896                       # 0.15000000596046448
 
 [Gear_KillEnemyAdditiveDamageRate_3_MK2_Range]
-CalculationValue = 0.30000001192092896
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.30000001192092896                       # 0.15000000596046448
+
+[Gear_KillEnemyAdditiveDamageRate_3_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_3_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyAdditiveDamageRate_Show]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_1_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_1_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_1_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_1_MK2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_2_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_2_MK2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_3_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_KillEnemyHealHP_3_Effect]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_KillEnemyHealHP_3_MK2_Condition]
-CalculationValue = 480.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 480.0                                     # 240.0
 
 [Gear_KillEnemyHealHP_3_MK2_Effect]
-CalculationValue = 480.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 480.0                                     # 240.0
+
+[Gear_LowHpDamageAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_LowHpDamageAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_LowHpDamageAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_LowHpDamageAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_LowHpDamageAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_LowHpDamageAdditiveRate_3_MK2]
-CalculationValue = 0.41999998688697815
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+
+[Gear_MaxBurstGauge_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxBurstGauge_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxBurstGauge_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxBurstGauge_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxBurstGauge_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxBurstGauge_3_MK2]
-CalculationValue = 1200.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 1200.0                                    # 600.0
+
+[Gear_MaxShield_1_MK2_MaxShield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_MK2_Shield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_MK2_ShieldRegen]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_MK2_ShieldRegenWhenBattle]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_MaxShield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_Shield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_ShieldRegen]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_1_ShieldRegenWhenBattle]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_MK2_MaxShield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_MK2_Shield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_MK2_ShieldRegen]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_MK2_ShieldRegenWhenBattle]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_MaxShield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_Shield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_ShieldRegen]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_2_ShieldRegenWhenBattle]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MaxShield_3_MK2_MaxShield]
-CalculationValue = 900.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 900.0                                     # 450.0
 
 [Gear_MaxShield_3_MK2_Shield]
-CalculationValue = 900.0
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 900.0                                     # 450.0
 
 [Gear_MaxShield_3_MK2_ShieldRegen]
-CalculationValue = 1.7999999523162842
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 1.7999999523162842                        # 0.8999999761581421
 
 [Gear_MaxShield_3_MK2_ShieldRegenWhenBattle]
-CalculationValue = 1.7999999523162842
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 1.7999999523162842                        # 0.8999999761581421
+
+[Gear_MaxShield_3_MaxShield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_3_Shield]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_3_ShieldRegen]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MaxShield_3_ShieldRegenWhenBattle]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeAttackDamageReductionRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeAttackDamageReductionRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeAttackDamageReductionRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeAttackDamageReductionRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeAttackDamageReductionRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeAttackDamageReductionRate_3_MK2]
-CalculationValue = 0.36000001430511475
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.36000001430511475                       # 0.18000000715255737
+
+[Gear_MeleeRangeDamageReductionRate_1_MK2_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_1_MK2_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_1_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_1_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_2_MK2_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_2_MK2_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_2_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_2_Range]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_MeleeRangeDamageReductionRate_3_MK2_Melee]
-CalculationValue = 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.23999999463558197                       # 0.11999999731779099
 
 [Gear_MeleeRangeDamageReductionRate_3_MK2_Range]
-CalculationValue = 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+
+[Gear_MeleeRangeDamageReductionRate_3_Melee]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_MeleeRangeDamageReductionRate_3_Range]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageAdditiveRate_3_MK2]
-CalculationValue = 0.23999999463558197
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.23999999463558197                       # 0.11999999731779099
+
+[Gear_RangeAttackDamageReductionRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageReductionRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageReductionRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageReductionRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_RangeAttackDamageReductionRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_RangeAttackDamageReductionRate_3_MK2]
-CalculationValue = 0.41999998688697815
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.41999998688697815                       # 0.20999999344348907
+
+[Gear_SPExpAdditiveRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_SPExpAdditiveRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_SPExpAdditiveRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_SPExpAdditiveRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_SPExpAdditiveRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_SPExpAdditiveRate_3_MK2]
-CalculationValue = 0.6000000238418579
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.6000000238418579                        # 0.30000001192092896
+
+[Gear_ShieldAttackPowerRate_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldAttackPowerRate_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldAttackPowerRate_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldAttackPowerRate_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldAttackPowerRate_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldAttackPowerRate_3_MK2]
-CalculationValue = 0.9599999785423279
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.9599999785423279                        # 0.47999998927116394
+
+[Gear_ShieldIgnorePercentage_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldIgnorePercentage_1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldIgnorePercentage_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldIgnorePercentage_2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[Gear_ShieldIgnorePercentage_3]
+CalculationMultipleValue = 2                                 # 1.0
 
 [Gear_ShieldIgnorePercentage_3_MK2]
-CalculationValue = 0.47999998927116394
+CalculationMultipleValue = 2                                 # 1.0
+CalculationValue = 0.47999998927116394                       # 0.23999999463558197
+
+[LV_Dead_Ocean]
+ActionValue1 = ""                                            # "DeadZoneAlert"
+LifeTime = -1                                                # 5.0
+LifeType = "EffectLifeType_Infinite"                         # "EffectLifeType_IndependentTime"
 
 [N_Drone_Scan]
-LifeTime = 30.0
+LifeTime = 30.0                                              # 3.5
 
 [P_Eve_SkillTree_JustEvade_BurstGauge1]
-ActiveTargetFilterAlias = "Self"
-CalculationMultipleValue = 4.0
-LifeTime = 11.0
-LifeType = "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0
-LoopTargetFilterAlias = "Self"
-OverlapCount = 1
-StartDelayTime = 1.0
+ActiveTargetFilterAlias = "Self"                             # "Self"
+CalculationMultipleValue = 4                                 # 1.0
+LifeTime = 11                                                # 1.0
+LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1                                         # "+0"
+LoopTargetFilterAlias = "Self"                               # 'null'
+OverlapCount = 1                                             # 0
+StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_JustEvade_BurstGauge2]
-ActiveTargetFilterAlias = "Self"
-CalculationMultipleValue = 3.0
-LifeTime = 11.0
-LifeType = "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0
-LoopTargetFilterAlias = "Self"
-OverlapCount = 1
-StartDelayTime = 1.0
+ActiveTargetFilterAlias = "Self"                             # "Self"
+CalculationMultipleValue = 3                                 # 1.0
+LifeTime = 11                                                # 1.0
+LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1                                         # "+0"
+LoopTargetFilterAlias = "Self"                               # 'null'
+OverlapCount = 1                                             # 0
+StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_JustParry_BetaGauge1]
-ActiveTargetFilterAlias = "Self"
-CalculationMultipleValue = 8.0
-LifeTime = 11.0
-LifeType = "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0
-LoopTargetFilterAlias = "Self"
-OverlapCount = 1
-StartDelayTime = 1.0
+ActiveTargetFilterAlias = "Self"                             # "Self"
+CalculationMultipleValue = 8                                 # 1.0
+LifeTime = 11                                                # 1.0
+LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1                                         # "+0"
+LoopTargetFilterAlias = "Self"                               # 'null'
+OverlapCount = 1                                             # 0
+StartDelayTime = 1                                           # "+0"
 
 [P_Eve_SkillTree_JustParry_BetaGauge2]
-ActiveTargetFilterAlias = "Self"
-CalculationMultipleValue = 6.0
-LifeTime = 11.0
-LifeType = "EffectLifeType_IndependentTime"
-LoopIntervalTime = 1.0
-LoopTargetFilterAlias = "Self"
-OverlapCount = 1
-StartDelayTime = 1.0
+ActiveTargetFilterAlias = "Self"                             # "Self"
+CalculationMultipleValue = 6                                 # 1.0
+LifeTime = 11                                                # 1.0
+LifeType = "EffectLifeType_IndependentTime"                  # "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1                                         # "+0"
+LoopTargetFilterAlias = "Self"                               # 'null'
+OverlapCount = 1                                             # 0
+StartDelayTime = 1                                           # "+0"
+
+[P_Protector_Burst1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst2_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst2_MK2_Burst]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst2_MK2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Burst3_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo1_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo1_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo1_Combo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo1_MK2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo1_MK2_BurstCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo1_MK2_Combo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo3_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo3_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Combo3_MK2_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd1_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd1_MK2_ForStatViewer]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd2_MK2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd3_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Crowd3_MK2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Down1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Down1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Down3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Down3_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Grenade1]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade1_MK12_Public_Condition]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade1_MK2]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade2]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade2_MK12_Public_Condition]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade2_MK2]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade3]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade3_MK12_Public_Condition]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Grenade3_MK2]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Guard1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Guard1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery1_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery1_MK2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_Effect_MeleeDmgReduce]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_Effect_RangeDmgReduce]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_MK2_Effect_MeleeDmgReduce]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_MK2_Effect_RangeDmgReduce]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery2_MK2_Trigger]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Recovery2_Trigger]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Recovery3_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery3_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery3_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery3_MK2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Recovery3_MK2_Trigger]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Recovery3_Trigger]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_4]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_5]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_6]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_MK2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_MK2_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_MK2_3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_MK2_4]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_MK2_5]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot2_MK2_6]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Shoot3_1]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_1_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_2]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_2_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_3]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_3_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_4]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_4_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_5]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_5_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_6]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_6_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_1]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_1_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_2]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_2_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_3]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_3_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_4]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_4_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_5]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_5_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_6]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_6_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Shoot3_MK2_ForTest]
+CalculationMultipleValue = 0                                 # "+0"
+
+[P_Protector_Skill1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill2_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill2_MK2_Beta]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill2_MK2_BetaCombo]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_11hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_15hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_1_CoolDown]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_1_Dispel]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_1hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_2hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_3hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_4hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_7hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_11hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_15hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_1_CoolDown]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_1_Dispel]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_1hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_2hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_3hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_4hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Skill3_MK2_7hit]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab2_MK2_Effect]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab2_MK2_Show]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab2_Show]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Stab3_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive1_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive1_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive1_MK2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive1_MK2_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive2_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive2_3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive2_MK2_1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive2_MK2_2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive2_MK2_3]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_Guard]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_Guard_Heal]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_MK2_Guard]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_MK2_Guard_Heal]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_MK2_Parry]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_MK2_Parry_Heal]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_Parry]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Survive3_Parry_Heal]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy1]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy1_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy2_MK2]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_Damage_Fixed]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_Damage_Percentage]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_KnockDownBw]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_KnockDownFw]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_MK2_Condition]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_MK2_Damage_Fixed]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_MK2_Damage_Percentage]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_MK2_KnockDownBw]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_MK2_KnockDownFw]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_MK2_Trigger]
+CalculationMultipleValue = 2                                 # 1.0
+
+[P_Protector_Tachy3_Trigger]
+CalculationMultipleValue = 2                                 # 1.0
+
+[SkillDamage_EveRangeCrowd]
+CalculationMultipleValue = 2                                 # 1.0
+
+[SkillDamage_EveRangeCrowd_MK2]
+CalculationMultipleValue = 2                                 # 1.0
 

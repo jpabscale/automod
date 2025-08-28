@@ -1,15 +1,16 @@
+# ...                                                        # Old Value
 [BS_Nier_01]
-SoundEventAlias = "NIER_OFF"
+SoundEventAlias = "NIER_OFF"                                 # "NIER_ON"
 
 [BS_Nier_01_Dmg]
-SoundEventAlias = "NIER_OFF"
+SoundEventAlias = "NIER_OFF"                                 # "NIER_ON"
 
 [BS_Nier_02]
-SoundEventAlias = "NIER_OFF"
+SoundEventAlias = "NIER_OFF"                                 # "NIER_ON"
 
 [BS_Nier_03]
-SoundEventAlias = "NIER_OFF"
+SoundEventAlias = "NIER_OFF"                                 # "NIER_ON"
 
 [BS_Nier_04]
-SoundEventAlias = "NIER_OFF"
+SoundEventAlias = "NIER_OFF"                                 # "NIER_ON"
 

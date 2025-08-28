@@ -1,23 +1,24 @@
+# ...                                                        # Old Value
 [Player]
-AttackSpeed = 1.5
-DamageReductionPerShieldBock = 0.25
-DrainHpByAttackPowerRate = 0.035
-DrainHpFixedValue = 50
-FishingAttackPower = 100
-MaxBurstGauge = 1800
-ShieldRegenPerSecond = 100
-ShieldRegenPerSecondWhenBattle = 20
-StackBullet1 = 999
-StackBullet2 = 999
-StackBullet3 = 999
-StackBullet4 = 999
-StackBullet5 = 999
-StackBullet6 = 999
-StackConsumable1 = 99
-StackConsumable2 = 99
-StackConsumable3 = 99
-StackConsumable4 = 99
-StackConsumable5 = 99
-StackConsumable6 = 99
-StackConsumable7 = 99
+AttackSpeed = 1.5                                            # 1.0
+DamageReductionPerShieldBock = 0.25                          # 0.17499999701976776
+DrainHpByAttackPowerRate = 0.035                             # "+0"
+DrainHpFixedValue = 50                                       # "+0"
+FishingAttackPower = 100                                     # 15.0
+MaxBurstGauge = 1800                                         # 1600
+ShieldRegenPerSecond = 100                                   # 80.0
+ShieldRegenPerSecondWhenBattle = 20                          # 10.0
+StackBullet1 = 999                                           # 30
+StackBullet2 = 999                                           # 3
+StackBullet3 = 999                                           # 16
+StackBullet4 = 999                                           # 12
+StackBullet5 = 999                                           # 60
+StackBullet6 = 999                                           # 8
+StackConsumable1 = 99                                        # 2
+StackConsumable2 = 99                                        # 3
+StackConsumable3 = 99                                        # 2
+StackConsumable4 = 99                                        # 2
+StackConsumable5 = 99                                        # 2
+StackConsumable6 = 99                                        # 1
+StackConsumable7 = 99                                        # 2
 
