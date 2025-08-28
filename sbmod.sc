@@ -11,6 +11,9 @@ import com.fasterxml.jackson.core.`type`.TypeReference
 import java.util.{Map => JMap}
 import scala.collection.immutable.{TreeMap, TreeSet}
 
+var cliArgs = args
+//cliArgs = Array(".setup")
+
 def exit(code: Int, msg: String = null): Nothing = {
   Option(msg).foreach(println(_))
   System.exit(code)
@@ -19,7 +22,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v1.9"
+val header = s"Stellar Blade Auto Modding Script v2.0.0"
 
 def printUsage(): Unit = {
   exit(0,
@@ -29,30 +32,18 @@ def printUsage(): Unit = {
        |                             | .code <path-to-jd-patch-file>
        |                             | .diff <from-path> <to-path> <out-path>
        |                             | .setup
+       |                             | .setup.vscode [ <path-to-vscode> ]
        |                             | .toml <out-path>
        |                             | .toml.all <path-to-StellarBlade> <out-path>
        |                             ]
        |
-       |  .code        Print Auto Modding Script patching code from a jd patch file
-       |  .diff        Recursively diff JSON files and write jd and TOML patch files
-       |  .setup       Only set up modding tools
-       |  .toml        Merge existing patch files in patches as TOML patch files
-       |  .toml.all    Merge script code patches with patch files in patches as TOML""".stripMargin)
+       |  .code            Print Auto Modding Script patching code from a jd patch file
+       |  .diff            Recursively diff JSON files and write jd and TOML patch files
+       |  .setup           Only set up modding tools
+       |  .setup.vscode    Set up modding tools and VSCode extensions
+       |  .toml            Merge existing patch files in patches as TOML patch files
+       |  .toml.all        Merge script code patches with patch files in patches as TOML""".stripMargin)
 }
-
-if (args.length == 0) printUsage()
-val argName = args.head
-argName match {
-  case ".setup" => if (args.length != 1) printUsage()
-  case ".diff" => if (args.length != 4) printUsage()
-  case ".toml.all" => if (args.length != 3) printUsage()
-  case _ => if (args.length != 2) printUsage()
-}
-
-def absPath(p: String): os.Path = os.Path(new java.io.File(p).getAbsolutePath)
-
-lazy val argPath = absPath(args(1))
-lazy val sbPakDir = argPath / "SB" / "Content" / "Paks"
 
 val retocVersion = "0.1.2"
 val uassetGuiVersion = "1.0.3"
@@ -680,14 +671,63 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
   println()
 }
 
+def vscode(vscOpt: Option[os.Path]): Unit = {
+  def setup(cmd: os.Path): Unit = {
+    val name = if (cmd.last == "code.cmd") "VSCode"  else "VSCodium"
+    println(s"Please wait while setting up ${absPath(cmd / os.up /  os.up)} ...")
+    println()
+    val extensions = Vector(
+      "scalameta.metals", 
+      "tamasfe.even-better-toml", 
+      absPath(workingDir / "vscode" / "sbmod-vscode.vsix")
+    )
+    for (extension <- extensions) {
+      println(s"Installing $extension ...")
+      os.proc("cmd.exe", "/C", cmd, "--force", "--install-extension", extension).call(cwd = workingDir, check = false)
+      println()
+    }
+    println(s"To use, please open the $workingDir directory in $name")
+    println()
+  }
+  var cmds = Vector(
+    os.Path(s"${System.getenv("LOCALAPPDATA")}\\Programs\\Microsoft VS Code\\bin\\code.cmd"),
+    os.Path("C:\\Program Files\\Microsoft VS Code\\bin\\code.cmd"),
+    os.Path("C:\\Program Files (x86)\\Microsoft VS Code\\bin\\code.cmd"),
+    os.Path("C:\\Program Files\\VSCodium\\bin\\codium.cmd")
+  )
+  for (vsc <- vscOpt) cmds = Vector(vsc / "bin" / "code.cmd", vsc / "bin" / "codium.cmd") ++ cmds
+  for (cmd <- cmds if os.isFile(cmd)) {
+    setup(cmd)
+    return
+  }
+  exit(-1, "Could not find a suitable VSCode/VSCodium to install into")
+}
+
+def absPath(p: os.Path): String = p.toIO.getAbsolutePath
+def absPath(p: String): os.Path = os.Path(new java.io.File(p).getAbsolutePath)
+
+if (cliArgs.length == 0) printUsage()
+val argName = cliArgs.head
+argName match {
+  case ".setup" => if (cliArgs.length != 1) printUsage()
+  case ".diff" => if (cliArgs.length != 4) printUsage()
+  case ".toml.all" => if (cliArgs.length != 3) printUsage()
+  case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
+  case _ => if (cliArgs.length != 2) printUsage()
+}
+
+lazy val argPath = absPath(cliArgs(1))
+lazy val sbPakDir = argPath / "SB" / "Content" / "Paks"
+
 val setup = setupModTools()
 
 argName match {
   case ".code" => code(argPath)
-  case ".diff" => diff(argPath, absPath(args(2)), absPath(args(3)))
+  case ".diff" => diff(argPath, absPath(cliArgs(2)), absPath(cliArgs(3)))
   case ".setup" => if (setup) println("All modding tools have been set up")
+  case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(argPath) else None)
   case ".toml" => toml(all = false, argPath)()
-  case ".toml.all" => setUAssetGUIConfigAndRun(toml(all = true, absPath(args(2))))
+  case ".toml.all" => setUAssetGUIConfigAndRun(toml(all = true, absPath(cliArgs(2))))
   case _ =>
     if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
     println(
@@ -700,3 +740,4 @@ argName match {
          |""".stripMargin)
     setUAssetGUIConfigAndRun(generateMod(true))
 }
+println("... done!")

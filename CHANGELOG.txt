@@ -1,3 +1,5 @@
+2.0.0: Added VSCode extension. [sigh, very broken; archived]
+
 1.9: Fixed .toml.all and usage checks.
 
 1.8: Added more jd patch form processing. Better TOML output. Added .toml.all command.
