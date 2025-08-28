@@ -1,8 +1,0 @@
-[M_Scarlet_BlinkCombo_Hit1]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":1.0}]"
-
-['.*: ^M_Scarlet_BlinkCombo_Hit[2-8]$']
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
-
-[M_Scarlet_BlinkCombo_Hit9]
-HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"

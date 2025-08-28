@@ -78,29 +78,65 @@ def isKeyPrefix(title: String, key: String): Boolean = getKeyPrefix(key) match {
 type CodeContext = {
   def objName: String
   def orig[T]: T
-  def current[T]: Option[T]
+  def currentOpt[T]: Option[T]
   def valueOf[T](objName: String, property: String): Option[T]
 }
 
+
+def evalProperty(uassetName: String, addToDataTableFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
+                 code: String, obj: uassetapi.Struct, property: String, orig: JsonNode): JsonNode = {
+  try {
+    val nil = """"null""""
+    val propertyF = eval[CodeContext => Any](
+    s"""{
+        |import com.fasterxml.jackson.databind.JsonNode
+        |import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+        |
+        |lazy val mapper = new com.fasterxml.jackson.databind.ObjectMapper
+        |def toJsonNode(content: String): JsonNode = mapper.readTree(content)
+        |def toJsonNodeT[T <: JsonNode](content: String): T = mapper.readTree(content).asInstanceOf[T]
+        |def fromJsonNode(node: JsonNode): String = Option(node).map(_.toString).getOrElse($nil)
+        |
+        |(v: {
+        |    def objName: String
+        |    def orig[T]: T
+        |    def currentOpt[T]: Option[T]
+        |    def valueOf[T](objName: String, property: String): Option[T]
+        |  }) => 
+        |  def calc(): Any = {
+        |    $code
+        |  }
+        |  calc() 
+        |}""".stripMargin)              
+    val origValue = uassetapi.Struct(uassetName, orig, addToDataTableFilePatches = false).getJson(property)
+    val currentValue = obj.getJson(property)
+    val ctx = (new {
+      def objName: String = obj.name
+      def orig[T]: T = uassetapi.toValue[T](origValue).get
+      def currentOpt[T]: Option[T] = uassetapi.toValue[T](currentValue)
+      def valueOf[T](objName: String, property: String): Option[T] = {
+        dataMap.get(objName) match {
+          case Some(node) =>
+            val obj = uassetapi.Struct(uassetName, node, addToDataTableFilePatches)
+            uassetapi.toValue[T](obj.getJson(property))
+          case _ => None
+        }
+      }
+    }: CodeContext)
+    return uassetapi.fromValue(propertyF(ctx))
+  } catch {
+    case t: Throwable =>
+      sbmod.exit(-1, 
+    s"""Evaluation failed for ${obj.name}/$property using $code:
+       |  ${t.getMessage}""".stripMargin)
+  }
+}
 sealed trait FilteredChanges {
   def addToDataTableFilePatches: Boolean
   def uassetName: String
   def orig: sbmod.JsonAst
-  def dataMap: () => collection.mutable.Map[String, ObjectNode]
+  def dataMap: collection.Map[String, ObjectNode]
   def changes: sbmod.PropertyChanges 
-  def codeContext(_path: String, _objName: String, _current: JsonNode, _orig: JsonNode): CodeContext = (new {
-    def objName: String = _objName
-    def orig[T]: T = uassetapi.toValue[T](_orig).get
-    def current[T]: Option[T] = uassetapi.toValue[T](_current)
-    def valueOf[T](objName: String, property: String): Option[T] = {
-      dataMap().get(objName) match {
-        case Some(node) =>
-          val obj = uassetapi.Struct(uassetName, node, addToDataTableFilePatches)
-          uassetapi.toValue[T](obj.getJson(property))
-        case _ => None
-      }
-    }
-  }: CodeContext)
   def applyPathChanges(path: String, node: JsonNode, orig: JsonNode): Unit = {
     val obj = uassetapi.Struct(uassetName, node, addToDataTableFilePatches)
     for ((property, valueOldValuePair) <- changes) {
@@ -109,37 +145,7 @@ sealed trait FilteredChanges {
         case v: TextNode => getKeyPrefix(v.textValue) match {
           case Some(`codePrefix`) =>
             val code = v.textValue.substring(codePrefix.length)
-            val propertyF = eval[CodeContext => Any](
-              s"""{
-                  |import com.fasterxml.jackson.databind.JsonNode
-                  |import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
-                  |
-                  |def toJsonNode(content: String): JsonNode = new com.fasterxml.jackson.databind.ObjectMapper().readTree(content)
-                  |def fromJsonNode(node: JsonNode): String = Option(node).map(_.toPrettyString).getOrElse("null")
-                  |
-                  |(v: {
-                  |    def objName: String
-                  |    def orig[T]: T
-                  |    def currentOpt[T]: Option[T]
-                  |    def valueOf[T](objName: String, property: String): Option[T]
-                  |  }) => 
-                  |  def calc() = {
-                  |    $code
-                  |  }
-                  |  calc() 
-                  |}""".stripMargin)
-            val currentValue = obj.getJson(property)
-            val origValue = uassetapi.Struct(uassetName, orig, addToDataTableFilePatches = false).getJson(property)
-            val ctx = codeContext(path, obj.name, currentValue, origValue)
-            try {
-              value = uassetapi.fromValue(propertyF(ctx))
-            } catch {
-              case t: Throwable =>
-                t.printStackTrace 
-                sbmod.exit(-1, 
-              s"""Evaluation failed for ${obj.name}/$property with value ${Option(origValue).map(_.toPrettyString).getOrElse("")} using $code:
-                 |  ${t.getMessage}""".stripMargin)
-            }
+            value = evalProperty(uassetName, addToDataTableFilePatches, dataMap, code, obj, property, orig)
           case _ =>
         }
         case _ =>
@@ -153,7 +159,7 @@ case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
                              uassetName: String,
                              isAdd: Boolean,
                              orig: sbmod.JsonAst,
-                             dataMap: () => collection.mutable.Map[String, ObjectNode],
+                             dataMap: collection.Map[String, ObjectNode],
                              path: String, 
                              changes: sbmod.PropertyChanges) extends FilteredChanges {
   def applyChanges(ast: sbmod.JsonAst): Unit = {
@@ -221,7 +227,7 @@ case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
 case class KeyFilteredChanges(addToDataTableFilePatches: Boolean,
                               uassetName: String,
                               orig: sbmod.JsonAst,
-                              dataMap: () => collection.mutable.Map[String, ObjectNode],
+                              dataMap: collection.Map[String, ObjectNode],
                               f: String => Boolean, 
                               changes: sbmod.PropertyChanges) extends FilteredChanges {
   def apply(key: String): Boolean = f(key)
@@ -232,16 +238,7 @@ def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: sbmod.Js
   var r1 = collection.mutable.TreeMap.empty[String, KeyFilteredChanges]
   var r2 = collection.mutable.TreeMap.empty[String, AtFilteredChanges]
   var rt: sbmod.UAssetPropertyChanges = collection.immutable.TreeMap.empty 
-  lazy val _dataMap: collection.mutable.Map[String, ObjectNode] = {
-    val r = collection.mutable.HashMap.empty[String, ObjectNode]
-    for (i <- 0 until data.size) {
-      val o = data.get(i).asInstanceOf[ObjectNode]
-      r.put(o.get("Name").asText, o)
-    }
-    r
-  }
-  lazy val _orig = ast.json[JsonNode].deepCopy[JsonNode]
-  val dataMap = () => _dataMap
+  val dataMap = sbmod.toDataMap(data)
   for ((key, properties) <- t) {
     r1.get(key) match {
       case Some(_) => sbmod.exit(-1, s"Redefined key for $uassetName: $key")

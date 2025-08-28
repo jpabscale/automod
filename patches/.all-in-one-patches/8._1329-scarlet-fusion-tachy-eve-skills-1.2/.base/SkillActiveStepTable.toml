@@ -1,5 +1,0 @@
-['.*: ^M_Scarlet_BlinkCombo_Cast.*$']
-StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"
-
-[M_Scarlet_BlinkCombo_Finish1]
-StartSelfEffect = "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"M_Scarlet_NoGuardCheck\"}, {\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"

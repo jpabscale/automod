@@ -1,0 +1,78 @@
+[M_Scarlet_BlinkCombo_Hit1]
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "DisableDeadSkill_Lurker" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "SkillDamage_Eve" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_HitStun", "Time": 1.0 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "DisableDeadSkill_Lurker" | "SkillDamage_Eve" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+HitLevelResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": 1.0 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "HitStun" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+['.*: ^M_Scarlet_BlinkCombo_Hit[2-8]$']
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "DisableDeadSkill_Lurker" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "SkillDamage_Eve" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_HitStun", "Time": 1.0 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "DisableDeadSkill_Lurker" | "SkillDamage_Eve" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+HitLevelResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": 1.0 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "HitStun" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+[M_Scarlet_BlinkCombo_Hit9]
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "DisableDeadSkill_Lurker" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "SkillDamage_Eve" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_HitStun", "Time": 1.0 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "DisableDeadSkill_Lurker" | "SkillDamage_Eve" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+HitLevelResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": 1.0 }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "HitStun" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
