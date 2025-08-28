@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.7.0"
+val header = s"Auto Modding Script v2.7.1"
 
 val maxLogs = Option(System.getenv("AUTOMOD_MAX_LOGS")).flatMap(_.toDoubleOption.map(Math.ceil(_).toInt)).getOrElse(30)
 val noPar = "true" == System.getenv("AUTOMOD_NO_PAR")
@@ -673,9 +673,10 @@ def generateMod(addToFilePatches: Boolean,
 
   def retoc(exe: os.Path, args: os.Shellable*): Vector[os.Shellable] = {
     var r = Vector[os.Shellable](exe)
-    if (config.game.aesKey.nonEmpty) {
+    val aesKey = config.game.aesKey 
+    if (aesKey.size > 1) {
       r = r :+ "--aes-key"
-      r = r :+ s"0x${config.game.aesKey}"
+      r = r :+ (if (aesKey.head == '0' && Character.toLowerCase(aesKey(1)) == 'x') aesKey else s"0x$aesKey")
     }
     r = r ++ args
     r
@@ -744,8 +745,8 @@ def generateMod(addToFilePatches: Boolean,
     os.copy.over(retocExe, retocExeCopy)
 
     println(s"Extracting $uassetFilename ...")
-    val pRetoc = os.proc(retoc(retocExeCopy, "to-legacy", "--no-parallel", "--version", ueVersionCode, "--filter", uassetFilename, sbPakDir, retocCopyDir))
-    if (pRetoc.call(check = false, cwd = retocCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0 || os.walk(retocCopyDir / gameId).isEmpty)
+    val pRetoc = os.proc(retoc(retocExeCopy, "to-legacy", "--no-shaders", "--no-compres-shaders", "--no-parallel", "--version", ueVersionCode, "--filter", uassetFilename, sbPakDir, retocCopyDir))
+    if (pRetoc.call(check = false, cwd = retocCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0 || !os.exists(retocCopyDir / gameId) || os.walk(retocCopyDir / gameId).isEmpty)
       retocFailed(s"extract $uassetFilename (double check the .uasset name)", pRetoc, retocCopyDir)
     println(s"... done extracting $uassetFilename")
     
