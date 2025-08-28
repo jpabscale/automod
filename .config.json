@@ -2,12 +2,13 @@
   "game" : {
     "contentPaks" : "SB/Content/Paks",
     "unrealEngine" : "4.26",
-    "mapUrl" : "https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/0eab1b4d7c1b88dea72298f60f6bb871682d3d1f/StellarBlade_1.1.0.usmap"
+    "mapUrl" : "https://github.com/Stellar-Blade-Modding-Team/Stellar-Blade-Modding-Guide/raw/0eab1b4d7c1b88dea72298f60f6bb871682d3d1f/StellarBlade_1.1.0.usmap",
+    "aesKey" : ""
   },
   "tools" : {
     "retoc" : "0.1.2",
     "uassetGui" : "1.0.3",
-    "fmodel" : "62b103f958865b2c7681ef2220c8a2ed844551b3",
+    "fmodel" : "1f1d2ae3c2cf3a47fadfe0fefd11c0e161fa57db",
     "jd" : "2.2.3"
   }
 }

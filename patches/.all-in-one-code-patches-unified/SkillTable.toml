@@ -80,11 +80,11 @@ ShieldAttackDamageRate = 8
 StartDelayTick = 5
 
 [P_Eve_Sword_Beta_ShieldBreak1_1]
-ShieldAttackDamageRate = 5
+ShieldAttackDamageRate = 10
 StartDelayTick = 5
 
 [P_Eve_Sword_Beta_ShieldBreak2_1]
-ShieldAttackDamageRate = 5
+ShieldAttackDamageRate = 10
 StartDelayTick = 5
 
 [P_Eve_Sword_Beta_SwordAura1Ex_1]
@@ -125,15 +125,33 @@ AttackDamageRate = 15
 FirstSkillActiveAlias = "M_Scarlet_BackDashSpaceCut_Cast1"
 ShieldAttackDamageRate = 10
 
+[P_Eve_Sword_Burst_MassiveAttack1_1]
+AttackDamageRate = 25
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_Chainstab1_1_Cast1"
+ShieldAttackDamageRate = 25
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"
+
+[P_Eve_Sword_Burst_MassiveAttack2_1]
+AttackDamageRate = 25
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_Chainstab1_1_Cast1"
+ShieldAttackDamageRate = 25
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"
+
+[P_Eve_Sword_Burst_MeleeCombatBuff1_1]
+AttackDamageRate = 25
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_SwordAura1_1_Cast1"
+ShieldAttackDamageRate = 25
+TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"
+
 [P_Eve_Sword_Burst_SpinAttack1_1]
-AttackDamageRate = 50
+AttackDamageRate = 25
 FirstSkillActiveAlias = "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
-ShieldAttackDamageRate = 50
+ShieldAttackDamageRate = 25
 
 [P_Eve_Sword_Burst_SpinAttack2_1]
-AttackDamageRate = 50
+AttackDamageRate = 25
 FirstSkillActiveAlias = "P_Eve_Sword_Burst_SpinAttack2_1_Cast1"
-ShieldAttackDamageRate = 50
+ShieldAttackDamageRate = 25
 
 [P_Eve_Sword_Evade_Evade1_1]
 CoolTime = 0.1
