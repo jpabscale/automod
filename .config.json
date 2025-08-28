@@ -2,13 +2,13 @@
   "game" : {
     "contentPaks" : "SB/Content/Paks",
     "unrealEngine" : "4.26",
-    "mapUri" : "tools/StellarBlade_1.3.1.usmap",
+    "mapUri" : "tools/usmap/StellarBlade_1.3.1.usmap",
     "aesKey" : ""
   },
   "tools" : {
     "retoc" : "0.1.2",
     "uassetGui" : "1.0.3",
     "fmodel" : "a1ddc72b79f422ef6baa1c738a5fe9a0bfdf9ab8",
-    "jd" : "2.2.3"
+    "jd" : "2.3.0"
   }
 }

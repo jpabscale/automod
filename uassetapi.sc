@@ -35,7 +35,7 @@ def toValue[T](node: JsonNode): Option[T] = {
         case _ => Some(toT(text))
       }
     case null | _: NullNode => None
-    case _ => sbmod.exit(-1, s"Unsupported value (class: ${node.getClass}): '${node.toPrettyString}'")
+    case _ => automod.exit(-1, s"Unsupported value (class: ${node.getClass}): '${node.toPrettyString}'")
   }
 }
 
@@ -56,7 +56,7 @@ def fromValue(v: Any): JsonNode = {
       for ((k, v) <- v) r.set[JsonNode](k.toString, fromValue(v))
       r
     case null => NullNode.instance
-    case _ => sbmod.exit(-1, s"Unsupported value (class: ${v.getClass}): '$v'")
+    case _ => automod.exit(-1, s"Unsupported value (class: ${v.getClass}): '$v'")
   }
 }
 
@@ -75,7 +75,7 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
   def obj(objName: String): ObjectNode = {
     objectMap.get(objName) match {
       case Some(obj) => return obj
-      case _ => sbmod.exit(-1, s"Could not find $objName in $uassetName")
+      case _ => automod.exit(-1, s"Could not find $objName in $uassetName")
     }
   }
 
@@ -93,8 +93,8 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
         val oldValueOpt = Option(obj(property).replace("Value", value))  
         (oldValueOpt, Option(value))
     }
-    sbmod.logPatch(uassetName, s"* $name/$property: ${sbmod.toJsonPrettyString(rOpt)} => ${sbmod.toJsonPrettyString(valueOpt)}", console = false)
-    if (addToFilePatches) sbmod.updatePatch(uassetName, name, property, sbmod.ValuePair(valueOpt, rOpt))
+    automod.logPatch(uassetName, s"* $name/$property: ${automod.toJsonPrettyString(rOpt)} => ${automod.toJsonPrettyString(valueOpt)}", console = false)
+    if (addToFilePatches) automod.updatePatch(uassetName, name, property, automod.ValuePair(valueOpt, rOpt))
     rOpt
   }
   

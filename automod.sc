@@ -7,13 +7,13 @@ import com.jayway.jsonpath
 import java.util.{EnumSet, Map => JMap}
 import java.util.concurrent.ConcurrentHashMap
 import scala.beans.BeanProperty
-import scala.collection.immutable.{TreeMap, TreeSet}
+import scala.collection.immutable.{ListMap, TreeMap, TreeSet}
 import scala.collection.mutable.HashMap
 import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.6.0"
+val header = s"Auto Modding Script v2.7.0"
 
 val maxLogs = Option(System.getenv("AUTOMOD_MAX_LOGS")).flatMap(_.toDoubleOption.map(Math.ceil(_).toInt)).getOrElse(30)
 val noPar = "true" == System.getenv("AUTOMOD_NO_PAR")
@@ -40,7 +40,7 @@ var modExt = "zip"
 class Game {
   @BeanProperty var contentPaks: String = "SB/Content/Paks"
   @BeanProperty var unrealEngine: String = "4.26"
-  @BeanProperty var mapUri: String = "tools/StellarBlade_1.3.1.usmap"
+  @BeanProperty var mapUri: String = "tools/usmap/StellarBlade_1.3.1.usmap"
   @BeanProperty var aesKey: String = ""
 }
 
@@ -48,7 +48,7 @@ class Tools {
   @BeanProperty var retoc: String = "0.1.2"
   @BeanProperty var uassetGui: String = "1.0.3"
   @BeanProperty var fmodel: String = "a1ddc72b79f422ef6baa1c738a5fe9a0bfdf9ab8"
-  @BeanProperty var jd: String = "2.2.3"
+  @BeanProperty var jd: String = "2.3.0"
 }
 
 class Config {
@@ -78,10 +78,47 @@ object OrderedString {
   }
 }
 type PropertyChanges = TreeMap[String, ValuePair]
-type UAssetPropertyChanges = TreeMap[String, PropertyChanges]
+type UAssetPropertyChanges = Map[String, PropertyChanges]
 type FilePatches = TreeMap[OrderedString, UAssetPropertyChanges]
 type CodePatches = TreeMap[String, uassetapi.Struct => Unit]
 type JsonAst = com.jayway.jsonpath.DocumentContext
+
+class ILinkedHashMap[K, +V](value: java.util.LinkedHashMap[K, V] = new java.util.LinkedHashMap[K, V]) extends collection.immutable.Map[K, V] {
+
+  override def iterator: Iterator[(K, V)] = new Iterator[(K, V)] {
+    val it = value.entrySet.iterator
+    override def hasNext: Boolean = it.hasNext
+    override def next(): (K, V) = {
+      val next = it.next
+      (next.getKey, next.getValue)
+    }
+  }
+
+  override def get(key: K): Option[V] = Option(value.get(key))
+
+  override def removed(key: K): Map[K,V] = {
+    val newValue = cloneValue
+    newValue.remove(key)
+    new ILinkedHashMap(newValue)
+  }
+
+  override def updated[V1 >: V](key: K, value: V1): Map[K, V1] = {
+    val newValue = cloneValue[V1]
+    newValue.put(key, value)
+    new ILinkedHashMap(newValue)
+  }
+
+  def cloneValue[V1 >: V]: java.util.LinkedHashMap[K, V1] = value.clone().asInstanceOf[java.util.LinkedHashMap[K, V1]]
+}
+
+object ILinkedHashMap {
+  def empty[K, V]: ILinkedHashMap[K, V] = new ILinkedHashMap[K, V]
+}
+
+val emptyPropertyChanges: PropertyChanges = TreeMap.empty
+val emptyUAssetPropertyChanges: UAssetPropertyChanges = ILinkedHashMap.empty
+val emptyFilePatches: FilePatches = TreeMap.empty
+val emptyCodePatches: CodePatches = TreeMap.empty
 
 val jp: jsonpath.ParseContext = {
   jsonpath.Configuration.setDefaults(new jsonpath.Configuration.Defaults {
@@ -150,7 +187,6 @@ val config = {
       println(s"Could not load $configPath; backed up to ${absPath(backup)}")
     }
   }
-  if (!os.exists(configPath)) writeConfig(r)
   r
 }
 
@@ -194,6 +230,7 @@ val automod = workingDir / "automod.bat"
 def setupModTools(): Boolean = {
   var setup = true
   
+  os.makeDir.all(patchesDir)
   os.makeDir.all(toolsDir)
 
   def download(uri: String, renameOpt: Option[String] = None): Unit = {
@@ -282,12 +319,7 @@ def setupModTools(): Boolean = {
     println()
   }
 
-  if (!os.exists(automod)) {
-    setup = false
-    os.write(automod, s"@scala-cli --suppress-outdated-dependency-warning --server=false project.scala -- %*${Properties.lineSeparator}")
-    println(s"Wrote $automod")
-    println()
-  }
+  if (!os.exists(configPath)) writeConfig(config)
 
   setup
 }
@@ -299,7 +331,7 @@ def jdFilePatches(path: os.Path)(err: Vector[String] => Unit =
     s"""Error when loading $path:
        |${msgs.mkString(Properties.lineSeparator)}""".stripMargin)): UAssetPropertyChanges = {
   val entryPathPrefix = """@ [0,"Rows","""
-  var map: UAssetPropertyChanges = TreeMap.empty
+  var map = emptyUAssetPropertyChanges
   val lines = os.read(path).trim.replace("\r", "").split('\n').map(_.trim)
   var errors = Vector[String]()
   val grouped = {
@@ -356,11 +388,11 @@ def jdFilePatches(path: os.Path)(err: Vector[String] => Unit =
               if (json.isObject || json.isArray) {
                 ok = false
               } else {
-                map = map + (name -> (map.getOrElse(name, TreeMap.empty: PropertyChanges) +
+                map = map + (name -> (map.getOrElse(name, emptyPropertyChanges) +
                   (property -> ValuePair(Some(json), Some(oldValue)))))
               }
             case _ =>
-              map = map + (name -> (map.getOrElse(name, TreeMap.empty: PropertyChanges) +
+              map = map + (name -> (map.getOrElse(name, emptyPropertyChanges) +
                 (property -> ValuePair(None, Some(oldValue)))))
           }
         case Array(n) if mode == "-" =>
@@ -368,7 +400,7 @@ def jdFilePatches(path: os.Path)(err: Vector[String] => Unit =
           var name = n
           name = name.substring(1, name.length - 1)
           val oldObj = toJsonNode(oldValueText).asInstanceOf[ObjectNode]
-          var m: PropertyChanges = TreeMap.empty
+          var m = emptyPropertyChanges
           for (fieldName <- oldObj.fieldNames.asScala) {
             val oldValue = oldObj.get(fieldName)
             m = m + (fieldName -> ValuePair(None, Some(oldValue)))
@@ -379,7 +411,7 @@ def jdFilePatches(path: os.Path)(err: Vector[String] => Unit =
           var name = n
           name = name.substring(1, name.length - 1)
           val newObjObj = toJsonNode(oldValueText).asInstanceOf[ObjectNode]
-          var m: PropertyChanges = TreeMap.empty
+          var m = emptyPropertyChanges
           for (fieldName <- newObjObj.fieldNames.asScala) {
             val newValue = newObjObj.get(fieldName)
             m = m + (fieldName -> ValuePair(Some(newValue), None))
@@ -407,9 +439,9 @@ def jdFilePatches(path: os.Path)(err: Vector[String] => Unit =
 def tomlFilePatches(path: os.Path): UAssetPropertyChanges = {
   val toml: JMap[String, JMap[String, Object]] =
     new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, JMap[String, Object]]] {})
-  var map: UAssetPropertyChanges = TreeMap.empty
+  var map = emptyUAssetPropertyChanges
   for (name <- toml.keySet.asScala) {
-    var m: PropertyChanges = TreeMap.empty
+    var m = emptyPropertyChanges
     val properties = toml.get(name)
     for (property <- properties.keySet.asScala) {
       def add(value: JsonNode): Unit = m = m + (property -> ValuePair(Option(value), None))
@@ -446,21 +478,21 @@ def tomlFilePatches(path: os.Path): UAssetPropertyChanges = {
 }
 
 var patchesInitialized = false
-private var _patches: FilePatches = TreeMap.empty
+private var _patches = emptyFilePatches
 
 val updatedPatches = new ConcurrentHashMap[String, UAssetPropertyChanges]
 
 def updatePatch(uassetName: String, objName: String, property: String, valuePair: ValuePair): Unit = {
-  var map = Option(updatedPatches.get(uassetName)).getOrElse(TreeMap.empty: UAssetPropertyChanges)
-  var m = map.getOrElse(objName, TreeMap.empty: sbmod.PropertyChanges)
+  var map = Option(updatedPatches.get(uassetName)).getOrElse(emptyUAssetPropertyChanges)
+  var m = map.getOrElse(objName, emptyPropertyChanges)
   m = m + (property -> valuePair)
   map = map + (objName -> m)
   updatedPatches.put(uassetName, map)
 }
 
 def updatePatches(uassetName: String, objName: String, properties: Iterable[(String, ValuePair)]): Unit = {
-  var map = Option(updatedPatches.get(uassetName)).getOrElse(TreeMap.empty: UAssetPropertyChanges)
-  var m = map.getOrElse(objName, TreeMap.empty: sbmod.PropertyChanges)
+  var map = Option(updatedPatches.get(uassetName)).getOrElse(emptyUAssetPropertyChanges)
+  var m = map.getOrElse(objName, emptyPropertyChanges)
   m = m ++ properties
   map = map + (objName -> m)
   updatedPatches.put(uassetName, map)
@@ -468,9 +500,9 @@ def updatePatches(uassetName: String, objName: String, properties: Iterable[(Str
 
 def applyChanges(path: String, map: FilePatches, uassetName: String, data: UAssetPropertyChanges): FilePatches = {
   val key = OrderedString(uassetName, path)
-  var m = map.getOrElse(key, TreeMap.empty: UAssetPropertyChanges)
+  var m = map.getOrElse(key, emptyUAssetPropertyChanges)
   for ((name, properties) <- data) {
-    var m2 = m.getOrElse(name, TreeMap.empty: PropertyChanges)
+    var m2 = m.getOrElse(name, emptyPropertyChanges)
     for ((property, valuePair) <- properties) {
       val valueString = toJsonPrettyString(valuePair.newValueOpt)
       val oldValueOpt = m2.get(property) match {
@@ -489,7 +521,7 @@ def applyChanges(path: String, map: FilePatches, uassetName: String, data: UAsse
 }
 
 def updatePatches(): Unit = {
-  var map: FilePatches = if (_patches == null) TreeMap.empty else _patches
+  var map = if (_patches == null) emptyFilePatches else _patches
 
   def rec(path: os.Path): Unit =   {
     if (path.last.headOption == Some('.')) {
@@ -821,7 +853,7 @@ def generateMod(addToFilePatches: Boolean,
     pack
   }
 
-  var codePatches: CodePatches = TreeMap.empty
+  var codePatches = emptyCodePatches
 
   val shouldPack = modNameOpt.nonEmpty
   var uassetNames = codePatches.keySet ++ uassetNameRequests
@@ -1057,11 +1089,17 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
     val extensions = Vector(
       "scalameta.metals", 
       "tamasfe.even-better-toml",
-      absPath(workingDir / "vscode" / "sbmod-vscode.vsix")
+      absPath(workingDir / "vscode" / "automod-vscode.vsix")
     )
+    os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
+      call(cwd = workingDir, check = false, stdout = new os.ProcessOutput {
+      def redirectTo: ProcessBuilder.Redirect = ProcessBuilder.Redirect.DISCARD
+      def processOutput(out: => os.SubProcess.OutputStream): Option[Runnable] = None
+    }, mergeErrIntoOut = true)
     for (extension <- extensions) {
       println(s"Installing $extension ...")
-      os.proc("cmd.exe", "/C", cmd, "--force", "--install-extension", extension).call(cwd = workingDir, check = false)
+      os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--install-extension", extension).
+        call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit)
       println()
     }
     println(s"To use, please open the $workingDir directory in $name")
@@ -1095,7 +1133,7 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
   if (isHard) modName = s"$modName-hard"
 
   val modPatches = patchesDir / modName
-  val aioPatches = patchesDir / "sb" / ".all-in-one-patches"
+  val aioPatches = patchesDir / "SB" / ".all-in-one-patches"
   if (isAIO) {
     val dotAIO = aioPatches / os.up / ".all-in-one-code-patches-unified"
     if (!os.exists(dotAIO)) exit(-1, s"$dotAIO does not exist")
