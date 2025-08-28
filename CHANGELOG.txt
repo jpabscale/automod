@@ -1,3 +1,5 @@
+1.9: Fixed .toml.all and usage checks.
+
 1.8: Added more jd patch form processing. Better TOML output. Added .toml.all command.
 
 1.7: Better usage & patch form checks and some fixes.

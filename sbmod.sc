@@ -19,9 +19,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v1.8"
-
-val argName = args.head
+val header = s"Stellar Blade Auto Modding Script v1.9"
 
 def printUsage(): Unit = {
   exit(0,
@@ -35,12 +33,15 @@ def printUsage(): Unit = {
        |                             | .toml.all <path-to-StellarBlade> <out-path>
        |                             ]
        |
-       |  .code    Print Auto Modding Script patching code from a jd patch file
-       |  .diff    Recursively diff JSON files and write jd and TOML patch files
-       |  .setup   Only set up modding tools
-       |  .toml    Merge existing patch files in patches as TOML patch files""".stripMargin)
+       |  .code        Print Auto Modding Script patching code from a jd patch file
+       |  .diff        Recursively diff JSON files and write jd and TOML patch files
+       |  .setup       Only set up modding tools
+       |  .toml        Merge existing patch files in patches as TOML patch files
+       |  .toml.all    Merge script code patches with patch files in patches as TOML""".stripMargin)
 }
 
+if (args.length == 0) printUsage()
+val argName = args.head
 argName match {
   case ".setup" => if (args.length != 1) printUsage()
   case ".diff" => if (args.length != 4) printUsage()
@@ -311,7 +312,7 @@ def updatePatches(): Unit = {
       if (os.isDir(p)) {
         rec(p)
       } else if (os.isFile(p)) {
-        p.ext match {
+        p.ext.toLowerCase match {
           case "patch" =>
             println(s"Loading $p ...")
             val uassetName = p.baseName
@@ -638,7 +639,7 @@ def toml(all: Boolean, path: os.Path)(): Unit = {
   }
 
   if (all) {
-    generateMod(false)
+    generateMod(false)()
     updatePatches()
   }
 
