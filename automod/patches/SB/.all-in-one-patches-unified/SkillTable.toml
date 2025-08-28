@@ -34,6 +34,10 @@ CoolTime = 0.1                                               # 0.400000005960464
 FirstSkillActiveAlias = "P_Eve_Tachy_Normal_Guard1_1_Parry1"    # "P_Eve_Sword_Normal_Guard1_1_Parry1"
 TargetFilterAlias = "P_Eve_Tachy_Normal_Guard1_1_Target"     # "P_Eve_Sword_Normal_Guard1_1_Target"
 
+[P_Eve_Sword_Beta_ChainStab1_1]
+HitLevel = 3                                                 # 1
+StartDelayTick = 5                                           # 1
+
 [P_Eve_Sword_Normal_Guard2_1]
 CoolTime = 0.1                                               # 0.4000000059604645
 ExpansionValue1 = "99999"                                    # "0.04"
@@ -42,15 +46,17 @@ JustActionTime = 1                                           # 0.150000005960464
 JustActionTime_StoryMode = 1                                 # 0.20000000298023224
 TargetFilterAlias = "P_Eve_Tachy_Normal_Guard1_1_Target"     # "P_Eve_Sword_Normal_Guard1_1_Target"
 
-[P_Eve_Sword_Beta_ChainStab1_1]
-HitLevel = 3                                                 # 1
-StartDelayTick = 5                                           # 1
-
 [P_Eve_Sword_Beta_ChainStabCombo1_1]
 AttackDamageRate = 9                                         # 2.0
 FirstSkillActiveAlias = "M_Scarlet_BlinkCut_Cast1"           # "P_Eve_Sword_Beta_ChainStabCombo1_1_Cast1"
 ShieldAttackDamageRate = 5                                   # 1.0
 StartDelayTick = 5                                           # 0
+
+[P_Eve_Tachy_Start2_1]
+AttackDamageRate = 33.33                                     # 50.0
+FirstSkillActiveAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"    # "P_Eve_Tachy_Start2_Cast1"
+ShieldAttackDamageRate = 33.33                               # 50.0
+TargetFilterAlias = "M_Scarlet_HitArea"                      # "P_Eve_Tachy_Start2_1_Target"
 
 [P_Eve_Sword_Beta_ChargeSlash1_1]
 HitLevel = 3                                                 # 1
@@ -158,12 +164,6 @@ AttackDamageRate = 8                                         # 8.0
 FirstSkillActiveAlias = "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast1"    # "P_Eve_Sword_Burst_FinishAttack3_1_Cast1"
 ShieldAttackDamageRate = 8                                   # 8.0
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_360_500_Target"
-
-[P_Eve_Tachy_Start2_1]
-AttackDamageRate = 33.33                                     # 50.0
-FirstSkillActiveAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"    # "P_Eve_Tachy_Start2_Cast1"
-ShieldAttackDamageRate = 33.33                               # 50.0
-TargetFilterAlias = "M_Scarlet_HitArea"                      # "P_Eve_Tachy_Start2_1_Target"
 
 [P_Eve_Sword_Normal_Evade1_1]
 CoolTime = 0.1                                               # 0.800000011920929

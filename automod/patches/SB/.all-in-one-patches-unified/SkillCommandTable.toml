@@ -15,6 +15,18 @@ InputDuration = 99999                                        # 1.200000047683715
 HoldDuration = 0.12                                          # 0.25
 InputDuration = 99999                                        # 1.2000000476837158
 
+[P_Eve_Fusion_JustParry_LightAttack1_1]
+InputDuration = 99                                           # 1.2000000476837158
+
+[P_Eve_Fusion_JustParry_StrongAttack1_1]
+InputDuration = 99                                           # 1.2000000476837158
+
+[P_Eve_Fusion_JustEvade_LightAttack1_1]
+InputDuration = 99                                           # 1.5
+
+[P_Eve_Fusion_JustEvade_StrongAttack1_1]
+InputDuration = 99                                           # 1.5
+
 [P_Eve_Sword_Evade_Evade1_1]
 NextComboCommandArray = [ { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "1", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "2", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" } ]    # [ { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "0", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "1", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "2", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_DashAttack1_1" } ]
 
@@ -43,17 +55,5 @@ InputDuration = 99                                           # 1.200000047683715
 InputDuration = 99                                           # 1.5
 
 [P_Eve_Tachy_JustEvade_StrongAttack1_1]
-InputDuration = 99                                           # 1.5
-
-[P_Eve_Fusion_JustParry_LightAttack1_1]
-InputDuration = 99                                           # 1.2000000476837158
-
-[P_Eve_Fusion_JustParry_StrongAttack1_1]
-InputDuration = 99                                           # 1.2000000476837158
-
-[P_Eve_Fusion_JustEvade_LightAttack1_1]
-InputDuration = 99                                           # 1.5
-
-[P_Eve_Fusion_JustEvade_StrongAttack1_1]
 InputDuration = 99                                           # 1.5
 

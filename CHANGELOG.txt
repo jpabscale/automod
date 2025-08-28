@@ -1,3 +1,5 @@
+2.8.0: Changed to use UAssetCLI -- a GUI-less stripped-down version of UAssetGUI in order to support multi-platform.  Added support for Windows arm64 and Linux amd64/arm64, but with .uasset extraction/regeneration parallelization disabled due to .NET 8 issues (macOS is unsupported due to even worse .NET issues). Added more patching parallelization for better performance (always on for all platforms).
+
 2.7.1: Fixed VSCode extension mod generation command. Relaxed handling of AES key (accepts with/without 0x) and added options to skip shaders when calling retoc. Fixed error handling when retoc does not produce any .uasset.
 
 2.7.0: Changed sbmod to automod (VSCode settings are also renamed to automod). Fixed default mapURI. Included all StellarBlade data tables in .cache. Added a new launcher automod.exe replacing automod.bat (use -s to disable scala-cli server mode). Made the game directory optional and use scala-cli server as the default setting in VSCode extension.

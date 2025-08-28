@@ -7,8 +7,8 @@
   },
   "tools" : {
     "retoc" : "0.1.2",
-    "uassetGui" : "1.0.3",
-    "fmodel" : "a1ddc72b79f422ef6baa1c738a5fe9a0bfdf9ab8",
+    "uassetCli" : "1.0.0",
+    "fmodel" : "0cc8da95e1cacd90662afe3124f88c6527079ea7",
     "jd" : "2.3.0"
   }
 }

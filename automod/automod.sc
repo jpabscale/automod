@@ -13,10 +13,72 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.7.1"
+val header = s"Auto Modding Script v2.8.0"
+
+val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
+
+sealed trait OsKind {
+  def isWin: Boolean
+  def isLinux: Boolean
+  def isMac: Boolean
+  def isArm: Boolean
+}
+
+object OsKind {
+  case object WinAmd64 extends OsKind {
+    def isWin: Boolean = true
+    def isLinux: Boolean = false
+    def isMac: Boolean = false
+    def isArm: Boolean = false
+    override def toString = "Windows/amd64"
+  }
+  case object LinuxAmd64 extends OsKind {
+    def isWin: Boolean = false
+    def isLinux: Boolean = true
+    def isMac: Boolean = false
+    def isArm: Boolean = false
+    override def toString = "Linux/amd64"
+  }
+  case object MacAmd64 extends OsKind {
+    def isWin: Boolean = false
+    def isLinux: Boolean = false
+    def isMac: Boolean = true
+    def isArm: Boolean = false
+    override def toString = "macOS/amd64"
+  }
+  case object WinArm64 extends OsKind {
+    def isWin: Boolean = true
+    def isLinux: Boolean = false
+    def isMac: Boolean = false
+    def isArm: Boolean = true
+    override def toString = "Windows/arm64"
+  }
+  case object LinuxArm64 extends OsKind {
+    def isWin: Boolean = false
+    def isLinux: Boolean = true
+    def isMac: Boolean = false
+    def isArm: Boolean = true
+    override def toString = "Linux/arm64"
+  }
+  case object MacArm64 extends OsKind {
+    def isWin: Boolean = false
+    def isLinux: Boolean = false
+    def isMac: Boolean = true
+    def isArm: Boolean = true
+    override def toString = "macOS/arm64"
+  }
+}
+
+val osKind = if (util.Properties.isWin) if (isArm) OsKind.WinArm64 else OsKind.WinAmd64 
+             else if (util.Properties.isLinux) if (isArm) OsKind.LinuxArm64 else OsKind.LinuxAmd64
+             else if (util.Properties.isMac) if (isArm) OsKind.MacArm64 else OsKind.MacAmd64
+             else exit(-1, s"Unsupported platform")
+
+if (osKind.isMac) exit(-1, s"Unsupported platform: .NET 8 for macOS does not currently work well enough for UAssetCLI")
 
 val maxLogs = Option(System.getenv("AUTOMOD_MAX_LOGS")).flatMap(_.toDoubleOption.map(Math.ceil(_).toInt)).getOrElse(30)
-val noPar = "true" == System.getenv("AUTOMOD_NO_PAR")
+
+val noPar = "true" == System.getenv("AUTOMOD_NO_PAR") || osKind.isLinux || osKind.isMac || osKind.isArm
 
 val dataTablePath = "/Exports/0/Table/Data"
 val noCodePatching = "--no-code-patching"
@@ -32,8 +94,6 @@ def exit(code: Int, msg: String = null): Nothing = {
   throw new RuntimeException
 }
 
-if (!Properties.isWin) exit(-1, "This script can only be used in Windows")
-
 val zipToolVersion = "25.01"
 var modExt = "zip"
 
@@ -46,8 +106,8 @@ class Game {
 
 class Tools {
   @BeanProperty var retoc: String = "0.1.2"
-  @BeanProperty var uassetGui: String = "1.0.3"
-  @BeanProperty var fmodel: String = "a1ddc72b79f422ef6baa1c738a5fe9a0bfdf9ab8"
+  @BeanProperty var uassetCli: String = "1.0.0"
+  @BeanProperty var fmodel: String = "0cc8da95e1cacd90662afe3124f88c6527079ea7"
   @BeanProperty var jd: String = "2.3.0"
 }
 
@@ -171,7 +231,8 @@ lazy val logDir = {
     os.remove.all(p)
   d / s"${cliArgs.head}-${getTimestamp()}"
 }
-
+val localAppData = if (osKind.isWin) os.Path(System.getenv("LOCALAPPDATA")) else os.home / ".local" / "share"
+val userName = if (osKind.isWin) System.getenv("USERNAME") else os.proc("whoami").call().out.toString.trim
 val config = {
   var r = new Config
   var ok = true
@@ -191,41 +252,44 @@ val config = {
 }
 
 val retocVersion = config.tools.retoc
-val uassetGuiVersion = config.tools.uassetGui
+val uassetCliVersion = config.tools.uassetCli
 val fmodelSha = config.tools.fmodel
 val fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = config.tools.jd
 val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
-val retocZip = "retoc-x86_64-pc-windows-msvc.zip"
-
-val retocUrl = s"https://github.com/trumank/retoc/releases/download/v$retocVersion/$retocZip"
-val uassetGuiUrl = s"https://github.com/atenfyr/UAssetGUI/releases/download/v$uassetGuiVersion/UAssetGUI.exe"
 val usmapUri = config.game.mapUri
-val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSha.zip"
-val jdUrl = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion/jd-amd64-windows.exe"
 val usmapFilename = usmapUri.substring(usmapUri.lastIndexOf('/') + 1)
 val usmapPath = workingDir / usmapFilename
 val usmap = usmapPath.baseName
-val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
-val z7Url = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7z${zipToolVersion.replace(".", "")}-x64.exe"
-
 val toolsDir = workingDir / "tools"
 val usmapDir = toolsDir / "usmap"
 
-val retocExe = toolsDir / "retoc.exe"
-val uassetGuiExe = toolsDir / "UAssetGUI.exe"
+val retocUrlPrefix = s"https://github.com/trumank/retoc/releases/download/v$retocVersion"
+val uassetCliUrl = s"https://github.com/jpabscale/UAssetCLI/releases/download/v$uassetCliVersion/UAssetCLI.zip"
+val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSha.zip"
+val jdUrlPrefix = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion"
+val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
+val z7UrlPrefix = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion"
+val retocExe = toolsDir / "retoc" / (if (osKind.isWin) "retoc.exe" else "retoc")
 val fmodelExe = toolsDir / "FModel.exe"
-val jdExe = toolsDir / "jd.exe"
-val uassetGuiSettingsDir = os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI"
+val jdExe = toolsDir / (if (osKind.isWin) "jd.exe" else "jd")
+val zipExe = toolsDir / "7z" / (if (osKind.isWin) "7z.exe" else "7zz")
+
+val uassetCliDir = toolsDir / "UAssetCLI"
+val uassetGuiSettingsDir = localAppData / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
-val zipExe = toolsDir / "7z" / "7z.exe"
 
 val gameId = config.game.contentPaks.split('/').head
 val cacheDir = workingDir / ".cache"
-val automod = workingDir / "automod.bat"
+lazy val dotnet = if (os.exists(os.home / ".dotnet" / "dotnet")) absPath(os.home / ".dotnet" / "dotnet") else "dotnet"
+
+val discardProcessOutput = new os.ProcessOutput {
+  def redirectTo: ProcessBuilder.Redirect = ProcessBuilder.Redirect.DISCARD
+  def processOutput(out: => os.SubProcess.OutputStream): Option[Runnable] = None
+}
 
 def setupModTools(): Boolean = {
   var setup = true
@@ -233,13 +297,10 @@ def setupModTools(): Boolean = {
   os.makeDir.all(patchesDir)
   os.makeDir.all(toolsDir)
 
-  def download(uri: String, renameOpt: Option[String] = None): Unit = {
+  def download(uri: String): os.Path = {
     val cacheName = java.util.Base64.getEncoder().encodeToString(uri.getBytes(java.nio.charset.StandardCharsets.UTF_8))
-    val cachePath = os.Path(System.getenv("LOCALAPPDATA")) / "Temp" / "automod" / cacheName
-    val dest = renameOpt match {
-      case Some(name) => toolsDir / name
-      case _ => toolsDir / uri.substring(uri.lastIndexOf('/') + 1)
-    }
+    val cachePath = localAppData / "Temp" / "automod" / cacheName
+    val dest = toolsDir / uri.substring(uri.lastIndexOf('/') + 1)
     if (!os.exists(cachePath)) {
       os.makeDir.all(cachePath / os.up)
       if (uri.startsWith("https://")) os.proc("curl", "-JLo", cachePath, uri).call(cwd = toolsDir, stdout = os.Inherit, stderr = os.Inherit)
@@ -247,37 +308,65 @@ def setupModTools(): Boolean = {
       else os.copy.over(workingDir / os.RelPath(uri), cachePath)
     }
     os.copy.over(cachePath, dest)
+    dest
   }
 
   if (!os.exists(zipExe)) {
     setup = false
     println(s"Setting up 7z v$zipToolVersion in $toolsDir ...")
-    val z7 = s"7z$zipToolVersion.exe"
-    val z7r = "7zr.exe"
-    download(z7rUrl, Some(z7r))
-    download(z7Url, Some(z7))
-    os.makeDir.all(toolsDir / "7z")
-    os.proc(toolsDir / "7zr.exe", "x", toolsDir / z7).call(cwd = toolsDir / "7z")
-    os.remove.all(toolsDir / z7)
-    os.remove.all(toolsDir / z7r)
+    osKind match {
+      case OsKind.WinAmd64 | OsKind.WinArm64 =>
+        val z7r = download(z7rUrl)
+        val z7 = download(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-${if (isArm) "arm64" else "x64"}.exe")
+        os.makeDir.all(toolsDir / "7z")
+        os.proc(toolsDir / "7zr.exe", "x", z7).call(cwd = toolsDir / "7z")
+        os.remove.all(z7)
+        z7r.toIO.deleteOnExit
+      case OsKind.LinuxAmd64 | OsKind.LinuxArm64 =>
+        val z7 = download(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-linux-${if (isArm) "arm64" else "x64"}.tar.xz")
+        os.makeDir.all(toolsDir / "7z")
+        os.proc("tar", "xf", z7).call(cwd = toolsDir / "7z")
+        os.remove.all(z7)
+      case OsKind.MacAmd64 | OsKind.MacArm64 =>
+        val z7 = download(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-mac.tar.xz")
+        os.makeDir.all(toolsDir / "7z")
+        os.proc("tar", "xf", z7).call(cwd = toolsDir / "7z")
+        os.remove.all(z7)
+    }
     println()
   }
 
   if (!os.exists(retocExe)) {
     setup = false
     println(s"Setting up retoc v$retocVersion in $toolsDir ...")
-    download(retocUrl)
-    os.proc(zipExe, "x", retocZip).call(cwd = toolsDir)
-    os.remove.all(toolsDir / retocZip)
-    os.move(toolsDir / "LICENSE", toolsDir / "retoc-LICENSE")
-    os.move(toolsDir / "README.md", toolsDir / "retoc-README.md")
+    val retocBundleName = osKind match {
+      case OsKind.WinAmd64 | OsKind.WinArm64 => "retoc-x86_64-pc-windows-msvc.zip"
+      case OsKind.MacAmd64 => "retoc-x86_64-apple-darwin.tar.xz"
+      case OsKind.LinuxAmd64 => "retoc-x86_64-unknown-linux-gnu.tar.xz"
+      case OsKind.LinuxArm64 => "retoc-aarch64-unknown-linux-gnu.tar.xz"
+      case OsKind.MacArm64 => "retoc-aarch64-apple-darwin.tar.xz"
+    }
+    val retocBundle = download(s"$retocUrlPrefix/$retocBundleName")
+    os.remove.all(retocExe / os.up)
+    if (osKind.isWin) {
+      os.makeDir.all(retocExe / os.up)
+      os.proc(zipExe, "x", retocBundle).call(cwd = retocExe / os.up)
+    } else {
+      os.proc("tar", "xf", retocBundle).call(cwd = toolsDir)
+      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("retoc-")) {
+        os.move.over(p, toolsDir / "retoc")
+      }
+    }
+    os.remove.all(retocBundle)
     println()
   }
 
-  if (!os.exists(uassetGuiExe)) {
+  if (!os.exists(uassetCliDir)) {
     setup = false
-    println(s"Setting up UAssetGUI v$uassetGuiVersion in $toolsDir ...")
-    download(uassetGuiUrl)
+    println(s"Setting up UAssetCLI v$uassetCliVersion in $uassetCliDir ...")
+    val uassetCliZip = download(uassetCliUrl)
+    os.proc(zipExe, "x", uassetCliZip).call(cwd = toolsDir)
+    os.remove.all(uassetCliZip)
     println()
   }
 
@@ -302,20 +391,29 @@ def setupModTools(): Boolean = {
     }
   }
 
-  if (!os.exists(fmodelExe)) {
+  if (osKind.isWin && !os.exists(fmodelExe)) {
     setup = false
-    val fmodelZip = s"${fmodelExe.last}.zip"
     println(s"Setting up FModel @$fmodelShortSha in $toolsDir ...")
-    download(fmodelUrl, Some(fmodelZip))
+    val fmodelZip = download(fmodelUrl)
     os.proc(zipExe, "x", fmodelZip).call(cwd = toolsDir)
-    os.remove.all(toolsDir / fmodelZip)
+    os.remove.all(fmodelZip)
     println()
   }
 
   if (!os.exists(jdExe)) {
     setup = false
     println(s"Setting up jd v$jdVersion in $toolsDir ...")
-    download(jdUrl, Some(jdExe.last))
+    val jdBundleName = osKind match {
+      case OsKind.WinAmd64 => "jd-amd64-windows.exe"
+      case OsKind.WinArm64 => "jd-arm64-windows.exe"
+      case OsKind.LinuxAmd64 => "jd-amd64-linux"
+      case OsKind.MacAmd64 => "jd-amd64-darwin"
+      case OsKind.LinuxArm64 => "jd-arm64-linux"
+      case OsKind.MacArm64 => "jd-arm64-darwin"
+    }
+    val jdBundle = download(s"$jdUrlPrefix/$jdBundleName")
+    os.move.over(jdBundle, jdExe)
+    if (!osKind.isWin) jdExe.toIO.setExecutable(true)
     println()
   }
 
@@ -544,11 +642,15 @@ def updatePatches(): Unit = {
             case "patch" =>
               val uassetName = p.baseName
               logPatch(uassetName, s"Loading $p ...", console = true)
-              map = applyChanges(p.relativeTo(patchesDir).toString.replace('/', '\\'), map, uassetName, jdFilePatches(p)())
+              var relPath = p.relativeTo(patchesDir).toString
+              if (osKind.isWin) relPath = relPath.replace('/' , '\\')
+              map = applyChanges(relPath, map, uassetName, jdFilePatches(p)())
             case "toml" =>
               val uassetName = p.baseName
               logPatch(uassetName, s"Loading $p ...", console = true)
-              map = applyChanges(p.relativeTo(patchesDir).toString.replace('/', '\\'), map, uassetName, tomlFilePatches(p))
+              var relPath = p.relativeTo(patchesDir).toString
+              if (osKind.isWin) relPath = relPath.replace('/' , '\\')
+              map = applyChanges(relPath, map, uassetName, tomlFilePatches(p))
             case _ =>
           }
         }
@@ -590,28 +692,40 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
   }
   val data = ast.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
   val origData = origAst.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
-  val seenObjectNames = scala.collection.mutable.HashSet.empty[String]
   val dataMap = toDataMap(data)
-  for (i <- 0 until data.size) {
-    val orig = origData.get(i)
-    val obj = uassetapi.Struct(uassetName, data.get(i), addToFilePatches = addToFilePatches)
-    val origObj = uassetapi.Struct(uassetName, orig, addToFilePatches = false)
-    seenObjectNames.add(obj.name)
-    for (kfc <- kfcMap.values if kfc(obj.name)) {
-      kfc.applyPathChanges(s"$dataTablePath/$i", obj.value, origObj.value)
+  def updateProperties(obj: uassetapi.Struct, orig: JsonNode, properties: PropertyChanges): Unit = {
+    for ((property, valueOldValuePair) <- properties) {
+      var value = valueOldValuePair.newValueOpt.orNull
+      value match {
+        case v: TextNode if patchlet.getKeyPrefix(v.textValue) == Some(patchlet.Constants.codePrefix) =>
+          val code = v.textValue.substring(patchlet.Constants.codePrefix.length)
+          value = patchlet.evalProperty(uassetName, addToFilePatches, dataMap, code, obj, property, orig, ast, origAst)
+        case _ =>
+      }
+      obj.setJson(property, value)
     }
-    t.get(obj.name) match {
-      case Some(properties) =>
-        for ((property, valueOldValuePair) <- properties) {
-          var value = valueOldValuePair.newValueOpt.orNull
-          value match {
-            case v: TextNode if patchlet.getKeyPrefix(v.textValue) == Some(patchlet.Constants.codePrefix) =>
-              val code = v.textValue.substring(patchlet.Constants.codePrefix.length)
-              value = patchlet.evalProperty(uassetName, addToFilePatches, dataMap, code, obj, property, orig, ast, origAst)
-            case _ =>
-          }
-          obj.setJson(property, value)
-        }
+  }
+  def applyKfcs(i: Int, obj: uassetapi.Struct, origObj: uassetapi.Struct, kfcs: Iterable[patchlet.KeyFilteredChanges]): Unit = {
+    for (kfc <- kfcs) kfc.applyPathChanges(s"$dataTablePath/$i", obj.value, origObj.value)
+  }
+
+  val indices = for (i <- 0 until data.size) yield i
+  val qs = for (i <- indices.par) yield {
+    val obj = uassetapi.Struct(uassetName, data.get(i), addToFilePatches = addToFilePatches)
+    val kfcs = for (kfc <- kfcMap.values if kfc(obj.name)) yield kfc
+    val propertiesOpt = t.get(obj.name) match {
+      case Some(ps) => Some(ps)
+      case _ => None
+    }
+    (i, obj, kfcs, propertiesOpt)
+  }
+
+  for ((i, obj, kfcs, propertiesOpt) <- qs) {
+    val orig = origData.get(i)
+    val origObj = uassetapi.Struct(uassetName, orig, addToFilePatches = false)
+    applyKfcs(i, obj, origObj, kfcs)
+    propertiesOpt match {
+      case Some(properties) => updateProperties(obj, orig, properties)
       case _ =>
     }
   }
@@ -626,7 +740,7 @@ def logPatch(uassetName: String, line: String, console: Boolean): Unit = {
 
 def generateMod(addToFilePatches: Boolean,
                 modNameOpt: Option[String], 
-                sbPakDirOpt: Option[os.Path], 
+                gamePakDirOpt: Option[os.Path], 
                 disableFilePatching: Boolean, 
                 disableCodePatching: Boolean, 
                 dryRun: Boolean,
@@ -634,17 +748,17 @@ def generateMod(addToFilePatches: Boolean,
                 currentAstMap: collection.mutable.HashMap[String, (JsonAst, JsonAst, JsonAst)] = collection.mutable.HashMap.empty,
                 origAstMap: collection.mutable.HashMap[String, JsonNode] = null,
                 uassetNameRequests: Vector[String] = Vector())(): Unit = {
-  val cacheKey = cacheDir / "key.properties"
+  val cacheKey = cacheDir / gameId / "key.properties"
   val output = workingDir / "out"
   os.remove.all(output)
 
   def computeCacheKey(): String = {
-    if (sbPakDirOpt.isEmpty) return null
-    val sbPakDir = sbPakDirOpt.get
+    if (gamePakDirOpt.isEmpty) return null
+    val sbPakDir = gamePakDirOpt.get
     if (!os.exists(sbPakDir)) return ""
     var r = Vector.empty[String]
     r = r :+ s"retoc=$retocVersion"
-    r = r :+ s"UAssetGUI=$uassetGuiVersion"
+    r = r :+ s"UAssetCLI=$uassetCliVersion"
     for (p <- os.list(sbPakDir).sortWith((p1, p2) => p1.last <= p2.last) if os.isFile(p)) {
       r = r :+ s"${p.last}=${p.toIO.lastModified}"
     }
@@ -665,7 +779,7 @@ def generateMod(addToFilePatches: Boolean,
   val cacheHit = {
     val key = computeCacheKey()
     if (key == null || os.exists(cacheKey) && os.read(cacheKey) == key) true else {
-      recreateDir(cacheDir)
+      recreateDir(cacheKey / os.up)
       if (key.nonEmpty) os.write(cacheKey, key)
       false
     }
@@ -690,18 +804,17 @@ def generateMod(addToFilePatches: Boolean,
        |Try to see if this is a known issue (or filing a new one) at:
        |https://github.com/trumank/retoc/issues""".stripMargin)
 
-  def uassetGuiFailed(title: String, pUassetGui: os.proc, at: os.Path, repack: Boolean): Nothing = {
+  def uassetCliFailed(title: String, pUassetGui: os.proc, at: os.Path, repack: Boolean): Nothing = {
     val moreInfo = if (!repack) "T" else 
       s"""First, check that the patched JSON file has been changed as intended with correct values. 
          |If everyhing looks proper, t""".stripMargin
     exit(-1, 
-      s"""Failed to use UAssetGUI to $title with the following command in $at:
+      s"""Failed to use UAssetCLI to $title with the following command in $at:
          |
          |${pUassetGui.commandChunks.mkString(" ")}
          |
-         |${moreInfo}ry to see if this is a known UAssetGUI issue (or filing a new one) at:
-         |https://github.com/atenfyr/UAssetAPI/issues, or
-         |https://github.com/atenfyr/UAssetGUI/issues""".stripMargin)
+         |${moreInfo}ry to see if this is a known UAssetAPI issue (or filing a new one) at:
+         |https://github.com/atenfyr/UAssetAPI/issues""".stripMargin)
   }
 
   val uassetNamePathMap = new ConcurrentHashMap[String, os.RelPath]
@@ -726,18 +839,17 @@ def generateMod(addToFilePatches: Boolean,
       return r
     }
 
-    if (sbPakDirOpt.isEmpty) exit(-1, s"$name.json is not cached; please supply the game directory")
+    if (gamePakDirOpt.isEmpty) exit(-1, s"$name.json is not cached; please supply the game directory")
 
-    val sbPakDir = sbPakDirOpt.get
+    val gamePakDir = gamePakDirOpt.get
 
     val outputName = output / name
-    val username = System.getenv("USERNAME")
-    val profileCopyDir = outputName / username
+    val profileCopyDir = outputName / userName
     val uassetGuiSettingsCopyDir = profileCopyDir / "AppData" / "Local" / "UAssetGUI"
     val retocCopyDir = outputName / "retoc"
-    val uassetGuiCopyDir = outputName / "uassetgui"
+    val uassetCliCopyDir = outputName / "uassetgui"
+    val uassetCliDll = uassetCliCopyDir / "UAssetCLI.dll"
     val retocExeCopy = retocCopyDir / retocExe.last
-    val uassetGuiExeCopy = uassetGuiCopyDir / uassetGuiExe.last
     val uassetFilename = s"$name.uasset"
     val uexpFilename = s"$name.uexp"
 
@@ -745,7 +857,7 @@ def generateMod(addToFilePatches: Boolean,
     os.copy.over(retocExe, retocExeCopy)
 
     println(s"Extracting $uassetFilename ...")
-    val pRetoc = os.proc(retoc(retocExeCopy, "to-legacy", "--no-shaders", "--no-compres-shaders", "--no-parallel", "--version", ueVersionCode, "--filter", uassetFilename, sbPakDir, retocCopyDir))
+    val pRetoc = os.proc(retoc(retocExeCopy, "to-legacy", "--no-shaders", "--no-compres-shaders", "--no-parallel", "--version", ueVersionCode, "--filter", uassetFilename, gamePakDir, retocCopyDir))
     if (pRetoc.call(check = false, cwd = retocCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0 || !os.exists(retocCopyDir / gameId) || os.walk(retocCopyDir / gameId).isEmpty)
       retocFailed(s"extract $uassetFilename (double check the .uasset name)", pRetoc, retocCopyDir)
     println(s"... done extracting $uassetFilename")
@@ -766,14 +878,13 @@ def generateMod(addToFilePatches: Boolean,
 
     println(s"Converting to $r ...")
     os.makeDir.all(uassetGuiSettingsCopyDir / os.up)
-    os.makeDir.all(uassetGuiCopyDir)
-    os.copy.over(os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI", uassetGuiSettingsCopyDir)
-    os.copy.over(uassetGuiExe, uassetGuiExeCopy)
+    os.copy.over(localAppData / "UAssetGUI", uassetGuiSettingsCopyDir)
+    os.copy.over(uassetCliDir, uassetCliCopyDir)
     val env = Map[String, String]("USERPROFILE" -> absPath(profileCopyDir), "LOCALAPPDATA" -> absPath(uassetGuiSettingsCopyDir))
-    val pUassetGui = os.proc(uassetGuiExeCopy, "tojson", uasset, json, s"VER_$ueVersionCode", usmap)
-    if (pUassetGui.call(check = false, cwd = uassetGuiCopyDir, stdout = os.Inherit, stderr = os.Inherit, env = env).exitCode != 0) 
-      uassetGuiFailed(s"convert $uasset to JSON", pUassetGui, uassetGuiCopyDir, repack = false)
-    os.copy.over(uassetGuiCopyDir / json, r)
+    val pUassetGui = os.proc(dotnet, uassetCliDll, "tojson", uasset, json, s"VER_$ueVersionCode", usmap)
+    if (pUassetGui.call(check = false, cwd = uassetCliCopyDir, stdout = os.Inherit, stderr = os.Inherit, env = env).exitCode != 0) 
+      uassetCliFailed(s"convert $uasset to JSON", pUassetGui, uassetCliCopyDir, repack = false)
+    os.copy.over(uassetCliCopyDir / json, r)
     os.copy.over(r, jsonCache)
     println(s"... done converting to $r")
 
@@ -785,24 +896,23 @@ def generateMod(addToFilePatches: Boolean,
 
   def packJson(name: String, path: os.Path): Unit = {
     val outputName = output / name
-    val username = System.getenv("USERNAME")
-    val profileCopyDir = outputName / username
+    val profileCopyDir = outputName / userName
     val uassetGuiSettingsCopyDir = profileCopyDir / "AppData" / "Local" / "UAssetGUI"
     val uasset = outputName / uassetNamePathMap.get(name)
     val pathCopy = outputName / path.last
-    val uassetGuiExeCopy = outputName / uassetGuiExe.last
+    val uassetCliDll = outputName / "UAssetCLI.dll"
 
     os.makeDir.all(uasset / os.up)
     os.makeDir.all(uassetGuiSettingsCopyDir / os.up)
-    os.copy.over(os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI", uassetGuiSettingsCopyDir)
-    os.copy.over(uassetGuiExe, uassetGuiExeCopy)
+    os.copy.over(localAppData / "UAssetGUI", uassetGuiSettingsCopyDir)
+    for (p <- os.list(uassetCliDir)) os.copy.over(p, outputName / p.last)
     os.copy.over(path, pathCopy)
 
     println(s"Regenerating $uasset ...")
-    val pUassetGui = os.proc(uassetGuiExeCopy, "fromjson", pathCopy, uasset, usmap)
+    val pUassetGui = os.proc(dotnet, uassetCliDll , "fromjson", pathCopy, uasset, usmap)
     val env = Map[String, String]("USERPROFILE" -> absPath(profileCopyDir), "LOCALAPPDATA" -> absPath(uassetGuiSettingsCopyDir))
     if (pUassetGui.call(check = false, cwd = outputName, stdout = os.Inherit, stderr = os.Inherit, env = env).exitCode != 0)
-      uassetGuiFailed(s"convert $uasset from JSON", pUassetGui, outputName, repack = true)
+      uassetCliFailed(s"convert $uasset from JSON", pUassetGui, outputName, repack = true)
     println(s"... done regenerating $uasset")
     os.makeDir.all(output / gameId)
     val src = outputName / gameId
@@ -1023,7 +1133,7 @@ def writeToml(path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[Jso
   println(s"Wrote $path")
 }
 
-def toml(sbPakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boolean)(): Unit = {
+def toml(gamePakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boolean)(): Unit = {
   if (os.exists(path) && !os.isDir(path)) {
     exit(-1, s"$path is not a directory")
   }
@@ -1031,8 +1141,8 @@ def toml(sbPakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boole
   val currMap = collection.mutable.HashMap.empty[String, (JsonAst, JsonAst, JsonAst)]
   val origMap = collection.mutable.HashMap.empty[String, JsonNode]
   if (!disableCodePatching)
-    generateMod(addToFilePatches = true, None, sbPakDirOpt, disableFilePatching = true, disableCodePatching, dryRun = true, includePatches = false, currMap, origMap)()
-  generateMod(addToFilePatches = true, None, sbPakDirOpt, disableFilePatching = false, disableCodePatching, dryRun = true, includePatches = false, currMap, origMap)()
+    generateMod(addToFilePatches = true, None, gamePakDirOpt, disableFilePatching = true, disableCodePatching, dryRun = true, includePatches = false, currMap, origMap)()
+  generateMod(addToFilePatches = true, None, gamePakDirOpt, disableFilePatching = false, disableCodePatching, dryRun = true, includePatches = false, currMap, origMap)()
 
   os.makeDir.all(path)
   var noPatch = true
@@ -1084,36 +1194,51 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
 
 def vscode(vscOpt: Option[os.Path]): Unit = {
   def setup(cmd: os.Path): Unit = {
-    val name = if (cmd.last == "code.cmd") "VSCode"  else "VSCodium"
-    println(s"Setting up ${absPath(cmd / os.up /  os.up)} ...")
+    val name = if (cmd.last == "code.cmd" || cmd.last == "code") "VSCode"  else "VSCodium"
+    println(s"Setting up $name using ${absPath(cmd)} ...")
     println()
     val extensions = Vector(
       "scalameta.metals", 
       "tamasfe.even-better-toml",
       absPath(workingDir / "vscode" / "automod-vscode.vsix")
     )
-    os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
-      call(cwd = workingDir, check = false, stdout = new os.ProcessOutput {
-      def redirectTo: ProcessBuilder.Redirect = ProcessBuilder.Redirect.DISCARD
-      def processOutput(out: => os.SubProcess.OutputStream): Option[Runnable] = None
-    }, mergeErrIntoOut = true)
+    if (osKind.isWin) {
+      os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
+        call(cwd = workingDir, check = false, stdout = discardProcessOutput, mergeErrIntoOut = true)
+    }
     for (extension <- extensions) {
       println(s"Installing $extension ...")
-      os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--install-extension", extension).
-        call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit)
+      if (osKind.isWin) {
+        os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--install-extension", extension).
+          call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit)
+      } else {
+        os.proc(cmd, "--force", "--install-extension", extension).
+          call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit)
+      }
       println()
     }
     println(s"To use, please open the $workingDir directory in $name")
     println()
   }
-  var cmds = Vector(
-    os.Path(s"${System.getenv("LOCALAPPDATA")}\\Programs\\Microsoft VS Code\\bin\\code.cmd"),
+  var cmds = if (osKind.isWin) Vector(
+    os.Path(s"$localAppData\\Programs\\Microsoft VS Code\\bin\\code.cmd"),
     os.Path("C:\\Program Files\\Microsoft VS Code\\bin\\code.cmd"),
     os.Path("C:\\Program Files (x86)\\Microsoft VS Code\\bin\\code.cmd"),
-    os.Path(s"${System.getenv("LOCALAPPDATA")}\\Programs\\VSCodium\\bin\\codium.cmd"),
+    os.Path(s"$localAppData\\Programs\\VSCodium\\bin\\codium.cmd"),
     os.Path("C:\\Program Files\\VSCodium\\bin\\codium.cmd")
-  )
-  for (vsc <- vscOpt) cmds = Vector(vsc / "bin" / "code.cmd", vsc / "bin" / "codium.cmd") ++ cmds
+  ) else if (osKind.isLinux) Vector(
+    os.Path("/usr/bin/code"), os.Path("/usr/bin/codium")
+  ) else if (osKind.isMac) Vector(
+    os.home / "Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
+    os.home / "Applications/VSCodium.app/Contents/Resources/app/bin/codium",
+    os.Path("/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"),
+    os.Path("/Applications/VSCodium.app/Contents/Resources/app/bin/codium")
+  ) else Vector()
+  for (vsc <- vscOpt) cmds = (
+    if (osKind.isWin) Vector(vsc / "bin" / "code.cmd", vsc / "bin" / "codium.cmd") 
+    else if (osKind.isMac) Vector(vsc / "Contents"/ "Resources" / "app" / "bin" / "code", vsc / "Contents"/ "Resources" / "app" / "bin" / "codium")
+    else Vector(vsc / "bin" / "code", vsc / "bin" / "codium")
+  ) ++ cmds
   for (cmd <- cmds if os.isFile(cmd)) {
     setup(cmd)
     return
@@ -1136,11 +1261,12 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
   val modPatches = patchesDir / modName
   val aioPatches = patchesDir / "SB" / ".all-in-one-patches"
   if (isAIO) {
-    val dotAIO = aioPatches / os.up / ".all-in-one-code-patches-unified"
+    val dotAIO = aioPatches / os.up / ".all-in-one-patches-unified"
     if (!os.exists(dotAIO)) exit(-1, s"$dotAIO does not exist")
     os.remove.all(modPatches)
     println()
-    execute(os.proc("xcopy", "/e", s"$dotAIO\\", s"$modPatches\\"))
+    if (osKind.isWin) execute(os.proc("xcopy", "/e", s"$dotAIO\\", s"$modPatches\\"))
+    else execute(os.proc("cp", "-R", dotAIO, modPatches))
     if (isHard) {
       def hard: os.Path = {
         for (p <- os.list(aioPatches) if p.last.contains("1329") && os.exists(p / "goddess" / ".hard")) 
@@ -1148,7 +1274,8 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
         exit(-1, s"Could not find the .hard patch")
       }
       println()
-      execute(os.proc("xcopy", "/e", s"$hard\\", s"$modPatches\\hard\\"))
+      if (osKind.isWin) execute(os.proc("xcopy", "/e", s"$hard\\", s"$modPatches\\hard\\"))
+      else execute(os.proc("cp", "-R", hard, modPatches / "hard"))
     }
   } else if (isEffect) {
     var found = false
@@ -1156,8 +1283,13 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
       found = true
       os.remove.all(modPatches)
       println()
-      execute(os.proc("xcopy", "/e", s"$p\\", s"$modPatches\\"))
-      execute(os.proc("cmd.exe", "/d", "/c", "del", s"$modPatches\\TargetFilterTable.toml"))
+      if (osKind.isWin) {
+        execute(os.proc("xcopy", "/e", s"$p\\", s"$modPatches\\"))
+        execute(os.proc("cmd.exe", "/d", "/c", "del", modPatches / "TargetFilterTable.toml"))
+      } else {
+        execute(os.proc("cp", "-R", p, modPatches))
+        execute(os.proc("rm", modPatches / "TargetFilterTable.toml"))
+      }
     }
   } else {
     var found = false
@@ -1165,28 +1297,34 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
       found = true
       os.remove.all(modPatches)
       println()
-      execute(os.proc("cmd.exe", "/d", "/c", "md", modPatches))
-      execute(os.proc("cmd.exe", "/d", "/c", "copy", s"$p\\$modName\\EffectTable.toml", s"$modPatches\\EffectTable.toml"))
+      if (osKind.isWin) {
+        execute(os.proc("cmd.exe", "/d", "/c", "md", modPatches))
+        execute(os.proc("cmd.exe", "/d", "/c", "copy", p / modName / "EffectTable.toml", modPatches / "EffectTable.toml"))
+      } else {
+        execute(os.proc("mkdir", modPatches))
+        execute(os.proc("cp", p / modName / "EffectTable.toml", modPatches / "EffectTable.toml"))
+      }
     }
   }
 
   try {
     println()
     gameDirOpt match {
-      case Some(gameDir) => execute(os.proc("cmd", "/D", "/C", "automod", modName, gameDir, noCodePatching, includePatches))
-      case _ => execute(os.proc("cmd", "/D", "/C", "automod", modName, noCodePatching, includePatches))
+      case Some(gameDir) => execute(os.proc(if (osKind.isWin) "automod" else "./automod.exe", modName, gameDir, noCodePatching, includePatches))
+      case _ => execute(os.proc(if (osKind.isWin) "automod" else "./automod.exe", modName, noCodePatching, includePatches))
     }
   } catch {
     case _: Throwable => exit(-1)
   } finally {
-    execute(os.proc("cmd", "/D", "/C", "rmdir", "/s", "/q", modPatches))
+    if (osKind.isWin) execute(os.proc("cmd", "/D", "/C", "rmdir", "/s", "/q", modPatches))
+    else execute(os.proc("rm", "-fR", modPatches))
   }
 }
 
 case class SearchPath(labelOpt: Option[String], path: String)
 case class UAssetSearch(uassetName: String, searchPaths: Vector[SearchPath])
 
-def search(sbPakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path): Unit = {
+def search(gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path): Unit = {
   def objectNameOpt(array: ArrayNode): Option[String] = {
     if (array.size != 1) return None
     array.get(0) match {
@@ -1235,7 +1373,7 @@ def search(sbPakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path): 
   
   if (uassetPaths.isEmpty) exit(-1, s"Could not find any JSON path in $pathsInput")
 
-  generateMod(addToFilePatches = false, None, sbPakDirOpt, disableFilePatching = true, disableCodePatching = true, 
+  generateMod(addToFilePatches = false, None, gamePakDirOpt, disableFilePatching = true, disableCodePatching = true, 
               dryRun = true, includePatches = false, uassetNameRequests = uassetNames)()
 
   os.makeDir.all(outDir)
@@ -1274,13 +1412,15 @@ def printUsage(): Nothing = {
   exit(0,
     s"""$header
        |
-       |Usage: automod [ <mod-name> [ <path-to-game> ] option*
-       |               | .demo.sb [ <path-to-StellarBlade> ]
-       |               | .diff[.into] <from-path> <to-path> <out-path>
-       |               | .search [ <path-to-game> ] <paths-input>.sam <out-path>
-       |               | .setup[.vscode [ <path-to-vscode> ]]
-       |               | .toml[.all] [ <path-to-game> ] <out-path>
-       |               ]
+       |Usage: automod [-s] [ <mod-name> [ <path-to-game> ] option*
+       |                    | .demo.sb [ <path-to-StellarBlade> ]
+       |                    | .diff[.into] <from-path> <to-path> <out-path>
+       |                    | .search [ <path-to-game> ] <paths-input>.sam <out-path>
+       |                    | .setup[.vscode [ <path-to-vscode> ]]
+       |                    | .toml[.all] [ <path-to-game> ] <out-path>
+       |                    ]
+       |
+       | -s                   Disable Scala CLI server
        |
        |option:
        | --dry-run            Disable actual mod generation and just test patches
@@ -1306,6 +1446,7 @@ def run(): Unit = {
   if (cliArgs.length == 0) printUsage()
   val argName = cliArgs.head
   val hasGameDir: Boolean = argName match {
+    case "" => printUsage(); false
     case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage(); false
     case ".toml" | ".toml.all" => if (cliArgs.length == 2) false else if (cliArgs.length == 3) true else printUsage()
     case ".search" => if (cliArgs.length == 3) false else if (cliArgs.length == 4) true else printUsage()
@@ -1317,17 +1458,19 @@ def run(): Unit = {
   }
 
   lazy val gameDir = absPath(cliArgs(1))
-  val (sbPakDirOpt, gameDirOpt, next) = if (hasGameDir) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 2) 
+  val (gamePakDirOpt, gameDirOpt, next) = if (hasGameDir) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 2) 
                                         else (None, None, 1)
   
   println(header)
-  if (sbPakDirOpt.nonEmpty) println(s"* Game directory: $gameDir")
+  if (gamePakDirOpt.nonEmpty) println(s"* Game directory: $gameDir")
   if (argName.head != '.') println(s"* Mod name to generate: $argName")
   println(
-    s"""* Working directory: $workingDir
-       |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $usmapFilename
-       |* Extra: FModel @$fmodelShortSha
-       |* Parallelization enabled: ${!noPar}
+    s"""* Platform: $osKind
+       |* Working directory: $workingDir
+       |* Using: retoc v$retocVersion, UAssetCLI v$uassetCliVersion, jd v$jdVersion, $usmapFilename""".stripMargin)
+  if (osKind.isWin) println(s"* Extra: FModel @$fmodelShortSha")
+  println(
+    s"""* Parallelization enabled: ${!noPar}
        |* Maximum task logs: $maxLogs
        |""".stripMargin)
 
@@ -1349,12 +1492,12 @@ def run(): Unit = {
     case ".search" =>
       val input = checkFileExt(absPath(cliArgs(next)), "sam")
       val outDir = checkDirAvailable(absPath(cliArgs(next + 1)))
-      search(sbPakDirOpt, input, outDir)
+      search(gamePakDirOpt, input, outDir)
     case ".setup" => if (setup) println("All modding tools have been set up")
     case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(absPath(cliArgs(1))) else None)
     case ".toml" | ".toml.all" => 
       val outDir = checkDirAvailable(absPath(cliArgs(next)))
-      setUAssetGUIConfigAndRun(toml(sbPakDirOpt, outDir, argName == ".toml"))
+      setUAssetGUIConfigAndRun(toml(gamePakDirOpt, outDir, argName == ".toml"))
     case _ =>
       if (argName.head == '.') exit(-1, s"Unrecognized command $argName")
       val modName = argName
@@ -1381,7 +1524,8 @@ def run(): Unit = {
           case arg => exit(-1, s"Unrecognized $arg")
         }
       }
-      setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), sbPakDirOpt, disableFilePatching = false, _noCodePatching, _dryRun, _includePatches))
+      setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
+                                           disableFilePatching = false, _noCodePatching, _dryRun, _includePatches))
   }
   println("... done!")
 }
