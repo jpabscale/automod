@@ -19,12 +19,12 @@ StartSelfEffect = '''=> {
 NextStepAlias = '''=> v.objName match {
   case "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Finish1" => "P_Eve_Sword_Normal_FinishAttack3_1_Ex_Cast1"
   case "P_Eve_Sword_Normal_FinishAttack3_1_Ex_Finish1" => "P_Eve_Sword_Air_RollingAttack1_1_Ex_Cast1"
-
-  case "P_Eve_Sword_Normal_LightAttack4_1_Ex_Finish1" => "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
-  case "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Finish1" => "P_Eve_Sword_Normal_StrongAttack6_1_Ex_Cast1"
   
   case "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Finish1" => "P_Eve_Sword_Normal_StrongAttack7_1_Ex_Cast1"
   case "P_Eve_Sword_Normal_StrongAttack7_1_Ex_Finish1" => "P_Eve_Sword_Normal_StrongAttack8_1_Ex_Cast1"
+
+  case "P_Eve_Sword_Normal_LightAttack4_1_Ex_Finish1" => "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
+  case "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Finish1" => "P_Eve_Sword_Normal_StrongAttack6_1_Ex_Cast1"
 
   case _ => null
 }'''                                                        # null

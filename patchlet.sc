@@ -1,7 +1,9 @@
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import com.jayway.jsonpath
+import java.util.{List => JList}
 import scala.collection.immutable.TreeMap
+import scala.jdk.CollectionConverters._
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
@@ -199,8 +201,8 @@ case class KeyFilteredChanges(addToDataTableFilePatches: Boolean,
   def apply(key: String): Boolean = f(key)
 }
 
-def kfcMap(maxOrder: Int, order: Int, addToDataTableFilePatches: Boolean, uassetName: String, ast: sbmod.JsonAst, origAst: sbmod.JsonAst, 
-           data: ArrayNode, t: sbmod.UAssetPropertyChanges): (collection.mutable.TreeMap[String, KeyFilteredChanges], collection.mutable.TreeMap[String, AtFilteredChanges], sbmod.UAssetPropertyChanges) = {
+def kfcMap(maxOrder: Int, order: Int, addToDataTableFilePatches: Boolean, uassetName: String, ast: sbmod.JsonAst, origAst: sbmod.JsonAst,
+           origAstPath: sbmod.JsonAst, data: ArrayNode, t: sbmod.UAssetPropertyChanges): (collection.mutable.TreeMap[String, KeyFilteredChanges], collection.mutable.TreeMap[String, AtFilteredChanges], sbmod.UAssetPropertyChanges) = {
   var r1 = collection.mutable.TreeMap.empty[String, KeyFilteredChanges]
   var r2 = collection.mutable.TreeMap.empty[String, AtFilteredChanges]
   var rt: sbmod.UAssetPropertyChanges = collection.immutable.TreeMap.empty 
@@ -233,16 +235,20 @@ def kfcMap(maxOrder: Int, order: Int, addToDataTableFilePatches: Boolean, uasset
           while (i < path.length && path(i) != '/' && path(i) != '$') i += 1
           if (i >= path.length) sbmod.exit(-1, s"Invalid $atPrefix path: $path")
           path = path.substring(i)
-          r2.put(key, AtFilteredChanges(addToDataTableFilePatches = false, uassetName, origAst, dataMap, path, properties))
-          if (addToDataTableFilePatches) {
+          val isDataTable = if (path.startsWith(sbmod.dataTablePath + "/")) true else {
+            val r = origAstPath.read(path).asInstanceOf[ArrayNode]
+            val prefix = sbmod.dataTableJsonPath + "["
+            def allWithPrefix: Boolean = {
+              for (i <- 0 until r.size if !r.get(i).textValue.startsWith(prefix)) return false
+              true
+            }
+            allWithPrefix
+          }
+          r2.put(key, AtFilteredChanges(addToDataTableFilePatches = isDataTable, uassetName, origAst, dataMap, path, properties))
+          if (addToDataTableFilePatches && !isDataTable) {
             val digits = (maxOrder + 1).toString.length
             val name = s"$atPrefix #${(for (i <- 0 until digits - order.toString.length) yield "0").mkString}$order $path"
-            val uassetKey = sbmod.OrderedString(uassetName, "", 0)
-            var map = sbmod._patches.getOrElse(uassetKey, TreeMap.empty: sbmod.UAssetPropertyChanges)
-            var m = map.getOrElse(name, TreeMap.empty: sbmod.PropertyChanges)
-            m = m ++ properties
-            map = map + (name -> m)
-            sbmod._patches = sbmod._patches + (uassetKey -> map)
+            sbmod.updatePatches(uassetName, name, properties)
           }
         case `javaRegexPrefix` =>
           val regexText = key.substring(javaRegexPrefix.length).trim

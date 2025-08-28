@@ -1,3 +1,5 @@
+2.5.1: Log patching detail to .log files instead of console (keeping the last 30 task logs, which can be overriden by defining AUTOMOD_MAX_LOGS env var to a different number). Improved performance by parallelizing .uasset/.json extractions, patching, and .uasset regenerations (can be disabled by defining the AUTOMOD_NO_PAR env var to any value). Added unification of .@: data table patches (detected based on their JSON Pointer or resolved JSONPath prefix). AIO changes: updated to use 1329 v2.7c scarlet godqueen.
+
 2.5.0: Made .@: patches preserved (including their load order) by .toml and .toml.all so .@: can be applied generally (e.g., for non data tables). Removed .demo, .demo.aio, .demo.aio.hard, and .demo.effect, and renamed .demo.all as .demo.sb. Moved Stellar Blade patches to patches\sb. AIOs: updated to use 1329 v2.7 scarlet godqueen; simplified 1156 patching to use an object name patchlet.
 
 2.4.5: Fixed property value patchlet handling when the curent value (v.currentOpt) is null. Changed to use 7-zip for compressing/uncompressing archives. AIOs: updated to use 1329 v2.6 scarlet godqueen.

@@ -1,43 +1,79 @@
 # ...                                                        # Game Original Value
+[M_Scarlet_AirDashCut_Cast1]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Cast2]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Cast3]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Cast4]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+bLookAtTarget = true                                         # false
+
+[M_Scarlet_AirDashCut_Cast5]
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1},{\"Alias\":\"LinkState_Monster\",\"Time\":1.75}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}, {\"Alias\":\"LinkState_Monster\", \"Time\":1.75}]"
+
+[M_Scarlet_AirDashCut_Finish1]
+Duration = 0.4                                               # 3.200000047683716
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"NoReactionSlug_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}]"
+
+[M_Scarlet_AirDashCut_Finish2]
+Duration = 0.4                                               # 3.0999999046325684
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"NoReactionSlug_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"M_Scarlet_NoGuardCheck\"}]"
+StartTargetEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"startDelayTime\":0.05},{\"Alias\":\"BlockAction_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"DownFaceDown\",\"startDelayTime\":1.9}]"
+
+[M_Scarlet_AirDashCut_Hit1]
+AttackCollisionGroupArray = "[{\"CollisionGroupName\":\"Collision_WeaponBig\",\"DelayTime\":0}]"    # "[{\"CollisionGroupName\":\"Collision_Weapon\", \"DelayTime\":0}]"
+SkillAttackDamageRate = 0.6                                  # 0.20000000298023224
+SkillShieldAttackDamageRate = 0.6                            # 0.20000000298023224
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Hit2]
+AttackCollisionGroupArray = "[{\"CollisionGroupName\":\"Collision_WeaponBig\",\"DelayTime\":0}]"    # "[{\"CollisionGroupName\":\"Collision_Weapon\", \"DelayTime\":0}]"
+SkillAttackDamageRate = 0.6                                  # 0.20000000298023224
+SkillShieldAttackDamageRate = 0.6                            # 0.20000000298023224
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Hit3]
+AttackCollisionGroupArray = "[{\"CollisionGroupName\":\"Collision_WeaponBig\",\"DelayTime\":0}]"    # "[{\"CollisionGroupName\":\"Collision_Weapon\", \"DelayTime\":0}]"
+SkillAttackDamageRate = 0.6                                  # 0.20000000298023224
+SkillShieldAttackDamageRate = 0.6                            # 0.20000000298023224
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Hit4]
+SkillAttackDamageRate = 0.6                                  # "+0"
+SkillShieldAttackDamageRate = 0.6                            # "+0"
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+
+[M_Scarlet_AirDashCut_Hit5]
+OverrideTargetFilterAlias = "M_Scarlet_MoveBackShot2_HitArea"    # 'null'
+SkillAttackDamageRate = 0.3                                  # 0.4000000059604645
+SkillResultAlias = "M_Scarlet_MoveBackShot2_Hit4"            # 'null'
+SkillShieldAttackDamageRate = 0.3                            # 0.4000000059604645
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"NoReactionSlug_Step\"},{\"Alias\":\"M_Scarlet_ShieldGain_Hit2\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"M_Scarlet_ShieldGain_Hit2\"}]"
+
 [M_Scarlet_AirDashSpaceCut_Cast1]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}, {\"Alias\":\"M_Scarlet_PlayTheater01\"}]"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}, {\"Alias\":\"M_Scarlet_PlayTheater01\"}]"
 
 [M_Scarlet_AirDashSpaceCut_Cast2]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
 
 [M_Scarlet_AirDashSpaceCut_Cast3]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
 
 [M_Scarlet_AirDashSpaceCut_Cast4]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
 
 [M_Scarlet_AirDashSpaceCut_Cast5]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
 
 [M_Scarlet_AirDashSpaceCut_Cast6]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
 
 [M_Scarlet_AirDashSpaceCut_Finish1]
-Duration = 0.4                                               # 2.3299999237060547
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"NoReactionSlug_Step\"}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"M_Scarlet_NoGuardCheck\"}]"
-
-[M_Scarlet_AirDashSpaceCut_Hit1]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
-
-[M_Scarlet_AirDashSpaceCut_Hit2]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
-
-[M_Scarlet_AirDashSpaceCut_Hit3]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
-
-[M_Scarlet_AirDashSpaceCut_Hit4]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":4}]"
-
-[M_Scarlet_AirDashSpaceCut_Hit5]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
-
-[M_Scarlet_AirDashSpaceCut_Hit6]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
+StartSelfEffect = "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"M_Scarlet_NoGuardCheck\"}, {\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"NoDamage_Skill\"}, {\"Alias\":\"AddHitDefense_Skill\", \"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"NoReactionSlug_Step\"}, {\"Alias\":\"M_Scarlet_NoGuardCheck\"}]"
 
 [M_Scarlet_AreaCombo_Cast1]
 StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}, {\"Alias\":\"M_Scarlet_PlayTheater01\"}]"
@@ -1956,9 +1992,10 @@ StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHi
 
 [P_Eve_Sword_Normal_StrongAttack6_1_Ex_Finish1]
 Duration = 0.1                                               # 2.930000066757202
-NextStepAlias = "M_Scarlet_AirDashSpaceCut_Cast1"            # 'null'
+NextStepAlias = "M_Scarlet_AirDashCut_Cast1"                 # 'null'
 OverrideTargetFilterAlias = "P_Eve_Sword_0500_360_500_HitArea"    # 'null'
 StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"UseSkill_Step\",\"Time\":1.3},{\"Alias\":\"BlockSkill_Step\",\"Time\":1.3}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":1.3}, {\"Alias\":\"BlockAction_Step\", \"Time\":1.3}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+bLookAtTarget = true                                         # false
 
 [P_Eve_Sword_Normal_StrongAttack6_1_Ex_Hit1]
 CanCutoff = true                                             # false

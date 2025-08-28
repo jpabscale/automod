@@ -35,7 +35,7 @@ def toValue[T](node: JsonNode): Option[T] = {
         case _ => Some(toT(text))
       }
     case null | _: NullNode => None
-    case _ => sbmod.exit(-1, s"Unsupported value: '${node.toPrettyString}'")
+    case _ => sbmod.exit(-1, s"Unsupported value (class: ${node.getClass}): '${node.toPrettyString}'")
   }
 }
 
@@ -56,7 +56,7 @@ def fromValue(v: Any): JsonNode = {
       for ((k, v) <- v) r.set[JsonNode](k.toString, fromValue(v))
       r
     case null => NullNode.instance
-    case _ => sbmod.exit(-1, s"Unsupported value: '$v'")
+    case _ => sbmod.exit(-1, s"Unsupported value (class: ${v.getClass}): '$v'")
   }
 }
 
@@ -93,15 +93,8 @@ case class Struct(uassetName: String, value: JsonNode, addToDataTableFilePatches
         val oldValueOpt = Option(obj(property).replace("Value", value))  
         (oldValueOpt, Option(value))
     }
-    println(s"* $name/$property: ${sbmod.toJsonPrettyString(rOpt)} => ${sbmod.toJsonPrettyString(valueOpt)}")
-    if (addToDataTableFilePatches) {
-      val uassetKey = sbmod.OrderedString(uassetName, "", 0)
-      var map = sbmod._patches.getOrElse(uassetKey, TreeMap.empty: sbmod.UAssetPropertyChanges)
-      var m = map.getOrElse(name, TreeMap.empty: sbmod.PropertyChanges)
-      m = m + (property -> sbmod.ValuePair(valueOpt, rOpt))
-      map = map + (name -> m)
-      sbmod._patches = sbmod._patches + (uassetKey -> map)
-    }
+    sbmod.logPatch(uassetName, s"* $name/$property: ${sbmod.toJsonPrettyString(rOpt)} => ${sbmod.toJsonPrettyString(valueOpt)}", console = false)
+    if (addToDataTableFilePatches) sbmod.updatePatch(uassetName, name, property, sbmod.ValuePair(valueOpt, rOpt))
     rOpt
   }
   

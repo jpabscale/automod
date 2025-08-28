@@ -41,8 +41,8 @@ StartTargetEffect = '''=> {
 ['.*: ^P_Eve_Sword_(Normal_StrongAttack(6|8)|Air_RollingAttack).*Ex_Finish1$']
 NextStepAlias = '''=> v.objName match {
   case "P_Eve_Sword_Air_RollingAttack1_1_Ex_Finish1" => "M_Scarlet_MoveBackShot2_Cast1"
-  case "P_Eve_Sword_Normal_StrongAttack6_1_Ex_Finish1" => "M_Scarlet_AirDashSpaceCut_Cast1"
   case "P_Eve_Sword_Normal_StrongAttack8_1_Ex_Finish1" => "M_Scarlet_BackDashSpaceCut_Cast1"
+  case "P_Eve_Sword_Normal_StrongAttack6_1_Ex_Finish1" => "M_Scarlet_AirDashCut_Cast1"
   case _ => null
 }'''                                                         # null
 StartSelfEffect = '''=> {
@@ -60,7 +60,44 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
-['.*: ^M_Scarlet_((BlinkCut|BlinkCombo|BlinkShot|SwingFast|AreaCombo|MoveBackShot2|BackDashSpaceCut|AirDashSpaceCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*(Cast|Hit).*|(SwingFast|AreaCombo|Swing_).*(Finish).*)$']
+['.*: ^M_Scarlet_(AirDashCut_Hit[1-3]|AreaCombo_Hit[2-5,7]|SwingFast_Hit1)$']
+AttackCollisionGroupArray = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{"CollisionGroupName":"Collision_WeaponBig", "DelayTime":0}"""))
+  newArray.toString
+}'''
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Finish1]
+bLookAtTarget = true
+
+[M_Scarlet_AirDashCut_Cast4]
+bLookAtTarget = true
+
+['.*: ^M_Scarlet_AirDashCut_Hit[1-4]$']
+SkillAttackDamageRate = 0.6
+SkillShieldAttackDamageRate = 0.6
+
+[M_Scarlet_AirDashCut_Hit5]
+SkillResultAlias = "M_Scarlet_MoveBackShot2_Hit4"
+OverrideTargetFilterAlias = "M_Scarlet_MoveBackShot2_HitArea"
+SkillAttackDamageRate = 0.3
+SkillShieldAttackDamageRate = 0.3
+
+
+[M_Scarlet_AirDashCut_Finish2]
+StartTargetEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "P_Eve_SkillTree_SwordAura_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_SkillTree_SwordAura_KnockDown" | "DownFaceDown" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''                                                         # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"DownFaceDown\",\"startDelayTime\":1.9}]"
+
+['.*: ^M_Scarlet_((BlinkCut|BlinkCombo|BlinkShot|SwingFast|AreaCombo|MoveBackShot2|BackDashSpaceCut|AirDashCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*(Cast|Hit).*|(AreaCombo|Swing_|SwingFast).*Finish.*)$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
@@ -77,7 +114,7 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
-['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|BlinkShot|MoveBackShot2|BackDashSpaceCut|AirDashSpaceCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Finish.*$']
+['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|BlinkShot|MoveBackShot2|BackDashSpaceCut|AirDashCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Finish.*$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
@@ -90,7 +127,7 @@ StartSelfEffect = '''=> {
   for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
     case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" | "NoDamage_Skill" | 
          "BlockAction_Step" | "BlockMove_Step" | "NoReactionSlug_Step" | "M_DummyScarlet_SummonDummyKill" |
-         "M_Scarlet_PlayTheater01" | "M_Scarlet_PlayTheater02" | "M_Scarlet_PlayTheater03" | 
+         "M_Scarlet_PlayTheater01" | "M_Scarlet_PlayTheater02" | "M_Scarlet_PlayTheater03" |
          "M_Scarlet_NoGuardCheck" | "M_Scarlet_NoShieldDamage" | "NoJustParryStaminaDamage_Dispel" |
          "MinimumHP_Dispel" | "M_Scarlet_HPRecover" | "M_Scarlet_ShieldZero" | "M_Scarlet_StaminaUp" |
          "M_Scarlet_StaminaRecover" | "M_Scarlet_PhaseChangeSkillCoolTimeResetGroup" | "M_Scarlet_AreaSkillCheck" =>
@@ -101,7 +138,7 @@ StartSelfEffect = '''=> {
 Duration = '''=> {
   val orig = v.orig[Double]
   v.objName match {
-    case "M_Scarlet_JumpStampSlash_Finish1" | "M_Scarlet_AirDashSpaceCut_Finish1" => 0.4
+    case "M_Scarlet_JumpStampSlash_Finish1" | "M_Scarlet_AirDashCut_Finish1" | "M_Scarlet_AirDashCut_Finish2" => 0.4
     case "M_Scarlet_BlinkCut_Finish1" | "M_Scarlet_BlinkCombo_Finish1" | "M_Scarlet_PhaseChange1_EndShieldOwn_Finish1" => 0.1
     case _ => if (orig > 2) 2 else orig
   }
@@ -133,13 +170,6 @@ SkillResultAlias = "P_Eve_Tachy_Start2_Hit2"                 # "None"
 OverrideTargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"    # "M_Scarlet_HitArea"
 NextStepAlias = "P_Eve_Sword_Beta_SwordAuraCombo1_1_Cast1"   # "M_Scarlet_AreaCombo_Cast9"
 Duration = 0.5                                               # 0.1
-
-['.*: ^M_Scarlet_(AreaCombo_Hit[2-5,7]|SwingFast_Hit1)$']
-AttackCollisionGroupArray = '''=> {
-  val newArray = JsonNodeFactory.instance.arrayNode
-  newArray.add(toJsonNode("""{"CollisionGroupName":"Collision_WeaponBig", "DelayTime":0}"""))
-  newArray.toString
-}'''
 
 [P_Eve_Sword_Normal_DashAttack1_2_Ex_Finish1] # Ex Combo S + Scarlet Judgement Cut/Tempest: R1+◯
 NextStepAlias = "P_Eve_Tachy_Start2_Cast1"                   # null
