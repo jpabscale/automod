@@ -1,8 +1,3 @@
-//> using scala 2.13.16
-//> using dep com.fasterxml.jackson.core:jackson-databind:2.19.1
-//> using dep com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.19.1
-//> using dep com.lihaoyi::os-lib:0.11.4
-
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, ObjectWriter}
 import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, ObjectNode, TextNode}
@@ -11,8 +6,9 @@ import com.fasterxml.jackson.core.`type`.TypeReference
 import java.util.{Map => JMap}
 import scala.beans.BeanProperty
 import scala.collection.immutable.{TreeMap, TreeSet}
+import patchSB._
 
-val header = s"Stellar Blade Auto Modding Script v2.1.1"
+val header = s"Auto Modding Script v2.2.0"
 
 var cliArgs = args
 //cliArgs = Array(".setup")
@@ -83,12 +79,12 @@ val retocZip = "retoc-x86_64-pc-windows-msvc.zip"
 
 val retocUrl = s"https://github.com/trumank/retoc/releases/download/v$retocVersion/$retocZip"
 val uassetGuiUrl = s"https://github.com/atenfyr/UAssetGUI/releases/download/v$uassetGuiVersion/UAssetGUI.exe"
-val sbMapUrl = config.game.mapUrl
+val usmapUrl = config.game.mapUrl
 val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSha.zip"
 val jdUrl = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion/jd-amd64-windows.exe"
-val sbMapFilename = sbMapUrl.substring(sbMapUrl.lastIndexOf('/') + 1)
-val sbMapPath = workingDir / sbMapFilename
-val sbMap = sbMapPath.baseName
+val usmapFilename = usmapUrl.substring(usmapUrl.lastIndexOf('/') + 1)
+val usmapPath = workingDir / usmapFilename
+val usmap = usmapPath.baseName
 
 val retocExe = workingDir / "retoc.exe"
 val uassetGuiExe = workingDir / "UAssetGUI.exe"
@@ -102,6 +98,7 @@ final case class ValuePair(newValueOpt: Option[String], oldValueOpt: Option[Stri
 type PropertyMap = TreeMap[String, ValuePair]
 type UAssetPatchTree = TreeMap[String, PropertyMap]
 type PatchTree = TreeMap[String, UAssetPatchTree]
+type PatchMap = TreeMap[String, UAssetObject => Unit]
 
 def setupModTools(): Boolean = {
   var setup = true
@@ -123,14 +120,14 @@ def setupModTools(): Boolean = {
     println()
   }
 
-  if (!os.exists(workingDir / sbMapFilename)) {
+  if (!os.exists(workingDir / usmapFilename)) {
     setup = false
-    println(s"Please wait while setting up $sbMapFilename in $workingDir ...")
-    os.proc("curl", "-JLO", sbMapUrl).call(cwd = workingDir)
+    println(s"Please wait while setting up $usmapFilename in $workingDir ...")
+    os.proc("curl", "-JLO", usmapUrl).call(cwd = workingDir)
     println()
 
-    val src = workingDir / sbMapFilename
-    val dest = uassetGuiMappingsDir / sbMapFilename
+    val src = workingDir / usmapFilename
+    val dest = uassetGuiMappingsDir / usmapFilename
     if (!os.exists(dest)) {
       os.makeDir.all(uassetGuiMappingsDir)
       os.copy.over(src, dest)
@@ -419,51 +416,6 @@ case class UAssetObject(name: String, value: JsonNode, addToPatchTree: Boolean) 
   def getString(name: String): String = getJson(name).asText
 }
 
-def patchEffect(obj: UAssetObject): Unit = {
-  val name = obj.getName
-  name match {
-
-    // based on https://www.nexusmods.com/stellarblade/mods/802
-    case "N_Drone_Scan" => obj.set("LifeTime", 20d)
-
-    // based on https://www.nexusmods.com/stellarblade/mods/897
-    case _ if name.startsWith("P_Eve_SkillTree_Just") && (name.contains("BetaGauge") || name.contains("BurstGauge")) =>
-      val cmv = name match {
-        case "P_Eve_SkillTree_JustParry_BetaGauge1" => 8d
-        case "P_Eve_SkillTree_JustParry_BetaGauge2" => 6d
-        case "P_Eve_SkillTree_JustEvade_BurstGauge1" => 4d
-        case "P_Eve_SkillTree_JustEvade_BurstGauge2" => 3d
-      }
-      obj.set("CalculationMultipleValue", cmv)
-      obj.set("OverlapCount", 1)
-      obj.set("LifeType", "EffectLifeType_IndependentTime")
-      obj.set("LifeTime", 11d)
-      obj.set("StartDelayTime", 1d)
-      obj.set("LoopIntervalTime", 1d)
-      obj.set("ActiveTargetFilterAlias", "Self")
-      obj.set("LoopTargetFilterAlias", "Self")
-
-    // ... add more cases for other EffectTable properties of interest here, e.g.,
-    //case _ if name.startsWith("Gear_") && name.contains("_3_MK2") && !name.endsWith("_HitDmgUp_Melee") =>
-    //  obj.set("CalculationValue", obj.getDouble("CalculationValue") * 2)
-
-    case _ =>
-  }
-}
-
-def patchTargetFilter(obj: UAssetObject): Unit = {
-  val name = obj.getName
-  name match {
-
-    // based on https://www.nexusmods.com/stellarblade/mods/802
-    case _ if name.startsWith("N_Drone_Normal_Scan1_1_Target_") =>
-      obj.set("FarDistance", 30000d)
-      obj.set("TargetCheckValue1", 3000d)
-
-    case _ =>
-  }
-}
-
 def toJsonPrettyString(valueOpt: Option[String], default: String = "") =
   valueOpt.map(toJsonNode).map(_.toPrettyString).getOrElse(default)
 
@@ -495,17 +447,48 @@ def patchUasset(addToPatchTree: Boolean, name: String, file: os.Path, fOpt: Opti
 def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () => {
   val modDirOpt = modNameOpt.map(workingDir / _)
   val output = workingDir / "out"
+  val cacheDir = workingDir / ".cache"
+  val cacheKey = cacheDir / "key.properties"
+
+  def computeCacheKey(): String = {
+    if (!os.exists(sbPakDir)) return ""
+    var r = Vector.empty[String]
+    r = r :+ s"retoc=$retocVersion"
+    r = r :+ s"UAssetGUI=$uassetGuiVersion"
+    for (p <- os.list(sbPakDir).sortWith((p1, p2) => p1.last <= p2.last) if os.isFile(p)) {
+      r = r :+ s"${p.last}=${p.toIO.lastModified}"
+    }
+    r.mkString(scala.util.Properties.lineSeparator)
+  }
 
   def recreateDir(dir: os.Path): Unit = {
     os.remove.all(dir)
     os.makeDir.all(dir)
   }
 
+  val cacheHit = {
+    val key = computeCacheKey()
+    if (os.exists(cacheKey) && os.read(cacheKey) == key) true else {
+      recreateDir(cacheDir)
+      if (key.nonEmpty) os.write(cacheKey, key)
+      false
+    }
+  }
+
   def unpackJson(name: String): os.Path = {
-    val uasset = output / os.RelPath(config.game.contentPaks).segments.head / "Content" / "Local" / "Data" / s"$name.uasset"
-    val uexp = s"$name.uexp"
     val json = s"$name.json"
     val r = workingDir / json
+    val jsonCache = cacheDir / json
+
+    if (cacheHit && os.exists(jsonCache)) {
+      os.copy.over(jsonCache, r)
+      println(s"Using cached $jsonCache")
+      println()
+      return r
+    }
+
+    val uasset = output / os.RelPath(config.game.contentPaks).segments.head / "Content" / "Local" / "Data" / s"$name.uasset"
+    val uexp = s"$name.uexp"
 
     recreateDir(output)
 
@@ -515,10 +498,11 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     println()
 
     println(s"Converting to $r ...")
-    os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersionCode", sbMap).call(cwd = workingDir)
+    os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersionCode", usmap).call(cwd = workingDir)
     os.remove.all(output)
     println()
 
+    os.copy.over(r, jsonCache)
     r
   }
 
@@ -528,7 +512,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     os.makeDir.all(dataDir)
 
     println(s"Regenerating $uasset ...")
-    os.proc(uassetGuiExe, "fromjson", path, uasset, sbMap).call(cwd = workingDir)
+    os.proc(uassetGuiExe, "fromjson", path, uasset, usmap).call(cwd = workingDir)
     println()
   }
 
@@ -554,11 +538,8 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     zip
   }
 
-  val uassetCodeMap = TreeMap(
-    // add more/change to uasset patching of interest here, e.g.,
-    //"TargetFilterTable" -> patchTargetFilter _,
-    "EffectTable" -> patchEffect _ // comment in this line to disable modding via code
-  )
+  var uassetCodeMap: PatchMap = TreeMap.empty
+  uassetCodeMap = uassetCodeMap ++ patchSB.patches // comment in this line to disable modding via code
 
   val pack = modNameOpt.nonEmpty
   val uassetNames = TreeSet.empty[String] ++ uassetCodeMap.keys ++ patches.keys
@@ -587,7 +568,7 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
     os.write.over(uassetGuiConfig,
       s"""{
          |  "PreferredVersion": $ueVersion,
-         |  "PreferredMappings": "$sbMap"
+         |  "PreferredMappings": "$usmap"
          |}""".stripMargin)
 
     f()
@@ -747,13 +728,13 @@ def printUsage(): Unit = {
   exit(0,
     s"""$header
        |
-       |Usage: scala-cli sbmod.sc -- [ <mod-name> <path-to-game>
-       |                             | .code <path-to-jd-patch-file>
-       |                             | .diff[.into] <from-path> <to-path> <out-path>
-       |                             | .setup[.vscode [ <path-to-vscode> ]]
-       |                             | .toml <out-path>
-       |                             | .toml.all <path-to-game> <out-path>
-       |                             ]
+       |Usage: automod [ <mod-name> <path-to-game>
+       |               | .code <path-to-jd-patch-file>
+       |               | .diff[.into] <from-path> <to-path> <out-path>
+       |               | .setup[.vscode [ <path-to-vscode> ]]
+       |               | .toml <out-path>
+       |               | .toml.all <path-to-game> <out-path>
+       |               ]
        |
        |  .code            Print Auto Modding Script patching code from a jd/TOML patch file
        |  .diff            Recursively diff JSON files and write jd and TOML patch files
@@ -801,7 +782,7 @@ def run(): Unit = {
            |* Game directory: $gameDir
            |* Mod name to generate: $argName
            |* Working directory: $workingDir
-           |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $sbMapFilename
+           |* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, jd v$jdVersion, $usmapFilename
            |* Extra: FModel @$fmodelShortSha
            |""".stripMargin)
       setUAssetGUIConfigAndRun(generateMod(Some(modName), sbPakDir))
