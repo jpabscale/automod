@@ -1,0 +1,129 @@
+[M_Scarlet_BlinkCombo_Hit9]
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_Skill_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_Skill_KnockDown" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"
+
+['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|PhaseChange1_EndShieldOwn|BackDashSpaceCut|KickStamp|JumpStampSlash).*Hit.*$']
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "SkillDamage_Eve" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "DisableDeadSkill_Lurker" }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "SkillDamage_Eve" | "DisableDeadSkill_Lurker" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack"
+ResultTargetDownShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"
+
+['.*: M_Scarlet_KickStamp.*Hit.*$']
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_0"
+
+['.*: ^M_Scarlet_(BlinkShot|MoveBackShot2|AirDashSpaceCut|SwingTriple|Swing_)(?!.*ReflectHit.*$).*Hit.*$']
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "SkillDamage_EveRange" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "DisableDeadSkill_Lurker" }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "SkillDamage_EveRange" | "DisableDeadSkill_Lurker" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+ResultTargetAirborneEffect =  '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "P_Eve_SkillTree_SwordAura_KnockDown" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+ResultTargetCommonShowPath = "Hit/Result_Hit_Stand_Sword_StrongAttack_SwordAura"
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"
+HitLevelResultTargetDownMoveAlias = "Hit_Back_020_150"
+ResultTargetDownShowPath = "Hit/Result_Hit_Projectile_LightAttack"
+ResultTargetGroggyShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetAirborneShowPath = "Hit/Result_Hit_Airborne"
+ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
+ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"
+
+[M_Scarlet_KickStamp_Hit2]
+HitLevelResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_Skill_KnockDown_NoMove", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_Skill_KnockDown" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+[M_Scarlet_JumpStampSlash_Hit5]
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_Skill_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_Skill_KnockDown" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+[M_Scarlet_SwingTriple_Hit3]
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_SkillTree_SwordAura_KnockDown", "startDelayTime": 0.05 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_SkillTree_SwordAura_KnockDown" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+['.*: ^M_Scarlet_(Swing_Hit1|JumpStampSlash_Hit2)$']
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "Stun" }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "Stun" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''

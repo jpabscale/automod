@@ -64,3 +64,6 @@ CoolTime = 0.15                                              # 0.2
 JustActionTime = 0.5                                         # 0.2
 JustActionTime_StoryMode = 0.5                               # 0.2
 
+['.*: ^P_Eve_Tachy_Skill.*$']
+AttackDamageRate = '=> v.orig[Double] * 2d'                  # 6.0
+ShieldAttackDamageRate = '=> v.orig[Double] * 2d'            # 6.0

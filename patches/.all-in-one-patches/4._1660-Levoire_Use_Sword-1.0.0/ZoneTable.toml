@@ -1,0 +1,9 @@
+['.*: ^Zone_A(T|Y)L.*$']
+EnterZoneEffects = '''=> {
+  var newArray = Seq[Map[String, Any]]()
+  for (m <- v.orig[Seq[Map[String, Any]]]) m("Value") match {
+    case "P_Eve_Stance_BlockSword" | "N_Drone_BlockScan" =>
+    case _ => newArray +:= m
+  }
+  newArray
+}'''

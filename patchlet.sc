@@ -8,7 +8,6 @@ import scala.tools.reflect.ToolBox
 object Constants {
   val codePrefix: String = "=>"
   val atPrefix = ".@:"
-  val addPrefix = ".@+:"
   val javaRegexPrefix = ".*:"
   val addValueKey = "value"
   lazy val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
@@ -39,10 +38,6 @@ def checkPatches(uassetName: String, map: sbmod.UAssetPropertyChanges): sbmod.UA
       }
     }
     isKeyPrefix(uassetName, objName)
-    getKeyPrefix(objName) match {
-      case Some(`addPrefix`) if !checkAddProperties => sbmod.exit(-1, s"Expecting a single inline table value with a '${uassetapi.Constants.typeKey}' String property for $uassetName: $objName")
-      case _ =>
-    }
     for ((property, value) <- properties) {
       value.newValueOpt match {
         case Some(node: TextNode) => getKeyPrefix(node.textValue) match {
@@ -95,8 +90,8 @@ def evalProperty(uassetName: String, addToDataTableFilePatches: Boolean, dataMap
         |import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
         |
         |lazy val mapper = new com.fasterxml.jackson.databind.ObjectMapper
-        |def toJsonNode(content: String): JsonNode = mapper.readTree(content)
-        |def toJsonNodeT[T <: JsonNode](content: String): T = mapper.readTree(content).asInstanceOf[T]
+        |def toJsonNode(content: String): JsonNode = if (content == null) null else mapper.readTree(content)
+        |def toJsonNodeT[T <: JsonNode](content: String): T = (if (content == null) null else mapper.readTree(content)).asInstanceOf[T]
         |def fromJsonNode(node: JsonNode): String = Option(node).map(_.toString).getOrElse($nil)
         |
         |(v: {
@@ -158,7 +153,6 @@ sealed trait FilteredChanges {
 
 case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
                              uassetName: String,
-                             isAdd: Boolean,
                              orig: sbmod.JsonAst,
                              dataMap: collection.Map[String, ObjectNode],
                              path: String, 
@@ -188,39 +182,9 @@ case class AtFilteredChanges(addToDataTableFilePatches: Boolean,
       sbmod.exit(-1, s"Unrecognized path for $uassetName: $path")
     }
     if (nodes.isEmpty) sbmod.exit(-1, s"Could not find objects for $uassetName: $path")
-    if (isAdd) {
-      if (nodes.size != 1) sbmod.exit(-1, s"The path evaluates to multiple objects: $path")
-      val (node, _) = nodes.head
-      node match {
-        case node: ArrayNode => 
-          var first = true
-          def add(o: ObjectNode): Unit = {
-            if (first) {
-              first = false
-              println(s"* @$path")
-            }
-            val lines = o.toPrettyString.linesIterator.map(line => s"    $line").toSeq
-            println(s"  * Added: ${lines.head.trim}")
-            lines.drop(1).foreach(println)
-            node.add(o)
-          }
-          val value = changes.get(addValueKey).get.newValueOpt.get
-          value match {
-            case value: ArrayNode =>
-              val offset = node.size
-              val p = path.split('/').toVector
-              for (i <- 0 until value.size) {
-                add(uassetapi.newData(p, (offset + i).toString, value.get(i)))
-              }
-            case _ => add(uassetapi.newData(path.split('/').toVector, node.size.toString, value))
-          }          
-        case _ => sbmod.exit(1, s"Expecting an array for $uassetName at: $path")
-      }
-    } else {
-      for ((node, orig) <- nodes) {
-        if (!node.get("Value").isInstanceOf[ArrayNode]) sbmod.exit(-1, s"$uassetName @$path is not a UAssetAPI's struct")
-        applyPathChanges(path, node, orig)
-      }
+    for ((node, orig) <- nodes) {
+      if (!node.get("Value").isInstanceOf[ArrayNode]) sbmod.exit(-1, s"$uassetName @$path is not a UAssetAPI's struct")
+      applyPathChanges(path, node, orig)
     }
   }
 }
@@ -264,10 +228,7 @@ def kfcMap(addToDataTableFilePatches: Boolean, uassetName: String, ast: sbmod.Js
           }
         case `atPrefix` =>
           val path = key.substring(atPrefix.length).trim
-          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = false, origAst, dataMap, path, properties))
-        case `addPrefix` =>
-          val path = key.substring(addPrefix.length).trim
-          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, isAdd = true, origAst, dataMap, path, properties))
+          r2.put(key, AtFilteredChanges(addToDataTableFilePatches, uassetName, origAst, dataMap, path, properties))
         case `javaRegexPrefix` =>
           val regexText = key.substring(javaRegexPrefix.length).trim
           try {

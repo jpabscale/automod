@@ -1,4 +1,7 @@
-# based on https://www.nexusmods.com/stellarblade/mods/602   # Game Original Value
+# ...                                                        # Game Original Value
+[N_Drone_Normal_Scan1_1]
+CoolTime = 4                                                 # 8
+
 [P_Eve_Fusion_Lockon_Evade1_1]
 JustActionTime = 1                                           # 0.2
 JustActionTime_StoryMode = 1                                 # 0.3
@@ -11,6 +14,15 @@ JustActionTime_StoryMode = 1                                 # 0.3
 CoolTime = 0.1                                               # 0.2
 JustActionTime = 1                                           # 0.2
 JustActionTime_StoryMode = 1                                 # 0.2
+
+[P_Eve_Gun_ShootExplosiveSlug1_1]
+CoolTime = 0                                                 # 0.8
+
+[P_Eve_Gun_ShootScatterSlug1_1]
+CoolTime = 0                                                 # 1
+
+[P_Eve_Sword_Air_Evade1_1]
+UsableCount = 1000                                           # 1
 
 [P_Eve_Sword_Evade_Evade1_1]
 CoolTime = 0.1                                               # 0.8
@@ -63,3 +75,4 @@ JustActionTime_StoryMode = 1                                 # 0.3
 CoolTime = 0.1                                               # 0.2
 JustActionTime = 1                                           # 0.2
 JustActionTime_StoryMode = 1                                 # 0.2
+

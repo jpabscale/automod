@@ -8,6 +8,7 @@ Duration = 99                                                # 0.1
 StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
 
 [P_Eve_Fusion_Normal_Guard1_1_Parry1]
+CanCutoff = true                                             # false
 Duration = 99                                                # 0.2
 NextStepAliasWhenHoldRelease = "P_Eve_Fusion_Normal_Guard1_1_Finish1"    # "None"
 
@@ -50,6 +51,7 @@ NextStepAliasWhenHoldRelease = "P_Eve_Tachy_Normal_Evade1_1_Finish1"    # "None"
 StartSelfEffect = "[{\"Alias\":\"BlockMove_Step\", \"Time\":0.1}]"    # "[{\"Alias\":\"BlockMove_Step\"}]"
 
 [P_Eve_Tachy_Normal_Guard1_1_Parry1]
+CanCutoff = true                                             # false
 Duration = 99                                                # 0.2
 NextStepAliasWhenHoldRelease = "P_Eve_Tachy_Normal_Guard1_1_Finish1"    # "None"
 

@@ -1,0 +1,112 @@
+['.*: ^P_Eve_Sword_(Normal_(Light|Strong|Finish|DashAttackCombo)|Air_RollingAttack).*Ex_Hit.*$']
+SkillAttackDamageRate = '=> v.orig[Double] * 0.6'
+SkillShieldAttackDamageRate = '=> v.orig[Double] * 0.6'
+
+['.*: ^(?!.*_Ex.*$)P_Eve_Sword_Normal_(Light|Strong)Attack.*(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 2 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve_Sword_Beta_(ChargeSlashCombo|Beta_ShieldBreak).*Ex_(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 2 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+[P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1]
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "P_Eve_SkillTree_ShieldBreak_ShieldAttackPower" }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "P_Eve_SkillTree_ShieldBreak_ShieldAttackPower" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve_(Tachy|Fusion)_(Skill|Normal_Dash).*(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 2 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve_(Fusion_(Normal_(DashAttack(Combo)?|FinishAttack)|Skill_Chainstab)1_1|Sword_(Beta_(ChainStab|ChargeSlash)Combo1_Ex|Burst_(Finish|Spin)Attack1_1)).*(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 2 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve_Sword_Burst_(Finish|Spin).*Finish.*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 2 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve.*Just(Evade|Parry).*(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 2 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''

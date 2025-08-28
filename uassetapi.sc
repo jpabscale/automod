@@ -216,8 +216,7 @@ def toValue[T](node: JsonNode): Option[T] = {
         case "+0.0" | "-0.0" | "+0" | "-0" => Some(toT(0d))
         case _ => Some(toT(text))
       }
-    case node: NullNode => Some(toT(null))
-    case null => Some(toT(null))
+    case null | _: NullNode => None
     case _ => sbmod.exit(-1, s"Unsupported value: '${node.toPrettyString}'")
   }
 }

@@ -11,7 +11,7 @@ import scala.collection.mutable.HashMap
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.4.4"
+val header = s"Auto Modding Script v2.4.5"
 
 val dataTablePath = "/Exports/0/Table/Data"
 val noCodePatching = "--no-code-patching"
@@ -27,6 +27,9 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!Properties.isWin) exit(-1, "This script can only be used in Windows")
 
+val zipToolVersion = "25.01"
+val modExt = "zip"
+
 class Game {
   @BeanProperty var contentPaks: String = "SB/Content/Paks"
   @BeanProperty var unrealEngine: String = "4.26"
@@ -37,7 +40,7 @@ class Game {
 class Tools {
   @BeanProperty var retoc: String = "0.1.2"
   @BeanProperty var uassetGui: String = "1.0.3"
-  @BeanProperty var fmodel: String = "4e7646916982f8d5a0fcd3890f91699b291a6ec2"
+  @BeanProperty var fmodel: String = "0760e1105806670163796ccb41110740e98089d5"
   @BeanProperty var jd: String = "2.2.3"
 }
 
@@ -189,6 +192,8 @@ val jdUrl = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion/
 val usmapFilename = usmapUrl.substring(usmapUrl.lastIndexOf('/') + 1)
 val usmapPath = workingDir / usmapFilename
 val usmap = usmapPath.baseName
+val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
+val z7Url = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7z${zipToolVersion.replace(".", "")}.exe"
 
 val toolsDir = workingDir / "tools"
 
@@ -199,12 +204,15 @@ val jdExe = toolsDir / "jd.exe"
 val uassetGuiSettingsDir = os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
+val zipExe = toolsDir / "7z" / "7z.exe"
 
 val automod = workingDir / "automod.bat"
 
 def setupModTools(): Boolean = {
   var setup = true
   
+  os.makeDir.all(toolsDir)
+
   def download(url: String, renameOpt: Option[String] = None): Unit = {
     val cacheName = java.util.Base64.getEncoder().encodeToString(url.getBytes(java.nio.charset.StandardCharsets.UTF_8))
     val cachePath = os.Path(System.getenv("LOCALAPPDATA")) / "Temp" / "automod" / cacheName
@@ -219,13 +227,25 @@ def setupModTools(): Boolean = {
     os.copy.over(cachePath, dest)
   }
 
-  os.makeDir.all(toolsDir)
+  if (!os.exists(zipExe)) {
+    setup = false
+    println(s"Setting up 7z v$zipToolVersion in $toolsDir ...")
+    val z7 = s"7z$zipToolVersion.exe"
+    val z7r = "7zr.exe"
+    download(z7rUrl, Some(z7r))
+    download(z7Url, Some(z7))
+    os.makeDir.all(toolsDir / "7z")
+    os.proc(toolsDir / "7zr.exe", "x", toolsDir / z7).call(cwd = toolsDir / "7z")
+    os.remove.all(toolsDir / z7)
+    os.remove.all(toolsDir / z7r)
+    println()
+  }
 
   if (!os.exists(retocExe)) {
     setup = false
     println(s"Setting up retoc v$retocVersion in $toolsDir ...")
     download(retocUrl)
-    os.proc("tar", "-xf", retocZip).call(cwd = toolsDir)
+    os.proc(zipExe, "x", retocZip).call(cwd = toolsDir)
     os.remove.all(toolsDir / retocZip)
     os.move(toolsDir / "LICENSE", toolsDir / "retoc-LICENSE")
     os.move(toolsDir / "README.md", toolsDir / "retoc-README.md")
@@ -260,7 +280,7 @@ def setupModTools(): Boolean = {
     val fmodelZip = s"${fmodelExe.last}.zip"
     println(s"Setting up FModel @$fmodelShortSha in $toolsDir ...")
     download(fmodelUrl, Some(fmodelZip))
-    os.proc("tar", "-xf", fmodelZip).call(cwd = toolsDir)
+    os.proc(zipExe, "x", fmodelZip).call(cwd = toolsDir)
     os.remove.all(toolsDir / fmodelZip)
     println()
   }
@@ -556,18 +576,6 @@ def patchFromTree(addToDataTableFilePatches: Boolean, uassetName: String, ast: J
       case _ =>
     }
   }
-  def addRemaining(): Unit = {
-    val structName = s"${config.game.contentPaks.substring(0, config.game.contentPaks.indexOf('/'))}${uassetName}Property"
-    for ((objName, properties) <- t if !seenObjectNames.contains(objName)) {
-      val obj = uassetapi.newStruct(structName, objName)
-      val values = obj.get("Value").asInstanceOf[ArrayNode]
-      for ((property, valueOldValuePair) <- properties) {
-        val value = valueOldValuePair.newValueOpt.orNull
-        values.add(uassetapi.newData(Vector(objName, property), property, value))
-      }
-      data.add(obj)
-    }
-  }
 }
 
 def patchDataTable(addToDataTableFilePatches: Boolean, name: String, file: os.Path, ast: JsonAst, 
@@ -725,7 +733,7 @@ def generateMod(addToDataTableFilePatches: Boolean,
       exit(-1, s"$modDir already exists")
     }
 
-    val zip = workingDir / s"$modName.zip"
+    val zip = workingDir / s"$modName.$modExt"
     os.remove.all(zip)
 
     os.makeDir.all(modDir)
@@ -737,7 +745,7 @@ def generateMod(addToDataTableFilePatches: Boolean,
     println()
 
     println(s"Archiving $zip ...")
-    os.proc("tar", "-acf", zip, modName).call(cwd = cwd)
+    os.proc(zipExe, "a", s"-t$modExt", "-mtm-", zip, modName).call(cwd = cwd)
     println()
 
     zip

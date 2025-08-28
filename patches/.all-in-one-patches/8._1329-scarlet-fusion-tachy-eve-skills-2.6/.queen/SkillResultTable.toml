@@ -1,6 +1,8 @@
-['.*: ^P_Eve_Sword_(Normal_(Light|Strong|Finish|DashAttackCombo)|Air_RollingAttack).*Ex_Hit.*$']
+['.*: ^(?!.*_Ex.*$)P_Eve_Sword_Normal_(Light|Strong)Attack.*_Hit.*$']
 HitLevelResultTargetCommonEffect = '''=> {
-  var hitStunTime = 1.0d
+  val maxStunTime = 3d
+  val mult = 2d
+  var hitStunTime = 0.3d
   val newArray = JsonNodeFactory.instance.arrayNode
   val value = v.currentOpt[String].get
   val array = toJsonNodeT[ArrayNode](value)
@@ -8,13 +10,18 @@ HitLevelResultTargetCommonEffect = '''=> {
     case "HitStun" => hitStunTime = array.get(i).get("Time").asDouble
     case _ => newArray.add(array.get(i))
   }
-  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": ${hitStunTime * 3} }"""))
+  hitStunTime = if (hitStunTime > maxStunTime) hitStunTime 
+                else if (hitStunTime * mult > maxStunTime) maxStunTime
+                else hitStunTime * mult
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": $hitStunTime }"""))
   newArray.toString
 }'''
 
-[P_Eve_Sword_Burst_MeleeCombatBuff1_1_Hit1]
+['.*: ^P_Eve_.*Just(Evade|Parry).*Hit.*$']
 HitLevelResultTargetCommonEffect = '''=> {
-  var hitStunTime = 1.0d
+  val maxStunTime = 3d
+  val mult = 2d
+  var hitStunTime = 0.3d
   val newArray = JsonNodeFactory.instance.arrayNode
   val value = v.currentOpt[String].get
   val array = toJsonNodeT[ArrayNode](value)
@@ -22,6 +29,9 @@ HitLevelResultTargetCommonEffect = '''=> {
     case "HitStun" => hitStunTime = array.get(i).get("Time").asDouble
     case _ => newArray.add(array.get(i))
   }
-  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": ${hitStunTime * 3} }"""))
+  hitStunTime = if (hitStunTime > maxStunTime) hitStunTime 
+                else if (hitStunTime * mult > maxStunTime) maxStunTime
+                else hitStunTime * mult
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": $hitStunTime }"""))
   newArray.toString
 }'''

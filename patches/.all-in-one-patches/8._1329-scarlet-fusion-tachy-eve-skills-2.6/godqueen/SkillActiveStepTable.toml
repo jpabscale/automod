@@ -1,0 +1,51 @@
+# ...                                                        # Game Original Value
+['.*: ^P_Eve_Sword_Normal.*Ex_(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 4 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 4 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "NoDamage_Skill" | "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve_(Sword_(Beta|Burst)|(Tachy|Fusion)_(Skill|Normal_Dash)).*(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 4 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 4 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "NoDamage_Skill" | "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
+
+['.*: ^P_Eve.*Just(Evade|Parry).*(Cast|Hit|Finish).*$']
+StartSelfEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 4 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 4 }"""))
+  val value = v.currentOpt[String].orNull
+  if (value != null) {
+    val array = toJsonNodeT[ArrayNode](value)
+    for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+      case "NoDamage_Skill" | "AddHitDefense_Skill" | "AddHitDefense_EveSkill" =>
+      case _ => newArray.add(array.get(i))
+    }
+  }
+  newArray.toString
+}'''
