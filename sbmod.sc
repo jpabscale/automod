@@ -4,22 +4,17 @@
 
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, ObjectNode, TextNode}
 
-def exit(code: Int): Nothing = {
+def exit(code: Int, msg: String = null): Nothing = {
+  Option(msg).foreach(println(_))
   System.exit(code)
   throw new RuntimeException
 }
 
-if (!scala.util.Properties.isWin) {
-  println("This script can only be used in Windows")
-  exit(-1)
-}
+if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-if (args.length != 2) {
-  println("Usage: scala-cli sbmod.sc -- <mod-name> <absolute>\\<path>\\<of>\\<stellar-blade-game-dir>")
-  exit(0)
-}
+if (args.length != 2) exit(0, "Usage: scala-cli sbmod.sc -- <mod-name> <absolute-path-to-StellarBlade>")
 
 val modName = args.head
 val sbDir = os.Path(args.last)
@@ -28,7 +23,8 @@ val sbPakDir = sbDir / "SB" / "Content" / "Paks"
 val retocVersion = "0.1.2"
 val uassetGuiVersion = "1.0.3"
 val sbMapVersion = "1.1.0"
-val ueVersion = "UE4_26"
+val ueVersion = "4.26"
+val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
 val retocZip = "retoc-x86_64-pc-windows-msvc.zip"
 val sbMap = s"StellarBlade_$sbMapVersion"
@@ -47,7 +43,7 @@ val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
 
 def setupModTools(): Unit = {
   if (!os.exists(retocExe)) {
-    println(s"Please wait while setting up retoc $retocVersion in $workingDir ...")
+    println(s"Please wait while setting up retoc v$retocVersion in $workingDir ...")
     os.proc("curl", "-JLO", retocUrl).call(cwd = workingDir)
     os.proc("tar", "-xf", retocZip).call(cwd = workingDir)
     os.remove.all(workingDir / retocZip)
@@ -57,7 +53,7 @@ def setupModTools(): Unit = {
   }
 
   if (!os.exists(uassetGuiExe)) {
-    println(s"Please wait while setting up UAssetGUI $uassetGuiVersion in $workingDir ...")
+    println(s"Please wait while setting up UAssetGUI v$uassetGuiVersion in $workingDir ...")
     os.proc("curl", "-JLO", uassetGuiUrl).call(cwd = workingDir)
     println()
   }
@@ -70,39 +66,12 @@ def setupModTools(): Unit = {
   }
 }
 
-case class RichObjectNode(value: JsonNode) {
-  def obj(name: String): ObjectNode = {
-    val values = value.get("Value").asInstanceOf[ArrayNode]
-    for (j <- 0 until values.size) {
-      val element = values.get(j).asInstanceOf[ObjectNode]
-      if (element.get("Name").asText == name) {
-        return element
-      }
-    }
-    println(s"Could not find `$name` in ${value.get("Name")}")
-    exit(-1)
-    return null
-  }
-  def setValue(name: String, value: Int): Int = {
-    val sub = obj(name)
-    val r = sub.get("Value").asInt
-    sub.put("Value", value)
-    r
-  }
-  def setValue(name: String, value: Double): Double = {
-    val sub = obj(name)
-    val r = sub.get("Value").asDouble
-    sub.put("Value", value)
-    r
-  }
-  def setValue(name: String, value: String): String = {
-    val sub = obj(name)
-    val r = sub.get("Value").asText
-    sub.put("Value", value)
-    r
-  }
-  def getName: String = value.get("Name").asText
+def recreateDir(dir: os.Path): Unit = {
+  os.remove.all(dir)
+  os.makeDir.all(dir)
 }
+
+def readJson(path: os.Path): JsonNode = new ObjectMapper().readTree(path.toIO)
 
 def writeJson(path: os.Path, node: JsonNode): Unit = {
   val indenter = new DefaultIndenter("  ", DefaultIndenter.SYS_LF)
@@ -113,9 +82,31 @@ def writeJson(path: os.Path, node: JsonNode): Unit = {
   new ObjectMapper().writer(printer).writeValue(path.toIO, node)
 }
 
-def patchEffectTableJson(file: os.Path): Unit = {
+case class RichObjectNode(value: JsonNode) {
+  def obj(name: String): ObjectNode = {
+    val values = value.get("Value").asInstanceOf[ArrayNode]
+    for (j <- 0 until values.size) {
+      val element = values.get(j).asInstanceOf[ObjectNode]
+      if (element.get("Name").asText == name) {
+        return element
+      }
+    }
+    exit(-1, s"Could not find '$name' in $getName")
+  }
+  def setJson(name: String, value: JsonNode): JsonNode = obj(name).replace("Value", value)
+  def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).asInt
+  def set(name: String, value: Double): Double = setJson(name, DoubleNode.valueOf(value)).asDouble
+  def set(name: String, value: String): String = setJson(name, TextNode.valueOf(value)).asText
+  def getName: String = value.get("Name").asText
+  def getJson(name: String): JsonNode = obj(name).get("Value")
+  def getInt(name: String): Int = getJson(name).asInt
+  def getDouble(name: String): Double = getJson(name).asDouble
+  def getString(name: String): String = getJson(name).asText
+}
+
+def patchEffectTable(file: os.Path): Unit = {
   println(s"Patching $file ...")
-  val ast = new ObjectMapper().readTree(file.toIO)
+  val ast = readJson(file)
   val data = ast.at("/Exports/0/Table/Data").asInstanceOf[ArrayNode]
   for (i <- 0 until data.size) {
     val obj = RichObjectNode(data.get(i))
@@ -123,26 +114,29 @@ def patchEffectTableJson(file: os.Path): Unit = {
     name match {
 
       // based on https://www.nexusmods.com/stellarblade/mods/802
-      case "N_Drone_Scan" =>
-        obj.setValue("LifeTime", 30d)
+      case "N_Drone_Scan" => obj.set("LifeTime", 30d)
 
       // based on https://www.nexusmods.com/stellarblade/mods/897
       case _ if name.startsWith("P_Eve_SkillTree_Just") && (name.contains("BetaGauge") || name.contains("BurstGauge")) =>
-        name match {
-          case "P_Eve_SkillTree_JustParry_BetaGauge1" => obj.setValue("CalculationMultipleValue", 8d)
-          case "P_Eve_SkillTree_JustParry_BetaGauge2" => obj.setValue("CalculationMultipleValue", 6d)
-          case "P_Eve_SkillTree_JustEvade_BurstGauge1" => obj.setValue("CalculationMultipleValue", 4d)
-          case "P_Eve_SkillTree_JustEvade_BurstGauge2" => obj.setValue("CalculationMultipleValue", 3d)
-          case _ => exit(-1)
+        val cmv = name match {
+          case "P_Eve_SkillTree_JustParry_BetaGauge1" => 8d
+          case "P_Eve_SkillTree_JustParry_BetaGauge2" => 6d
+          case "P_Eve_SkillTree_JustEvade_BurstGauge1" => 4d
+          case "P_Eve_SkillTree_JustEvade_BurstGauge2" => 3d
         }
-        obj.setValue("OverlapCount", 1)
-        obj.setValue("LifeType", "EffectLifeType_IndependentTime")
-        obj.setValue("LifeTime", 11d)
-        obj.setValue("StartDelayTime", 1d)
-        obj.setValue("LoopIntervalTime", 1d)
-        obj.setValue("ActiveTargetFilterAlias", "Self")
-        obj.setValue("LoopTargetFilterAlias", "Self")
-        
+        obj.set("CalculationMultipleValue", cmv)
+        obj.set("OverlapCount", 1)
+        obj.set("LifeType", "EffectLifeType_IndependentTime")
+        obj.set("LifeTime", 11d)
+        obj.set("StartDelayTime", 1d)
+        obj.set("LoopIntervalTime", 1d)
+        obj.set("ActiveTargetFilterAlias", "Self")
+        obj.set("LoopTargetFilterAlias", "Self")
+
+      // ... add more cases for other EffectTable properties of interest here, e.g.,
+      //case _ if name.startsWith("Gear_") && name.contains("_3_MK2") && !name.endsWith("_HitDmgUp_Melee") =>
+      //  obj.set("CalculationValue", obj.getDouble("CalculationValue") * 2)
+
       case _ =>
     }
   }
@@ -150,15 +144,9 @@ def patchEffectTableJson(file: os.Path): Unit = {
   println()
 }
 
-
 def generateMod(): Unit = {
+  val modDir = workingDir / modName
   val output = workingDir / "output"
-  def recreateOutput(): Unit = {
-    if (os.exists(output)) {
-      os.remove.all(output)
-    }
-    os.makeDir.all(output)
-  }
 
   def unpackJson(name: String): os.Path = {
     val uasset = output / "SB" / "Content" / "Local" / "Data" / s"$name.uasset"
@@ -166,17 +154,15 @@ def generateMod(): Unit = {
     val json = s"$name.json"
     val r = workingDir / json
 
-    recreateOutput()
+    recreateDir(output)
 
     println(s"Extracting $uasset ...")
-    os.proc(retocExe, "to-legacy", "--no-parallel", "--version", ueVersion, "--filter", uasset.last, sbPakDir, output).call(cwd = workingDir)
-    for (p <- os.walk(output) if os.isFile(p) && p.last != uasset.last && p.last != uexp) {
-      os.remove(p)
-    }
+    os.proc(retocExe, "to-legacy", "--no-parallel", "--version", ueVersionCode, "--filter", uasset.last, sbPakDir, output).call(cwd = workingDir)
+    for (p <- os.walk(output) if os.isFile(p) && p.last != uasset.last && p.last != uexp) os.remove(p)
     println()
 
     println(s"Converting to $r ...")
-    os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersion", sbMap).call(cwd = workingDir)
+    os.proc(uassetGuiExe, "tojson", uasset, json, s"VER_$ueVersionCode", sbMap).call(cwd = workingDir)
     os.remove.all(output)
     println()
 
@@ -185,20 +171,21 @@ def generateMod(): Unit = {
 
   def packJson(name: String, path: os.Path): Unit = {
     val dataDir = output / "SB" / "Content" / "Local" / "Data"
-    os.makeDir.all(dataDir)
     val uasset = dataDir / s"$name.uasset"
+    os.makeDir.all(dataDir)
+
     println(s"Regenerating $uasset ...")
-    os.proc(uassetGuiExe, "fromjson", path, dataDir / s"$name.uasset", sbMap).call(cwd = workingDir)
+    os.proc(uassetGuiExe, "fromjson", path, uasset, sbMap).call(cwd = workingDir)
     println()
   }
 
-  def packMod(dir: os.Path): os.Path = {
+  def packMod(): os.Path = {
     val zip = workingDir / s"$modName.zip"
     os.remove.all(zip)
 
-    val utoc = dir / s"${modName}_P.utoc"
+    val utoc = modDir / s"${modName}_P.utoc"
     println(s"Converting to $utoc ...")
-    os.proc(retocExe, "to-zen", "--no-parallel", "--version", ueVersion, output, utoc).call(cwd = workingDir)
+    os.proc(retocExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utoc).call(cwd = workingDir)
     println()
 
     println(s"Archiving $zip ...")
@@ -208,28 +195,25 @@ def generateMod(): Unit = {
     zip
   }
 
+  recreateDir(modDir)
+
   val effectTable = "EffectTable"
-  val uassetNames = Vector(effectTable)
+  val uassetNames = Vector(effectTable) // add more/change to uassets of interest here
 
   val jsonMap = Map.empty[String, os.Path] ++ (for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName)))
 
-  patchEffectTableJson(jsonMap(effectTable))
+  patchEffectTable(jsonMap(effectTable))
+  // ... add more patching code for a different uasset (as JSON) file here
 
-  recreateOutput()
-
+  recreateDir(output)
   for ((name, path) <- jsonMap) packJson(name, path)
 
-  val modDir = workingDir / modName
-  if (os.exists(modDir)) {
-    os.remove.all(modDir)
-  }
-  os.makeDir(modDir)
+  packMod()
 
-  packMod(modDir)
-
+  // comment out the following three lines to keep intermediate JSON, .uasset, .uexp, .utoc, .ucas, and .pak files
   os.remove.all(output)
   os.remove.all(modDir)
-  for (path <- jsonMap.values) os.remove(path)
+  for (path <- jsonMap.values) os.remove.all(path)
 }
 
 def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
@@ -237,7 +221,7 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
   try {
     os.write.over(uassetGuiConfig,
       s"""{
-         |  "PreferredVersion": "4.26",
+         |  "PreferredVersion": $ueVersion,
          |  "PreferredMappings": "$sbMap"
          |}""".stripMargin)
 
@@ -250,10 +234,7 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
   }
 }
 
-if (!os.isDir(sbPakDir)) {
-  println(s"$sbPakDir directory does not exist")
-  exit(-1)
-}
+if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
 
 println(s"Stellar Blade game directory: $sbDir")
 println(s"Mod name to generate: $modName")

@@ -1,3 +1,5 @@
+1.2: Added customization hint comments and another property update example, as well as some clean up and simplification refactoring.
+
 1.1: Updated .usmap URL and other minor tweaks.
 
 1.0: Initial version.
