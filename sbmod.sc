@@ -16,15 +16,26 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-if (args.length != 2) exit(0, "Usage: scala-cli sbmod.sc -- <mod-name> <absolute-path-to-StellarBlade>")
+val header = s"Stellar Blade Auto Modding Script v1.4"
 
-val modName = args.head
-val sbDir = os.Path(args.last)
-val sbPakDir = sbDir / "SB" / "Content" / "Paks"
+if (args.length != 2) exit(0,
+  s"""$header
+     |
+     |Usage: scala-cli sbmod.sc -- ( <mod-name> <path-to-StellarBlade>
+     |                             | .code <path-to-jd-patch-file>
+     |                             | .setup
+     |                             )
+     |
+     |  .code    Print Auto Modding Script patching code from a jd patch file
+     |  .setup   Only set up modding tools""".stripMargin)
+
+val argName = args.head
+val argPath = os.Path(new java.io.File(args.last).getAbsolutePath)
+val sbPakDir = argPath / "SB" / "Content" / "Paks"
 
 val retocVersion = "0.1.2"
 val uassetGuiVersion = "1.0.3"
-val fmodelSha = "ba0aedba6826ebaa0bdbd650e521fbfe314b92ae"
+val fmodelSha = "03a4f79c3aab3516005de92786183451e81601f5"
 val fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = "2.2.3"
 val sbMapVersion = "1.1.0"
@@ -193,7 +204,7 @@ def patchTable(file: os.Path, f: UAssetObject => Unit): Unit = {
 
 def generateMod(): Unit = {
   val output = workingDir / "out"
-  val modDir = output / modName
+  val modDir = output / argName
 
   def unpackJson(name: String): os.Path = {
     val sbDir = output / "SB"
@@ -229,16 +240,16 @@ def generateMod(): Unit = {
   }
 
   def packMod(): os.Path = {
-    val zip = workingDir / s"$modName.zip"
+    val zip = workingDir / s"$argName.zip"
     os.remove.all(zip)
 
-    val utoc = modDir / s"${modName}_P.utoc"
+    val utoc = modDir / s"${argName}_P.utoc"
     println(s"Converting to $utoc ...")
     os.proc(retocExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utoc).call(cwd = workingDir)
     println()
 
     println(s"Archiving $zip ...")
-    os.proc("tar", "-acf", s"..\\${zip.last}", modName).call(cwd = output)
+    os.proc("tar", "-acf", s"..\\${zip.last}", argName).call(cwd = output)
     println()
 
     zip
@@ -283,15 +294,59 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
   }
 }
 
-if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
+def code(path: os.Path): Unit = {
+  val entryPathPrefix = """@ [0,"Rows","""
+  var map = TreeMap.empty[String, TreeMap[String, String]]
+  for (Array(entryPath, _, valueText) <- os.read(path).trim.split(Array('\r', '\n')).map(_.trim).grouped(3)) {
+    val Array(name, property) = entryPath.substring(entryPathPrefix.length, entryPath.length - 1).split(',').map(_.trim)
+    var value = valueText.substring(2).trim
+    if (value.contains("::")) value = "\"" + value.substring(value.lastIndexOf("::") + 2)
+    if (value(0) != '"' && (value.contains('.') && value.toIntOption.isEmpty)) value = value + "d"
+    map = map + (name -> (map.getOrElse(name, TreeMap.empty[String, String]) + (property -> value)))
+  }
 
-println(s"Stellar Blade Auto Modding Script v1.3")
-println(s"* Game directory: $sbDir")
-println(s"* Mod name to generate: $modName")
-println(s"* Working directory: $workingDir")
-println(s"* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, $sbMapFilename")
-println(s"* Extra: FModel @$fmodelShortSha, jd v$jdVersion")
-println()
+  val name = {
+    val i = path.last.indexOf('.')
+    if (i >= 0) path.last.substring(0, i) else path.last
+  }
+  var lines = Vector(
+    s"def patch$name(obj: UAssetObject): Unit = {",
+    "  val name = obj.getName",
+    "  name match {"
+  )
+  for ((name, properties) <- map) {
+    if (properties.size == 1) {
+      for ((property, value) <- properties) lines = lines :+ s"    case $name => obj.set($property, $value)"
+    } else {
+      lines = lines :+ s"    case $name =>"
+      for ((property, value) <- properties) lines = lines :+ s"      obj.set($property, $value)"
+    }
+    lines = lines :+ ""
+  }
+  lines = lines :+ "    case _ =>"
+  lines = lines :+ "  }"
+  lines = lines :+ "}"
+  println(lines.mkString(util.Properties.lineSeparator))
+}
 
 setupModTools()
-setUAssetGUIConfigAndRun(generateMod _)
+
+argName match {
+  case ".code" => code(argPath)
+
+  case ".setup" => // skip
+
+  case _ =>
+
+    if (!os.isDir(sbPakDir)) exit(-1, s"$sbPakDir directory does not exist")
+
+    println(header)
+    println(s"* Game directory: $argPath")
+    println(s"* Mod name to generate: $argName")
+    println(s"* Working directory: $workingDir")
+    println(s"* Using: retoc v$retocVersion, UAssetGUI v$uassetGuiVersion, $sbMapFilename")
+    println(s"* Extra: FModel @$fmodelShortSha, jd v$jdVersion")
+    println()
+
+    setUAssetGUIConfigAndRun(generateMod _)
+}
