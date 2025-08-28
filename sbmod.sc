@@ -5,7 +5,7 @@
 
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, ObjectNode, TextNode}
 import com.fasterxml.jackson.dataformat.toml.TomlMapper
 import com.fasterxml.jackson.core.`type`.TypeReference
 import java.util.{Map => JMap}
@@ -22,7 +22,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v2.0.0"
+val header = s"Stellar Blade Auto Modding Script v2.0.1"
 
 def printUsage(): Unit = {
   exit(0,
@@ -47,7 +47,7 @@ def printUsage(): Unit = {
 
 val retocVersion = "0.1.2"
 val uassetGuiVersion = "1.0.3"
-val fmodelSha = "03a4f79c3aab3516005de92786183451e81601f5"
+val fmodelSha = "394bcf356f4c4774ea3edba200bc13b35e4c132c"
 val fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = "2.2.3"
 val sbMapVersion = "1.1.0"
@@ -385,11 +385,13 @@ case class UAssetObject(name: String, value: JsonNode, addToPatchTree: Boolean) 
     }
     rOpt
   }
+  def set(name: String, value: Boolean): Boolean = setJson(name, BooleanNode.valueOf(value)).map(_.asBoolean).getOrElse(false)
   def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).map(_.asInt).getOrElse(0)
   def set(name: String, value: Double): Double = setJson(name, DoubleNode.valueOf(value)).map(_.asDouble).getOrElse(0d)
   def set(name: String, value: String): String = setJson(name, TextNode.valueOf(value)).map(_.asText).orNull
   def getName: String = value.get("Name").asText
   def getJson(name: String): JsonNode = obj(name).get("Value")
+  def getBoolean(name: String): Boolean = getJson(name).asBoolean
   def getInt(name: String): Int = getJson(name).asInt
   def getDouble(name: String): Double = getJson(name).asDouble
   def getString(name: String): String = getJson(name).asText
@@ -472,6 +474,10 @@ def generateMod(pack: Boolean): () => Unit = () => {
   val modDir = workingDir / argName
   val output = workingDir / "out"
 
+  if (os.exists(modDir)) {
+    exit(-1, s"$modDir already exists")
+  }
+
   def recreateDir(dir: os.Path): Unit = {
     os.remove.all(dir)
     os.makeDir.all(dir)
@@ -524,7 +530,7 @@ def generateMod(pack: Boolean): () => Unit = () => {
     zip
   }
 
-  recreateDir(modDir)
+  os.makeDir.all(modDir)
 
   val uassetCodeMap = TreeMap(
     // add more/change to uasset patching of interest here, e.g.,

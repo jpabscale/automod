@@ -1,3 +1,5 @@
+2.0.1: Fixed a critical bug in VSCode extension.
+
 2.0.0: Added VSCode extension. [sigh, very broken; archived]
 
 1.9: Fixed .toml.all and usage checks.
