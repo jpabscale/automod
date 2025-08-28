@@ -1,0 +1,4 @@
+# ...                                                        # Game Original Value
+[P_Eve_Tachy_Start2_1] # Tachy Mode -> Scarlet 1 Hit Super Attack
+AttackDamageRate = 33.33                                     # 50.0
+ShieldAttackDamageRate = 33.33                               # 50.0

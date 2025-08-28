@@ -1,3 +1,5 @@
+2.5.0: Made .@: patches preserved (including their load order) by .toml and .toml.all so .@: can be applied generally (e.g., for non data tables). Removed .demo, .demo.aio, .demo.aio.hard, and .demo.effect, and renamed .demo.all as .demo.sb. Moved Stellar Blade patches to patches\sb. AIOs: updated to use 1329 v2.7 scarlet godqueen; simplified 1156 patching to use an object name patchlet.
+
 2.4.5: Fixed property value patchlet handling when the curent value (v.currentOpt) is null. Changed to use 7-zip for compressing/uncompressing archives. AIOs: updated to use 1329 v2.6 scarlet godqueen.
 
 2.4.4: Fixed UAssetGUI-breaking '... :: ...' enum property value patching. Added support for general UAssetAPI JSON objects and arrays for property value patching (use inline tables/objects in TOML). Added a more helpful message in the case UAssetGUI fails to repack .uasset. AIOs: updated to use 1329 v2.2 godqueen; effect-table: made Gold Gears as heal-on-hit.

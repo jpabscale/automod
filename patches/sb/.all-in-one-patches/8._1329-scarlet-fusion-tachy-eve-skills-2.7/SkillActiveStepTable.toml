@@ -101,10 +101,11 @@ StartSelfEffect = '''=> {
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
   newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 4 }"""))
   newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 4 }"""))
+  newArray.add(toJsonNode("""{ "Alias": "BlockMove_Step" }"""))
   val value = v.currentOpt[String].get
   val array = toJsonNodeT[ArrayNode](value)
   for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
-    case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" | "NoDamage_Skill" | "NoReactionSlug_Step" =>
+    case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" | "NoDamage_Skill" | "NoReactionSlug_Step" | "BlockAction_Step" | "BlockMove_Step" =>
     case _ => newArray.add(array.get(i))
   }
   newArray.toString
@@ -121,6 +122,11 @@ Duration = 1
 NextStepAlias = "P_Eve_Sword_Burst_FinishAttack1_1_Cast1"
 OverrideTargetFilterAlias = "P_Eve_Sword_0500_360_500_HitArea"
 Duration = 0.5
+
+[P_Eve_Fusion_JustEvade_LightAttack1_1_Finish1] # Incursion III β - Shield Break: ☐, △, Hold ☐
+NextStepAlias = "P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1"
+OverrideTargetFilterAlias = "P_Eve_Sword_0500_360_500_HitArea"
+Duration = 0.1
 
 [P_Eve_Sword_Beta_ChainStabCombo1_Ex_Finish1] # Onslaught I β - Quadruplet++: △, △, Hold △
 NextStepAlias = "P_Eve_Fusion_JustEvade_LightAttackCombo1_1_Cast1"
@@ -163,7 +169,17 @@ NextStepAlias = "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
 OverrideTargetFilterAlias = "P_Eve_Sword_0500_360_500_HitArea"
 Duration = 0.1
 
-['.*: ^P_Eve_((Tachy_(Skill_Chainstab|Just(Evade_StrongAttack|Parry_StrongAttackCombo))|Fusion_(Normal_FinishAttack|Normal_DashAttackCombo))_1|Sword_(Beta_(ChainStab|ChargeSlash)Combo1|Normal_DashAttackCombo1_1)_Ex)_Finish1$']
+[P_Eve_Sword_Burst_MeleeCombatBuff1_1_Finish1] # Ex Combo S + Scarlet Judgement Cut/Tempest: R1+◯
+Duration = 0.5
+NextStepAlias = "P_Eve_Fusion_JustParry_LightAttack1_1_Cast1"
+OverrideTargetFilterAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_HitArea"
+
+[P_Eve_Fusion_JustParry_LightAttack1_1_Finish1] # ...Ex Combo S + Scarlet Judgement Cut/Tempest: R1+◯
+Duration = 0.5
+NextStepAlias = "P_Eve_Sword_Normal_DashAttack1_2_Ex_Cast1"
+OverrideTargetFilterAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_HitArea"
+
+['.*: ^P_Eve_((Tachy_(Skill_Chainstab|Just(Evade_StrongAttack|Parry_StrongAttackCombo))|Fusion_(Normal_FinishAttack|Normal_DashAttackCombo))_1|Sword_(Beta_(ChainStab|ChargeSlash)Combo1|Normal_(DashAttack1_2|DashAttackCombo1_1))_Ex)_Finish1$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "BlockMove_Step" }"""))
@@ -176,8 +192,10 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
+# P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1
 # P_Eve_Fusion_JustEvade_StrongAttack1_1_Cast1
 # P_Eve_Fusion_JustEvade_StrongAttackCombo1_1_Cast1
+# P_Eve_Fusion_JustParry_LightAttack1_1_Cast1
 # P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1
 # P_Eve_Fusion_Normal_FinishAttack1_1_Cast1
 # P_Eve_Fusion_Skill_Chainstab1_1_Cast1
@@ -185,9 +203,10 @@ StartSelfEffect = '''=> {
 # P_Eve_Sword_Beta_ChargeSlashCombo1_Ex_Cast1
 # P_Eve_Sword_Burst_FinishAttack1_1_Cast1
 # P_Eve_Sword_Burst_SpinAttack1_1_Cast1
+# P_Eve_Sword_Normal_DashAttack1_2_Ex_Cast1
 # P_Eve_Tachy_JustEvade_LightAttackCombo1_1_Cast1
 # P_Eve_Tachy_JustParry_StrongAttackCombo1_1_Cast1
-['.*: ^P_Eve_(Fusion_(JustEvade_StrongAttack(Combo)?|Normal_(DashAttackCombo|FinishAttack)|Skill_Chainstab)1_1|Sword_(Beta_(ChainStab|ChargeSlash)Combo1_Ex|Burst_(Finish|Spin)Attack1_1)|Tachy_Just(Evade_LightAttackCombo|Parry_StrongAttackCombo)1_1).*Cast.*$']
+['.*: ^P_Eve_(Fusion_(Just(Evade_(LightAttack|StrongAttack(Combo)?|Parry_LightAttack))|Normal_(DashAttackCombo|FinishAttack)|Skill_Chainstab)1_1|Sword_(Beta_(ChainStab|ChargeSlash)Combo1_Ex|Burst_(Finish|Spin)Attack1_1|Normal_DashAttack1_2_Ex)|Tachy_Just(Evade_LightAttackCombo|Parry_StrongAttackCombo)1_1).*Cast.*$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "BlockMove_Step" }"""))

@@ -22,6 +22,8 @@ StartTargetEffect = '''=> {
   }
   newArray.toString
 }'''                                                         # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactStrongLink\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"BlockRotation_Step\"}, {\"Alias\":\"ImmediateDeathPossibleRevival\"}]""
+SkillAttackDamageRate = '=> v.orig[Double] * 3d'             # 1.0
+SkillShieldAttackDamageRate = '=> v.orig[Double] * 3d'       # 1.0
 
 [M_Scarlet_PhaseChange1_EndShieldOwn_Finish1]
 StartTargetEffect = '''=> {
@@ -35,23 +37,6 @@ StartTargetEffect = '''=> {
   }
   newArray.toString
 }'''                                                         # "[{\"Alias\":\"M_Scarlet_EnterZoneEnd\"}, {\"Alias\":\"BlockAction_Step\", \"Time\":2.1}, {\"Alias\":\"BlockRotation_Step\", \"Time\":2.1}, {\"Alias\":\"DownFaceDown\",\"startDelayTime\":1.9}, {\"Alias\":\"ForceLockOn\",\"startDelayTime\":1.2}, {\"Alias\":\"Dispel_NotDamageScreenFX\"}, {\"Alias\":\"Dispel_NotCameraShake\"}]"
-
-[P_Eve_Sword_Burst_MeleeCombatBuff1_1_Finish1]
-NextStepAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"  # null
-StartSelfEffect = '''=> {
-  val newArray = JsonNodeFactory.instance.arrayNode
-  newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
-  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_Skill", "CalculationValue": 4 }"""))
-  newArray.add(toJsonNode("""{ "Alias": "AddHitDefense_EveSkill", "CalculationValue": 4 }"""))
-  newArray.add(toJsonNode("""{ "Alias": "BlockMove_Step" }"""))
-  val value = v.currentOpt[String].get
-  val array = toJsonNodeT[ArrayNode](value)
-  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
-    case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" | "NoDamage_Skill" | "BlockAction_Step" | "BlockMove_Step" =>
-    case _ => newArray.add(array.get(i))
-  }
-  newArray.toString
-}'''
 
 ['.*: ^P_Eve_Sword_(Normal_StrongAttack(6|8)|Air_RollingAttack).*Ex_Finish1$']
 NextStepAlias = '''=> v.objName match {
@@ -75,7 +60,7 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
-['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|BlinkShot|PhaseChange1_EndShieldOwn|MoveBackShot2|BackDashSpaceCut|AirDashSpaceCut|SwingTriple|Swing_|KickStamp|JumpStampSlash).*(Cast|Hit).*$']
+['.*: ^M_Scarlet_((BlinkCut|BlinkCombo|BlinkShot|SwingFast|AreaCombo|MoveBackShot2|BackDashSpaceCut|AirDashSpaceCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*(Cast|Hit).*|(SwingFast|AreaCombo|Swing_).*(Finish).*)$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
@@ -92,7 +77,7 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
-['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|BlinkShot|PhaseChange1_EndShieldOwn|MoveBackShot2|BackDashSpaceCut|AirDashSpaceCut|SwingTriple|Swing_|KickStamp|JumpStampSlash).*Finish.*$']
+['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|BlinkShot|MoveBackShot2|BackDashSpaceCut|AirDashSpaceCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Finish.*$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
@@ -104,11 +89,11 @@ StartSelfEffect = '''=> {
   val array = toJsonNodeT[ArrayNode](value)
   for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
     case "AddHitDefense_Skill" | "AddHitDefense_EveSkill" | "NoDamage_Skill" | 
-         "BlockAction_Step" | "BlockMove_Step" | "NoReactionSlug_Step" | 
+         "BlockAction_Step" | "BlockMove_Step" | "NoReactionSlug_Step" | "M_DummyScarlet_SummonDummyKill" |
          "M_Scarlet_PlayTheater01" | "M_Scarlet_PlayTheater02" | "M_Scarlet_PlayTheater03" | 
          "M_Scarlet_NoGuardCheck" | "M_Scarlet_NoShieldDamage" | "NoJustParryStaminaDamage_Dispel" |
          "MinimumHP_Dispel" | "M_Scarlet_HPRecover" | "M_Scarlet_ShieldZero" | "M_Scarlet_StaminaUp" |
-         "M_Scarlet_StaminaRecover" | "M_Scarlet_PhaseChangeSkillCoolTimeResetGroup" =>
+         "M_Scarlet_StaminaRecover" | "M_Scarlet_PhaseChangeSkillCoolTimeResetGroup" | "M_Scarlet_AreaSkillCheck" =>
     case _ => newArray.add(array.get(i))
   }
   newArray.toString
@@ -116,10 +101,8 @@ StartSelfEffect = '''=> {
 Duration = '''=> {
   val orig = v.orig[Double]
   v.objName match {
-    case "M_Scarlet_KickStamp_Finish1" => orig
     case "M_Scarlet_JumpStampSlash_Finish1" | "M_Scarlet_AirDashSpaceCut_Finish1" => 0.4
     case "M_Scarlet_BlinkCut_Finish1" | "M_Scarlet_BlinkCombo_Finish1" | "M_Scarlet_PhaseChange1_EndShieldOwn_Finish1" => 0.1
-    case "M_Scarlet_JumpStampSlash_Finish1" => 0.4
     case _ => if (orig > 2) 2 else orig
   }
 }'''
@@ -139,10 +122,34 @@ AttackCollisionGroupArray = '''=> {
   } else null
 }'''
 
-[M_Scarlet_Swing_Finish1]
+[M_Scarlet_SwingFast_Finish1] # Shield Break -> Scarlet Swing Fast + Area Combo-+: L1+X
+NextStepAlias = "M_Scarlet_AreaCombo_Cast1"                  # "None"
+Duration = 0.1                                               # 1.02
+
+[M_Scarlet_AreaCombo_Hit6] # Shield Break -> Scarlet Swing Fast + Area Combo-+: L1+X
+Type = "SkillActiveStepType_Hit"                             # "ESBSkillActiveStepType::SkillActiveStepType_None"
+HitDetectionType = "SkillHitDetectionType_TargetFilter"      # "ESBSkillHitDetectionType::SkillHitDetectionType_None"
+SkillResultAlias = "P_Eve_Tachy_Start2_Hit2"                 # "None"
+OverrideTargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"    # "M_Scarlet_HitArea"
+NextStepAlias = "P_Eve_Sword_Beta_SwordAuraCombo1_1_Cast1"   # "M_Scarlet_AreaCombo_Cast9"
+Duration = 0.5                                               # 0.1
+
+['.*: ^M_Scarlet_(AreaCombo_Hit[2-5,7]|SwingFast_Hit1)$']
+AttackCollisionGroupArray = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode("""{"CollisionGroupName":"Collision_WeaponBig", "DelayTime":0}"""))
+  newArray.toString
+}'''
+
+[P_Eve_Sword_Normal_DashAttack1_2_Ex_Finish1] # Ex Combo S + Scarlet Judgement Cut/Tempest: R1+◯
+NextStepAlias = "P_Eve_Tachy_Start2_Cast1"                   # null
+OverrideTargetFilterAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_HitArea"    # "P_Eve_Sword_0500_360_500_HitArea"
+Duration = 0.1                                               # 0.5
+
+[M_Scarlet_Swing_Finish1] # Tachy Mode L1+△
 NextStepAlias = "M_Scarlet_KickStamp_Cast1"
 OverrideTargetFilterAlias = "M_Scarlet_HitArea"
 
-['.*: ^P_Eve_(Fusion|Tachy)_Skill_ParrySlash1_1_Finish2$']
+['.*: ^P_Eve_(Fusion|Tachy)_Skill_ParrySlash1_1_Finish2$'] # Tachy Mode L1+X
 NextStepAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"
 OverrideTargetFilterAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_HitArea"

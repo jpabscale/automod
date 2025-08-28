@@ -1,0 +1,6 @@
+# ...                                                        # Game Original Value
+[P_Eve_Tachy_Start2_1] # Tachy Mode -> Scarlet 1 Hit Super Attack
+FirstSkillActiveAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"    # "P_Eve_Tachy_Start2_Cast1"
+AttackDamageRate = 50                                        # 50
+ShieldAttackDamageRate = 50                                  # 50
+TargetFilterAlias = "M_Scarlet_HitArea"                      # "P_Eve_Tachy_Start2_1_Target"

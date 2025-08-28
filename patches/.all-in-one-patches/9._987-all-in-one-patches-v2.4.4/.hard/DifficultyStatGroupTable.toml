@@ -1,9 +1,0 @@
-# based on https://www.nexusmods.com/stellarblade/mods/1156
-
-['.@: $..Data[16:31]']
-StatValue4 = '=> v.orig[Double] * 6'
-StatValue5 = '=> v.orig[Double] * 6'
-
-['.@: $..Data[60:86]']
-StatValue4 = '=> if (v.objName == "324") 420 else v.orig[Double] * 6'
-StatValue5 = '=> if (v.objName == "324") 420 else v.orig[Double] * 6'

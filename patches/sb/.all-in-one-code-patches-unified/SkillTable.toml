@@ -104,25 +104,25 @@ StartDelayTick = 5                                           # 0
 TargetFilterAlias = "M_Scarlet_BlinkCombo_Target"            # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Beta_ShieldBreak1Ex_1]
-AttackDamageRate = 8.0                                       # 9.5
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1"
-ShieldAttackDamageRate = 7.0                                 # 9.5
-StartDelayTick = 1                                           # 1
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+AttackDamageRate = 9.5                                       # 9.5
+FirstSkillActiveAlias = "M_Scarlet_SwingFast_Cast1"          # "P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1"
+ShieldAttackDamageRate = 9.5                                 # 9.5
+StartDelayTick = 5                                           # 1
+TargetFilterAlias = "M_Scarlet_SwingFast_Target"             # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Beta_ShieldBreak1_1]
-AttackDamageRate = 8.0                                       # 8.0
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak1_1_Cast1"
-ShieldAttackDamageRate = 7.0                                 # 7.0
+AttackDamageRate = 9.5                                       # 8.0
+FirstSkillActiveAlias = "M_Scarlet_SwingFast_Cast1"          # "P_Eve_Sword_Beta_ShieldBreak1_1_Cast1"
+ShieldAttackDamageRate = 9.5                                 # 7.0
 StartDelayTick = 1                                           # 1
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+TargetFilterAlias = "M_Scarlet_SwingFast_Target"             # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Beta_ShieldBreak2_1]
-AttackDamageRate = 8.0                                       # 8.0
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Beta_ShieldBreak2_1_Cast1"
-ShieldAttackDamageRate = 7.0                                 # 7.0
+AttackDamageRate = 9.5                                       # 8.0
+FirstSkillActiveAlias = "M_Scarlet_SwingFast_Cast1"          # "P_Eve_Sword_Beta_ShieldBreak2_1_Cast1"
+ShieldAttackDamageRate = 9.5                                 # 7.0
 StartDelayTick = 1                                           # 1
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+TargetFilterAlias = "M_Scarlet_SwingFast_Target"             # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Beta_SwordAura1Ex_1]
 SkillType = "SkillType_MeleeAttack"                          # "SkillType_RangeAttack"
@@ -166,16 +166,12 @@ ShieldAttackDamageRate = 8                                   # 8.0
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_360_500_Target"
 
 [P_Eve_Sword_Burst_MassiveAttack1_1]
-AttackDamageRate = 12                                        # 12.0
-FirstSkillActiveAlias = "P_Eve_Tachy_Start2_Cast1"           # "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"
-ShieldAttackDamageRate = 12                                  # 12.0
-TargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"            # "P_Eve_Sword_0800_360_500_Target"
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
 
 [P_Eve_Sword_Burst_MassiveAttack2_1]
-AttackDamageRate = 12                                        # 12.0
-FirstSkillActiveAlias = "P_Eve_Tachy_Start2_Cast1"           # "P_Eve_Sword_Burst_MassiveAttack2_1_Cast1"
-ShieldAttackDamageRate = 12                                  # 12.0
-TargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"            # "P_Eve_Sword_0800_360_500_Target"
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack2_1_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
 
 [P_Eve_Sword_Burst_MeleeCombatBuff1_1]
 AttackDamageRate = 8                                         # 3.0
@@ -312,7 +308,7 @@ TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500
 
 [P_Eve_Sword_Normal_LightAttackChain1_1]
 AttackDamageRate = 9.5                                       # 2.299999952316284
-FirstSkillActiveAlias = "P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1"    # "P_Eve_Sword_Normal_LightAttackChain1_1_Cast1"
+FirstSkillActiveAlias = "P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1"    # "P_Eve_Sword_Normal_LightAttackChain1_1_Cast1"
 ShieldAttackDamageRate = 9.5                                 # 1.2000000476837158
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 
@@ -438,5 +434,8 @@ TargetFilterAlias = "P_Eve_Tachy_Start1_1_Target"            # "P_Eve_Tachy_Star
 WorldObjectHitShow = ""                                      # 'null'
 
 [P_Eve_Tachy_Start2_1]
-TargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"            # "P_Eve_Tachy_Start2_1_Target"
+AttackDamageRate = 33.33                                     # 50.0
+FirstSkillActiveAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"    # "P_Eve_Tachy_Start2_Cast1"
+ShieldAttackDamageRate = 33.33                               # 50.0
+TargetFilterAlias = "M_Scarlet_HitArea"                      # "P_Eve_Tachy_Start2_1_Target"
 

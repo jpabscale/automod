@@ -8,8 +8,10 @@ NextStepAlias = '''=> v.objName match {
   case _ => null
 }'''                                                         # null
 
-[P_Eve_Sword_Burst_MeleeCombatBuff1_1_Finish1]
-NextStepAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"   # null
+[P_Eve_Sword_Normal_DashAttack1_2_Ex_Finish1] # ... Ex Combo S + Tempest: R1+◯
+NextStepAlias = "P_Eve_Sword_Burst_MassiveAttack2_1_Cast1"   # null
+OverrideTargetFilterAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_HitArea"
+Duration = 0.1
 
 [P_Eve_Fusion_Normal_DashAttack1_1_Finish1]
 NextStepAlias = "P_Eve_Fusion_Skill_Chainstab1_1_Cast1"      # null

@@ -1,0 +1,3 @@
+[M_Scarlet_PhaseChange1_EndShieldOwn_Hit1]
+SkillAttackDamageRate = '=> v.orig[Double] * 2d'
+SkillShieldAttackDamageRate = '=> v.orig[Double] * 2d'

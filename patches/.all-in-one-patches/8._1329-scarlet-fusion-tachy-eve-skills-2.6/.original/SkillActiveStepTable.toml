@@ -1,3 +1,0 @@
-['.*: ^P_Eve_Sword_(Normal_(Light|Strong|Finish|DashAttackCombo)|Air_RollingAttack).*Ex_Hit.*$']
-SkillAttackDamageRate = '=> v.orig[Double] * 0.2'
-SkillShieldAttackDamageRate = '=> v.orig[Double] * 0.2'

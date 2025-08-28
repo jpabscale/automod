@@ -1,5 +1,0 @@
-['.*: ^P_Eve_Sword_Burst_MassiveAttack[1-2]_1$'] # Tempest -> Scarlet Judgement Cut: R1+◯
-AttackDamageRate = 12                                        # 12
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"
-ShieldAttackDamageRate = 12                                  # 12
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
