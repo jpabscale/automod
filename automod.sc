@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.8.0"
+val header = s"Auto Modding Script v2.8.1"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
 
@@ -76,6 +76,12 @@ val osKind = if (util.Properties.isWin) if (isArm) OsKind.WinArm64 else OsKind.W
 
 if (osKind.isMac) exit(-1, s"Unsupported platform: .NET 8 for macOS does not currently work well enough for UAssetCLI")
 
+val automodDir = {
+  var file = new java.io.File(sourcecode.File())
+  while (!new java.io.File(file, "automod.sc").exists) file = file.getParentFile
+  os.Path(file.getCanonicalFile.getAbsolutePath)
+}
+
 val maxLogs = Option(System.getenv("AUTOMOD_MAX_LOGS")).flatMap(_.toDoubleOption.map(Math.ceil(_).toInt)).getOrElse(30)
 
 val noPar = "true" == System.getenv("AUTOMOD_NO_PAR") || osKind.isLinux || osKind.isMac || osKind.isArm
@@ -86,7 +92,10 @@ val dryRun = "--dry-run"
 val includePatches = "--include-patches"
 val ultraCompression = "--ultra-compression"
 
-var cliArgs = args
+var cliArgs = args match {
+  case Array("-s", _*) => args.drop(1)
+  case _ => args
+}
 
 def exit(code: Int, msg: String = null): Nothing = {
   Option(msg).foreach((if (code == 0) Console.out else Console.err).println(_))
@@ -96,11 +105,12 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 val zipToolVersion = "25.01"
 var modExt = "zip"
+val usmapUrlPrefix = "https://github.com/jpabscale/UAssetCLI/releases/download/usmap/"
 
 class Game {
   @BeanProperty var contentPaks: String = "SB/Content/Paks"
   @BeanProperty var unrealEngine: String = "4.26"
-  @BeanProperty var mapUri: String = "tools/usmap/StellarBlade_1.3.1.usmap"
+  @BeanProperty var mapUri: String = s"${usmapUrlPrefix}StellarBlade_1.3.1.usmap"
   @BeanProperty var aesKey: String = ""
 }
 
@@ -218,7 +228,7 @@ def getTimestamp(): String = {
   DateTimeFormatter.ISO_INSTANT.format(ZonedDateTime.now(ZoneOffset.UTC)).replace(":", "-").replace(".", "-")
 }
 
-def absPath(p: os.Path): String = p.toIO.getCanonicalFile.getAbsolutePath
+def absPath(p: os.Path): String = p.toString
 def absPath(p: String): os.Path = os.Path(new java.io.File(p).getCanonicalFile.getAbsolutePath)
 
 val workingDir = os.pwd
@@ -261,9 +271,9 @@ val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
 val usmapUri = config.game.mapUri
 val usmapFilename = usmapUri.substring(usmapUri.lastIndexOf('/') + 1)
-val usmapPath = workingDir / usmapFilename
+val usmapPath = automodDir / usmapFilename
 val usmap = usmapPath.baseName
-val toolsDir = workingDir / "tools"
+val toolsDir = automodDir / "tools"
 val usmapDir = toolsDir / "usmap"
 
 val retocUrlPrefix = s"https://github.com/trumank/retoc/releases/download/v$retocVersion"
@@ -283,6 +293,7 @@ val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
 
 val gameId = config.game.contentPaks.split('/').head
+val automodGameCacheDir = automodDir / ".cache" / usmapFilename.replace(".usmap", "") / gameId
 val cacheDir = workingDir / ".cache"
 lazy val dotnet = if (os.exists(os.home / ".dotnet" / "dotnet")) absPath(os.home / ".dotnet" / "dotnet") else "dotnet"
 
@@ -291,24 +302,34 @@ val discardProcessOutput = new os.ProcessOutput {
   def processOutput(out: => os.SubProcess.OutputStream): Option[Runnable] = None
 }
 
-def setupModTools(): Boolean = {
+def init(): Boolean = {
   var setup = true
-  
-  os.makeDir.all(patchesDir)
-  os.makeDir.all(toolsDir)
 
-  def download(uri: String): os.Path = {
+  val tempDir = localAppData / "Temp" / "automod"
+  os.makeDir.all(tempDir)
+  os.write.over(tempDir / ".automod.dir", automodDir.toString)
+  
+  os.makeDir.all(usmapDir)
+
+  def download(uri: String, noCache: Boolean = false): Option[os.Path] = {
     val cacheName = java.util.Base64.getEncoder().encodeToString(uri.getBytes(java.nio.charset.StandardCharsets.UTF_8))
-    val cachePath = localAppData / "Temp" / "automod" / cacheName
+    val cachePath = tempDir / cacheName
     val dest = toolsDir / uri.substring(uri.lastIndexOf('/') + 1)
-    if (!os.exists(cachePath)) {
-      os.makeDir.all(cachePath / os.up)
+    if (noCache || !os.exists(cachePath)) {
+      os.remove.all(cachePath)
       if (uri.startsWith("https://")) os.proc("curl", "-JLo", cachePath, uri).call(cwd = toolsDir, stdout = os.Inherit, stderr = os.Inherit)
       else if (uri.startsWith("file://")) os.copy.over(os.Path(new java.io.File(new java.net.URI(uri)).getCanonicalFile.getAbsolutePath), cachePath)
-      else os.copy.over(workingDir / os.RelPath(uri), cachePath)
+      else if (os.exists(automodDir / os.RelPath(uri))) os.copy.over(automodDir / os.RelPath(uri), cachePath)
     }
-    os.copy.over(cachePath, dest)
-    dest
+    if (os.exists(cachePath)) os.copy.over(cachePath, dest)
+    if (os.exists(dest)) Some(dest) else None
+  }
+
+  def downloadCheck(uri: String): os.Path = {
+    download(uri) match {
+      case Some(p) => p
+      case _ => exit(-1, s"Could not set up from $uri")
+    }
   }
 
   if (!os.exists(zipExe)) {
@@ -316,19 +337,19 @@ def setupModTools(): Boolean = {
     println(s"Setting up 7z v$zipToolVersion in $toolsDir ...")
     osKind match {
       case OsKind.WinAmd64 | OsKind.WinArm64 =>
-        val z7r = download(z7rUrl)
-        val z7 = download(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-${if (isArm) "arm64" else "x64"}.exe")
+        val z7r = downloadCheck(z7rUrl)
+        val z7 = downloadCheck(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-${if (isArm) "arm64" else "x64"}.exe")
         os.makeDir.all(toolsDir / "7z")
         os.proc(toolsDir / "7zr.exe", "x", z7).call(cwd = toolsDir / "7z")
         os.remove.all(z7)
         z7r.toIO.deleteOnExit
       case OsKind.LinuxAmd64 | OsKind.LinuxArm64 =>
-        val z7 = download(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-linux-${if (isArm) "arm64" else "x64"}.tar.xz")
+        val z7 = downloadCheck(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-linux-${if (isArm) "arm64" else "x64"}.tar.xz")
         os.makeDir.all(toolsDir / "7z")
         os.proc("tar", "xf", z7).call(cwd = toolsDir / "7z")
         os.remove.all(z7)
       case OsKind.MacAmd64 | OsKind.MacArm64 =>
-        val z7 = download(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-mac.tar.xz")
+        val z7 = downloadCheck(s"$z7UrlPrefix/7z${zipToolVersion.replace(".", "")}-mac.tar.xz")
         os.makeDir.all(toolsDir / "7z")
         os.proc("tar", "xf", z7).call(cwd = toolsDir / "7z")
         os.remove.all(z7)
@@ -346,7 +367,7 @@ def setupModTools(): Boolean = {
       case OsKind.LinuxArm64 => "retoc-aarch64-unknown-linux-gnu.tar.xz"
       case OsKind.MacArm64 => "retoc-aarch64-apple-darwin.tar.xz"
     }
-    val retocBundle = download(s"$retocUrlPrefix/$retocBundleName")
+    val retocBundle = downloadCheck(s"$retocUrlPrefix/$retocBundleName")
     os.remove.all(retocExe / os.up)
     if (osKind.isWin) {
       os.makeDir.all(retocExe / os.up)
@@ -364,7 +385,7 @@ def setupModTools(): Boolean = {
   if (!os.exists(uassetCliDir)) {
     setup = false
     println(s"Setting up UAssetCLI v$uassetCliVersion in $uassetCliDir ...")
-    val uassetCliZip = download(uassetCliUrl)
+    val uassetCliZip = downloadCheck(uassetCliUrl)
     os.proc(zipExe, "x", uassetCliZip).call(cwd = toolsDir)
     os.remove.all(uassetCliZip)
     println()
@@ -375,8 +396,7 @@ def setupModTools(): Boolean = {
   if (!os.exists(usmap)) {
     setup = false
     println(s"Setting up $usmapFilename in $usmapDir ...")
-    download(usmapUri)
-    os.move.over(toolsDir / usmap.last, usmap)
+    os.move.over(downloadCheck(usmapUri), usmap)
     println()
   }
 
@@ -394,7 +414,7 @@ def setupModTools(): Boolean = {
   if (osKind.isWin && !os.exists(fmodelExe)) {
     setup = false
     println(s"Setting up FModel @$fmodelShortSha in $toolsDir ...")
-    val fmodelZip = download(fmodelUrl)
+    val fmodelZip = downloadCheck(fmodelUrl)
     os.proc(zipExe, "x", fmodelZip).call(cwd = toolsDir)
     os.remove.all(fmodelZip)
     println()
@@ -411,13 +431,24 @@ def setupModTools(): Boolean = {
       case OsKind.LinuxArm64 => "jd-arm64-linux"
       case OsKind.MacArm64 => "jd-arm64-darwin"
     }
-    val jdBundle = download(s"$jdUrlPrefix/$jdBundleName")
+    val jdBundle = downloadCheck(s"$jdUrlPrefix/$jdBundleName")
     os.move.over(jdBundle, jdExe)
     if (!osKind.isWin) jdExe.toIO.setExecutable(true)
     println()
   }
 
-  if (!os.exists(configPath)) writeConfig(config)
+  if (!os.exists(automodGameCacheDir) && usmapUri.startsWith(usmapUrlPrefix)) {
+    println(s"Setting up $automodGameCacheDir ...")
+    download(usmapUri.replace("/usmap/", "/cache/").replace(".usmap", ".7z")) match {
+      case Some(p) => 
+        os.proc(zipExe, "x", p).call(cwd = automodDir, stdout = os.Inherit, stderr = os.Inherit)
+        os.remove.all(p)
+      case _ =>
+    }
+    println()
+  }
+
+  if (!os.exists(configPath) && automodDir.toString == workingDir.toString) writeConfig(config)
 
   setup
 }
@@ -658,7 +689,7 @@ def updatePatches(): Unit = {
     }
   }
 
-  if (os.exists(patchesDir)) rec(patchesDir)
+  if (os.isDir(patchesDir)) rec(patchesDir)
   println()
   _patches = map
 }
@@ -736,6 +767,10 @@ def logPatch(uassetName: String, line: String, console: Boolean): Unit = {
   val log = logDir / s"$uassetName.log"
   os.write.append(log, line)
   os.write.append(log, util.Properties.lineSeparator)
+}
+
+def checkPatchesDir(): Unit = {
+  if (!os.isDir(patchesDir)) exit(-1, s"Missing directory: $patchesDir")
 }
 
 def generateMod(addToFilePatches: Boolean,
@@ -822,22 +857,33 @@ def generateMod(addToFilePatches: Boolean,
   def unpackJson(name: String): os.Path = {
     val json = s"$name.json"
 
-    def findCached(): os.Path = {
-      for (p <- os.walk(cacheDir) if p.last == json) return p
+    def findCached(dir: os.Path): os.Path = {
+      if (!os.isDir(dir)) return null
+      for (p <- os.walk(dir) if p.last == json) return p
       null
     }
 
-    var jsonCache: os.Path = findCached()
-    var r = if (jsonCache != null) tempDir / jsonCache.relativeTo(cacheDir) else null
-     
-    if (cacheHit && jsonCache != null && os.exists(jsonCache)) {
-      os.makeDir.all(r / os.up)
-      os.copy.over(jsonCache, r)
-      val relPath = jsonCache.relativeTo(cacheDir)
-      uassetNamePathMap.put(name, relPath / os.up / s"${relPath.baseName}.uasset")
-      println(s"Using cached $jsonCache")
-      return r
+    var jsonCache: os.Path = null
+    var r: os.Path = null
+
+    def tryCacheDir(dir: os.Path): Boolean = {
+      jsonCache = findCached(dir)
+      r = if (jsonCache != null) tempDir / jsonCache.relativeTo(dir / os.up) else null
+      if (jsonCache != null && os.exists(jsonCache)) {
+        os.makeDir.all(r / os.up)
+        os.copy.over(jsonCache, r)
+        val relPath = jsonCache.relativeTo(dir / os.up)
+        uassetNamePathMap.put(name, relPath / os.up / s"${relPath.baseName}.uasset")
+        println(s"Using cached $jsonCache")
+        return true
+      }
+      false
     }
+     
+
+    if (cacheHit && tryCacheDir(cacheDir / gameId)) return r
+
+    if (gamePakDirOpt.isEmpty && usmapUri.startsWith(usmapUrlPrefix) && tryCacheDir(automodGameCacheDir)) return r
 
     if (gamePakDirOpt.isEmpty) exit(-1, s"$name.json is not cached; please supply the game directory")
 
@@ -1163,7 +1209,7 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
     if (os.isFile(f) && os.isFile(t) && f.ext.toLowerCase == "json" && t.ext.toLowerCase == "json") {
       val patch = out / s"${f.baseName}.patch"
       println(s"Diffing $f => $t ...")
-      os.proc(jdExe, "-o", patch, f, t).call(cwd = workingDir, check = false).exitCode match {
+      os.proc(jdExe, "-o", patch, f, t).call(check = false).exitCode match {
         case 0 =>
           println("No changes found")
         case 1 =>
@@ -1200,24 +1246,23 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
     val extensions = Vector(
       "scalameta.metals", 
       "tamasfe.even-better-toml",
-      absPath(workingDir / "vscode" / "automod-vscode.vsix")
+      absPath(automodDir / "vscode" / "automod-vscode.vsix")
     )
     if (osKind.isWin) {
       os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
-        call(cwd = workingDir, check = false, stdout = discardProcessOutput, mergeErrIntoOut = true)
+        call(check = false, stdout = discardProcessOutput, mergeErrIntoOut = true)
     }
     for (extension <- extensions) {
       println(s"Installing $extension ...")
       if (osKind.isWin) {
         os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--install-extension", extension).
-          call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit)
+          call(check = false, stdout = os.Inherit, stderr = os.Inherit)
       } else {
         os.proc(cmd, "--force", "--install-extension", extension).
-          call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit)
+          call(check = false, stdout = os.Inherit, stderr = os.Inherit)
       }
       println()
     }
-    println(s"To use, please open the $workingDir directory in $name")
     println()
   }
   var cmds = if (osKind.isWin) Vector(
@@ -1259,7 +1304,13 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
   if (isHard) modName = s"$modName-hard"
 
   val modPatches = patchesDir / modName
-  val aioPatches = patchesDir / "SB" / ".all-in-one-patches"
+
+  if (!os.exists(patchesDir)) {
+    if (osKind.isWin) execute(os.proc("cmd.exe", "/d", "/c", "md", patchesDir))
+    else execute(os.proc("mkdir", patchesDir))
+  }
+  
+  val aioPatches = automodDir / "patches" / "SB" / ".all-in-one-patches"
   if (isAIO) {
     val dotAIO = aioPatches / os.up / ".all-in-one-patches-unified"
     if (!os.exists(dotAIO)) exit(-1, s"$dotAIO does not exist")
@@ -1310,8 +1361,8 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
   try {
     println()
     gameDirOpt match {
-      case Some(gameDir) => execute(os.proc(if (osKind.isWin) "automod" else "./automod.exe", modName, gameDir, noCodePatching, includePatches))
-      case _ => execute(os.proc(if (osKind.isWin) "automod" else "./automod.exe", modName, noCodePatching, includePatches))
+      case Some(gameDir) => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, gameDir, noCodePatching, includePatches))
+      case _ => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, noCodePatching, includePatches))
     }
   } catch {
     case _: Throwable => exit(-1)
@@ -1431,7 +1482,7 @@ def printUsage(): Nothing = {
        |.demo.sb              Generate all Stellar Blade demonstration mods
        |.diff                 Recursively diff JSON files and write jd and TOML patch files
        |.diff.into            Use .diff between <from-path> with each sub-folder of <to-path>
-       |.search               Query UAssetAPI JSON files using the JSON paths in <paths-input>
+       |.search               Query UAssetAPI JSON files using the JSONPaths in <paths-input>
        |.setup                Only set up modding tools
        |.setup.vscode         Set up modding tools and VSCode extensions
        |.toml                 Merge existing patch files in patches as TOML patch files
@@ -1460,21 +1511,20 @@ def run(): Unit = {
   lazy val gameDir = absPath(cliArgs(1))
   val (gamePakDirOpt, gameDirOpt, next) = if (hasGameDir) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 2) 
                                         else (None, None, 1)
-  
   println(header)
-  if (gamePakDirOpt.nonEmpty) println(s"* Game directory: $gameDir")
-  if (argName.head != '.') println(s"* Mod name to generate: $argName")
   println(
     s"""* Platform: $osKind
-       |* Working directory: $workingDir
+       |* Automod directory: $automodDir
        |* Using: retoc v$retocVersion, UAssetCLI v$uassetCliVersion, jd v$jdVersion, $usmapFilename""".stripMargin)
   if (osKind.isWin) println(s"* Extra: FModel @$fmodelShortSha")
   println(
     s"""* Parallelization enabled: ${!noPar}
-       |* Maximum task logs: $maxLogs
-       |""".stripMargin)
-
-  val setup = setupModTools()
+       |* Maximum task logs: $maxLogs""".stripMargin)
+  if (gamePakDirOpt.nonEmpty) println(s"* Game directory: $gameDir")
+  println(s"* Working directory: $workingDir")
+  if (argName.head != '.') println(s"* Mod name to generate: $argName")
+  println()
+  val setup = init()
 
   def demoSbFirst(): Unit = demoSb(isAIO = false, isHard = false, isEffect = false, gameDirOpt)
   def demoSbAio(): Unit = demoSb(isAIO = true, isHard = false, isEffect = false, gameDirOpt)
@@ -1497,9 +1547,11 @@ def run(): Unit = {
     case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(absPath(cliArgs(1))) else None)
     case ".toml" | ".toml.all" => 
       val outDir = checkDirAvailable(absPath(cliArgs(next)))
+      checkPatchesDir()
       setUAssetGUIConfigAndRun(toml(gamePakDirOpt, outDir, argName == ".toml"))
     case _ =>
       if (argName.head == '.') exit(-1, s"Unrecognized command $argName")
+      checkPatchesDir()
       val modName = argName
       var _dryRun = false
       var _includePatches = false

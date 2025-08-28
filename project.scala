@@ -4,6 +4,7 @@
 //> using dep com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.19.2
 //> using dep com.jayway.jsonpath:json-path:2.9.0
 //> using dep com.lihaoyi::os-lib:0.11.5
+//> using dep com.lihaoyi::sourcecode:0.4.2
 //> using dep org.scala-lang:scala-compiler:2.13.16
 //> using dep org.scala-lang:scala-reflect:2.13.16
 //> using dep org.scala-lang.modules::scala-parallel-collections:1.2.0

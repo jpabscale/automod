@@ -34,10 +34,6 @@ CoolTime = 0.1                                               # 0.400000005960464
 FirstSkillActiveAlias = "P_Eve_Tachy_Normal_Guard1_1_Parry1"    # "P_Eve_Sword_Normal_Guard1_1_Parry1"
 TargetFilterAlias = "P_Eve_Tachy_Normal_Guard1_1_Target"     # "P_Eve_Sword_Normal_Guard1_1_Target"
 
-[P_Eve_Sword_Beta_ChainStab1_1]
-HitLevel = 3                                                 # 1
-StartDelayTick = 5                                           # 1
-
 [P_Eve_Sword_Normal_Guard2_1]
 CoolTime = 0.1                                               # 0.4000000059604645
 ExpansionValue1 = "99999"                                    # "0.04"
@@ -46,17 +42,15 @@ JustActionTime = 1                                           # 0.150000005960464
 JustActionTime_StoryMode = 1                                 # 0.20000000298023224
 TargetFilterAlias = "P_Eve_Tachy_Normal_Guard1_1_Target"     # "P_Eve_Sword_Normal_Guard1_1_Target"
 
+[P_Eve_Sword_Beta_ChainStab1_1]
+HitLevel = 3                                                 # 1
+StartDelayTick = 5                                           # 1
+
 [P_Eve_Sword_Beta_ChainStabCombo1_1]
 AttackDamageRate = 9                                         # 2.0
 FirstSkillActiveAlias = "M_Scarlet_BlinkCut_Cast1"           # "P_Eve_Sword_Beta_ChainStabCombo1_1_Cast1"
 ShieldAttackDamageRate = 5                                   # 1.0
 StartDelayTick = 5                                           # 0
-
-[P_Eve_Tachy_Start2_1]
-AttackDamageRate = 33.33                                     # 50.0
-FirstSkillActiveAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"    # "P_Eve_Tachy_Start2_Cast1"
-ShieldAttackDamageRate = 33.33                               # 50.0
-TargetFilterAlias = "M_Scarlet_HitArea"                      # "P_Eve_Tachy_Start2_1_Target"
 
 [P_Eve_Sword_Beta_ChargeSlash1_1]
 HitLevel = 3                                                 # 1
@@ -89,7 +83,7 @@ StartDelayTick = 5                                           # 0
 AttackDamageRate = 9.5                                       # 8.0
 FirstSkillActiveAlias = "M_Scarlet_SwingFast_Cast1"          # "P_Eve_Sword_Beta_ShieldBreak1_1_Cast1"
 ShieldAttackDamageRate = 9.5                                 # 7.0
-StartDelayTick = 1                                           # 1
+StartDelayTick = 5                                           # 1
 TargetFilterAlias = "M_Scarlet_SwingFast_Target"             # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Beta_ShieldBreak2_1]
@@ -138,11 +132,11 @@ TargetFilterAlias = "M_Scarlet_SwingFast_Target"             # "P_Eve_Sword_0500
 [P_Eve_Sword_Burst_SpinAttack1_1]
 AttackDamageRate = 8                                         # 8.0
 FirstSkillActiveAlias = "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"    # "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
-ShieldAttackDamageRate = 8                                   # 8.0
+ShieldAttackDamageRate = 50                                  # 8.0
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0600_360_500_Target"
 
 [P_Eve_Sword_Burst_SpinAttack2_1]
-AttackDamageRate = 8                                         # 8.0
+AttackDamageRate = 50                                        # 8.0
 FirstSkillActiveAlias = "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"    # "P_Eve_Sword_Burst_SpinAttack2_1_Cast1"
 ShieldAttackDamageRate = 8                                   # 8.0
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0600_360_500_Target"
@@ -165,6 +159,19 @@ FirstSkillActiveAlias = "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast1"    # "P
 ShieldAttackDamageRate = 8                                   # 8.0
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_360_500_Target"
 
+[P_Eve_Tachy_Start2_1]
+AttackDamageRate = 33.33                                     # 50.0
+FirstSkillActiveAlias = "M_Scarlet_PhaseChange1_EndShieldOwn_Cast1"    # "P_Eve_Tachy_Start2_Cast1"
+ShieldAttackDamageRate = 33.33                               # 50.0
+TargetFilterAlias = "M_Scarlet_HitArea"                      # "P_Eve_Tachy_Start2_1_Target"
+
+[P_Eve_Tachy_Normal_Guard1_1]
+CoolTime = 0.1                                               # 0.20000000298023224
+ExpansionFromAcquisitionAlias1 = "ParryUpgrade2_1"           # 'null'
+ExpansionValue1 = "99"                                       # 'null'
+JustActionTime = 1                                           # 0.20000000298023224
+JustActionTime_StoryMode = 1                                 # 0.20000000298023224
+
 [P_Eve_Sword_Normal_Evade1_1]
 CoolTime = 0.1                                               # 0.800000011920929
 
@@ -179,41 +186,11 @@ JustSkillActiveAlias = "P_Eve_Sword_Normal_JustEvade1_1_Cast1"    # 'null'
 [P_Eve_Sword_Lockon_Evade1_1]
 CoolTime = 0.1                                               # 0.800000011920929
 
-[P_Eve_Sword_LockonEvade_Evade1_1]
-CoolTime = 0.1                                               # 0.800000011920929
-ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # 'null'
-ExpansionValue1 = "99999"                                    # 'null'
-JustActionTime = 0.15                                        # "+0"
-JustActionTime_StoryMode = 0.3                               # "+0"
-JustSkillActiveAlias = "P_Eve_Sword_Lockon_JustEvade1_1_Cast1"    # 'null'
-
-[P_Eve_Sword_Air_Evade1_1]
-UsableCount = 1000                                           # 1
-
 [P_Eve_Gun_ShootScatterSlug1_1]
 CoolTime = 0                                                 # 1.0
 
 [P_Eve_Gun_ShootExplosiveSlug1_1]
 CoolTime = 0                                                 # 0.800000011920929
-
-[P_Eve_Tachy_Normal_Guard1_1]
-CoolTime = 0.1                                               # 0.20000000298023224
-ExpansionFromAcquisitionAlias1 = "ParryUpgrade2_1"           # 'null'
-ExpansionValue1 = "99"                                       # 'null'
-JustActionTime = 1                                           # 0.20000000298023224
-JustActionTime_StoryMode = 1                                 # 0.20000000298023224
-
-[P_Eve_Tachy_Normal_Evade1_1]
-ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # 'null'
-ExpansionValue1 = "99"                                       # 'null'
-JustActionTime = 1                                           # 0.20000000298023224
-JustActionTime_StoryMode = 1                                 # 0.30000001192092896
-
-[P_Eve_Tachy_Lockon_Evade1_1]
-ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # 'null'
-ExpansionValue1 = "99"                                       # 'null'
-JustActionTime = 1                                           # 0.20000000298023224
-JustActionTime_StoryMode = 1                                 # 0.30000001192092896
 
 [N_Drone_Normal_Scan1_1]
 CoolTime = 4                                                 # 8.0
@@ -237,11 +214,28 @@ ExpansionValue1 = "99"                                       # 'null'
 JustActionTime = 1                                           # 0.20000000298023224
 JustActionTime_StoryMode = 1                                 # 0.30000001192092896
 
-[P_Eve_Sword_Normal_LightAttack4_1_Ex]
-AttackDamageRate = 10.4                                      # 2.700000047683716
-FirstSkillActiveAlias = "P_Eve_Fusion_JustParry_LightAttackCombo2_1_Cast1"    # "P_Eve_Sword_Normal_LightAttack4_1_Ex_Cast1"
-ShieldAttackDamageRate = 10.4                                # 1.399999976158142
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+[P_Eve_Sword_LockonEvade_Evade1_1]
+CoolTime = 0.1                                               # 0.800000011920929
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # 'null'
+ExpansionValue1 = "99999"                                    # 'null'
+JustActionTime = 0.15                                        # "+0"
+JustActionTime_StoryMode = 0.3                               # "+0"
+JustSkillActiveAlias = "P_Eve_Sword_Lockon_JustEvade1_1_Cast1"    # 'null'
+
+[P_Eve_Sword_Air_Evade1_1]
+UsableCount = 1000                                           # 1
+
+[P_Eve_Tachy_Normal_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # 'null'
+ExpansionValue1 = "99"                                       # 'null'
+JustActionTime = 1                                           # 0.20000000298023224
+JustActionTime_StoryMode = 1                                 # 0.30000001192092896
+
+[P_Eve_Tachy_Lockon_Evade1_1]
+ExpansionFromAcquisitionAlias1 = "EvadeUpgrade3_1"           # 'null'
+ExpansionValue1 = "99"                                       # 'null'
+JustActionTime = 1                                           # 0.20000000298023224
+JustActionTime_StoryMode = 1                                 # 0.30000001192092896
 
 [P_Eve_Sword_Normal_StrongAttack5_1_Ex]
 AttackDamageRate = 4                                         # 4.5
@@ -284,6 +278,12 @@ FirstSkillActiveAlias = "P_Eve_Fusion_Skill_SwordAura1_1_Cast1"    # "P_Eve_Swor
 ShieldAttackDamageRate = 6                                   # 2.9000000953674316
 TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
 
+[P_Eve_Sword_Normal_LightAttack4_1_Ex]
+AttackDamageRate = 10.4                                      # 2.700000047683716
+FirstSkillActiveAlias = "P_Eve_Fusion_JustParry_LightAttackCombo2_1_Cast1"    # "P_Eve_Sword_Normal_LightAttack4_1_Ex_Cast1"
+ShieldAttackDamageRate = 10.4                                # 1.399999976158142
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+
 [P_Eve_Sword_Normal_StrongAttack8_1_Ex]
 AttackDamageRate = 6                                         # 4.599999904632568
 FirstSkillActiveAlias = "P_Eve_Fusion_Skill_Chainstab1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack8_1_Ex_Cast1"
@@ -302,6 +302,12 @@ FirstSkillActiveAlias = "P_Eve_Fusion_JustEvade_StrongAttack1_1_Cast1"    # "P_E
 ShieldAttackDamageRate = 8                                   # 2.5999999046325684
 TargetFilterAlias = "P_Eve_Sword_1800_360_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 
+[P_Eve_Sword_JustParry_LightAttackCombo2_1]
+AttackDamageRate = 12                                        # 10.399999618530273
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"    # "P_Eve_Sword_JustParry_LightAttackCombo2_1_Cast1"
+ShieldAttackDamageRate = 12                                  # 10.399999618530273
+TargetFilterAlias = "P_Eve_Sword_0800_360_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+
 [P_Eve_Sword_Normal_DashAttackCombo1_1]
 AttackDamageRate = 3                                         # 4.0
 FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo1_1_Cast1"
@@ -309,19 +315,76 @@ ShieldAttackDamageRate = 3                                   # 2.0
 
 [P_Eve_Sword_Normal_DashAttackCombo1_1_Ex]
 AttackDamageRate = 3                                         # 4.300000190734863
-FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast1"
 ShieldAttackDamageRate = 3                                   # 2.200000047683716
-
-[P_Eve_Sword_JustParry_LightAttackCombo2_1]
-AttackDamageRate = 12                                        # 10.399999618530273
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"    # "P_Eve_Sword_JustParry_LightAttackCombo2_1_Cast1"
-ShieldAttackDamageRate = 12                                  # 10.399999618530273
-TargetFilterAlias = "P_Eve_Sword_0800_360_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Air_LightAttack1_1]
 AttackDamageRate = 2                                         # 1.399999976158142
 FirstSkillActiveAlias = "P_Eve_Fusion_Air_LightAttack1_1_Cast1"    # "P_Eve_Sword_Air_LightAttack1_1_Cast1"
 ShieldAttackDamageRate = 2                                   # 0.699999988079071
+
+[P_Eve_Tachy_JustParry_LightAttack1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_LightAttack1_1_Cast1\"}]"
+
+[P_Eve_Tachy_JustParry_LightAttackCombo1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_LightAttackCombo1_1_Cast1\"}]"
+
+[P_Eve_Sword_Burst_MassiveAttack2_1]
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack2_1_Cast1"
+
+[P_Eve_Sword_Burst_MassiveAttack1_1]
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
+
+[P_Eve_Tachy_JustParry_LightAttackCombo2_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_LightAttackCombo2_1_Cast1\"}]"
+
+[P_Eve_Sword_Burst_MeleeCombatBuff1_1]
+AttackDamageRate = 8                                         # 3.0
+FirstSkillActiveAlias = "P_Eve_Sword_Normal_LightAttack4_1_Ex_Cast1"    # "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"
+ShieldAttackDamageRate = 12                                  # 3.0
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+
+[P_Eve_Tachy_Normal_DashAttackCombo1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1\"}]"
+
+[P_Eve_Tachy_JustParry_StrongAttack1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_StrongAttack1_1_Cast1\"}]"
+
+[P_Eve_Tachy_JustParry_StrongAttackCombo1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_StrongAttackCombo1_1_Cast1\"}]"
+
+[P_Eve_Tachy_JustEvade_LightAttack1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1\"}]"
+
+[P_Eve_Tachy_JustEvade_LightAttackCombo1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_LightAttackCombo1_1_Cast1\"}]"
+
+[P_Eve_Sword_Normal_DashAttack2_1]
+AttackDamageRate = 3                                         # 12.0
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack2_1_Cast1"
+ShieldAttackDamageRate = 3                                   # 12.0
+
+[P_Eve_Tachy_JustEvade_StrongAttack1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_StrongAttack1_1_Cast1\"}]"
+
+[P_Eve_Tachy_JustEvade_StrongAttackCombo1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_StrongAttackCombo1_1_Cast1\"}]"
+
+[P_Eve_Tachy_Start1_1]
+AttackDamageRate = 0                                         # "+0"
+Cancelable = false                                           # false
+FirstActiveStepByEffect = "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_TachyFusion_Start1_Cast1\"}]"    # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_TachyFusion_Start1_Cast1\"}]"
+FirstSkillActiveAlias = "P_Eve_Tachy_Start1_Cast1"           # "P_Eve_Tachy_Start1_Cast1"
+ShieldAttackDamageRate = 0                                   # "+0"
+SkillType = "SkillType_None"                                 # "SkillType_None"
+TargetDeadType = "None"                                      # 'null'
+TargetFilterAlias = "P_Eve_Tachy_Start1_1_Target"            # "P_Eve_Tachy_Start1_1_Target"
+WorldObjectHitShow = ""                                      # 'null'
+
+[P_Eve_Tachy_Normal_FinishAttack2_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_Normal_FinishAttack1_1_Cast1\"}]"
+
+[P_Eve_Tachy_Normal_DashAttack1_1]
+FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_Normal_DashAttack1_1_Cast1\"}]"
 
 [P_Eve_Sword_Air_LightAttack2_1]
 AttackDamageRate = 2                                         # 1.5
@@ -347,72 +410,6 @@ ShieldAttackDamageRate = 6                                   # 2.400000095367431
 AttackDamageRate = 6                                         # 3.0
 FirstSkillActiveAlias = "P_Eve_Fusion_Air_StrongAttack1_1_Cast1"    # "P_Eve_Sword_Air_GuardBreakAttack1_1_Ex_Cast1"
 ShieldAttackDamageRate = 6                                   # 3.5999999046325684
-
-[P_Eve_Sword_Normal_DashAttack2_1]
-AttackDamageRate = 3                                         # 12.0
-FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack2_1_Cast1"
-ShieldAttackDamageRate = 3                                   # 12.0
-
-[P_Eve_Sword_Burst_MassiveAttack1_1]
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
-
-[P_Eve_Sword_Burst_MassiveAttack2_1]
-FirstSkillActiveAlias = "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"    # "P_Eve_Sword_Burst_MassiveAttack2_1_Cast1"
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0800_360_500_Target"
-
-[P_Eve_Sword_Burst_MeleeCombatBuff1_1]
-AttackDamageRate = 8                                         # 3.0
-FirstSkillActiveAlias = "P_Eve_Sword_Normal_LightAttack4_1_Ex_Cast1"    # "P_Eve_Sword_Burst_MeleeCombatBuff1_1_Cast1"
-ShieldAttackDamageRate = 12                                  # 3.0
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
-
-[P_Eve_Tachy_Start1_1]
-AttackDamageRate = 0                                         # "+0"
-Cancelable = false                                           # false
-FirstActiveStepByEffect = "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_TachyFusion_Start1_Cast1\"}]"    # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_TachyFusion_Start1_Cast1\"}]"
-FirstSkillActiveAlias = "P_Eve_Tachy_Start1_Cast1"           # "P_Eve_Tachy_Start1_Cast1"
-ShieldAttackDamageRate = 0                                   # "+0"
-SkillType = "SkillType_None"                                 # "SkillType_None"
-TargetDeadType = "None"                                      # 'null'
-TargetFilterAlias = "P_Eve_Tachy_Start1_1_Target"            # "P_Eve_Tachy_Start1_1_Target"
-WorldObjectHitShow = ""                                      # 'null'
-
-[P_Eve_Tachy_JustParry_LightAttack1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_LightAttack1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustParry_LightAttackCombo1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_LightAttackCombo1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustParry_LightAttackCombo2_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_LightAttackCombo2_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustParry_StrongAttack1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_StrongAttack1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustParry_StrongAttackCombo1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustParry_StrongAttackCombo1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustEvade_LightAttack1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustEvade_LightAttackCombo1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_LightAttackCombo1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustEvade_StrongAttack1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_StrongAttack1_1_Cast1\"}]"
-
-[P_Eve_Tachy_JustEvade_StrongAttackCombo1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_JustEvade_StrongAttackCombo1_1_Cast1\"}]"
-
-[P_Eve_Tachy_Normal_FinishAttack2_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_Normal_FinishAttack1_1_Cast1\"}]"
-
-[P_Eve_Tachy_Normal_DashAttack1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_Normal_DashAttack1_1_Cast1\"}]"
-
-[P_Eve_Tachy_Normal_DashAttackCombo1_1]
-FirstActiveStepByEffect = 'null'                             # "[{\"Effect\":\"P_Eve_TachyFusionModeItem\", \"SkillActiveStepAlias\":\"P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1\"}]"
 
 [P_Eve_Tachy_Skill_ChainStab1_1]
 AttackDamageRate = 18.0                                      # 6.0
