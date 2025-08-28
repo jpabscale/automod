@@ -8,7 +8,7 @@ import scala.beans.BeanProperty
 import scala.collection.immutable.{TreeMap, TreeSet}
 import patchSB._
 
-val header = s"Auto Modding Script v2.2.0"
+val header = s"Auto Modding Script v2.2.1"
 
 var cliArgs = args
 //cliArgs = Array(".setup")
@@ -30,7 +30,7 @@ class Game {
 class Tools {
   @BeanProperty var retoc: String = "0.1.2"
   @BeanProperty var uassetGui: String = "1.0.3"
-  @BeanProperty var fmodel: String = "394bcf356f4c4774ea3edba200bc13b35e4c132c"
+  @BeanProperty var fmodel: String = "62b103f958865b2c7681ef2220c8a2ed844551b3"
   @BeanProperty var jd: String = "2.2.3"
 }
 
@@ -94,6 +94,8 @@ val uassetGuiSettingsDir = os.Path(System.getenv("LOCALAPPDATA")) / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
 
+val automod = workingDir / "automod.bat"
+
 final case class ValuePair(newValueOpt: Option[String], oldValueOpt: Option[String])
 type PropertyMap = TreeMap[String, ValuePair]
 type UAssetPatchTree = TreeMap[String, PropertyMap]
@@ -150,6 +152,13 @@ def setupModTools(): Boolean = {
     setup = false
     println(s"Please wait while setting up jd v$jdVersion in $workingDir ...")
     os.proc("curl", "-JLo", jdExe.last, jdUrl).call(cwd = workingDir)
+    println()
+  }
+
+  if (!os.exists(automod)) {
+    setup = false
+    os.write(automod, s"@scala-cli --server=false project.scala -- %*${util.Properties.lineSeparator}")
+    println(s"Wrote $automod")
     println()
   }
 
@@ -458,7 +467,7 @@ def generateMod(modNameOpt: Option[String], sbPakDir: os.Path): () => Unit = () 
     for (p <- os.list(sbPakDir).sortWith((p1, p2) => p1.last <= p2.last) if os.isFile(p)) {
       r = r :+ s"${p.last}=${p.toIO.lastModified}"
     }
-    r.mkString(scala.util.Properties.lineSeparator)
+    r.mkString(util.Properties.lineSeparator)
   }
 
   def recreateDir(dir: os.Path): Unit = {

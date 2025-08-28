@@ -1,0 +1,129 @@
+# ...                                                        # Old Value
+[P_Eve_Sword_Beta_ChainStab1Ex]
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ChainStab1_1]
+HitLevel = 3                                                 # 1
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ChainStabCombo1Ex]
+AttackDamageRate = 15                                        # 4
+FirstSkillActiveAlias = "M_Scarlet_BlinkCut_Cast1"           # "P_Eve_Sword_Beta_ChainStabCombo1_Ex_Cast1"
+ShieldAttackDamageRate = 8                                   # 2
+StartDelayTick = 5                                           # 0
+
+[P_Eve_Sword_Beta_ChainStabCombo1_1]
+AttackDamageRate = 9                                         # 2
+FirstSkillActiveAlias = "M_Scarlet_BlinkCut_Cast1"           # "P_Eve_Sword_Beta_ChainStabCombo1_1_Cast1"
+ShieldAttackDamageRate = 5                                   # 1
+StartDelayTick = 5                                           # 0
+
+[P_Eve_Sword_Beta_ChargeSlash1Ex]
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ChargeSlash1_1]
+HitLevel = 3                                                 # 1
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ChargeSlash2_1]
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ChargeSlashCombo1Ex_1]
+AttackDamageRate = 10                                        # 4
+FirstSkillActiveAlias = "M_Scarlet_AirDashSpaceCut_Cast1"    # "P_Eve_Sword_Beta_ChargeSlashCombo1_Ex_Cast1"
+ShieldAttackDamageRate = 8                                   # 2
+StartDelayTick = 5                                           # 0
+
+[P_Eve_Sword_Beta_ChargeSlashCombo1_1]
+AttackDamageRate = 10                                        # 2
+FirstSkillActiveAlias = "M_Scarlet_SwingCombo_Cast1"         # "P_Eve_Sword_Beta_ChargeSlashCombo1_1_Cast1"
+ShieldAttackDamageRate = 10                                  # 1
+StartDelayTick = 5                                           # 0
+
+[P_Eve_Sword_Beta_ShieldBreak1Ex_1]
+AttackDamageRate = 15                                        # 9.5
+FirstSkillActiveAlias = "M_Scarlet_MoveBackShot2_Cast1"      # "P_Eve_Sword_Beta_ShieldBreak1_Ex_Cast1"
+ShieldAttackDamageRate = 8                                   # 9.5
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ShieldBreak1_1]
+ShieldAttackDamageRate = 5                                   # 7
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_ShieldBreak2_1]
+ShieldAttackDamageRate = 5                                   # 7
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_SwordAura1Ex_1]
+SkillType = "SkillType_MeleeAttack"                          # "SkillType_RangeAttack"
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_SwordAura1_1]
+ActiveSkillWhileCutoff = false                               # true
+Cancelable = false                                           # true
+HitLevel = 3                                                 # 1
+SkillType = "SkillType_MeleeAttack"                          # "SkillType_RangeAttack"
+StartDelayTick = 5                                           # 1
+
+[P_Eve_Sword_Beta_SwordAuraCombo1Ex_1]
+AttackDamageRate = 15                                        # 4
+FirstSkillActiveAlias = "M_Scarlet_BlinkShot_Cast1"          # "P_Eve_Sword_Beta_SwordAuraCombo1_Ex_Cast1"
+ShieldAttackDamageRate = 8                                   # 2
+StartDelayTick = 5                                           # 0
+
+[P_Eve_Sword_Beta_SwordAuraCombo1_1]
+AttackDamageRate = 9                                         # 2
+FirstSkillActiveAlias = "M_Scarlet_BlinkShot_Cast1"          # "P_Eve_Sword_Beta_SwordAuraCombo1_1_Cast1"
+ShieldAttackDamageRate = 5                                   # 1
+StartDelayTick = 5                                           # 0
+
+[P_Eve_Sword_Burst_FinishAttack1_1]
+AttackDamageRate = 15                                        # 8
+FirstSkillActiveAlias = "M_Scarlet_BackDashSpaceCut_Cast1"   # "P_Eve_Sword_Burst_FinishAttack1_1_Cast1"
+ShieldAttackDamageRate = 10                                  # 8
+
+[P_Eve_Sword_Burst_FinishAttack2_1]
+AttackDamageRate = 15                                        # 8
+FirstSkillActiveAlias = "M_Scarlet_BackDashSpaceCut_Cast1"   # "P_Eve_Sword_Burst_FinishAttack2_1_Cast1"
+ShieldAttackDamageRate = 10                                  # 8
+
+[P_Eve_Sword_Burst_FinishAttack3_1]
+AttackDamageRate = 15                                        # 8
+FirstSkillActiveAlias = "M_Scarlet_BackDashSpaceCut_Cast1"   # "P_Eve_Sword_Burst_FinishAttack3_1_Cast1"
+ShieldAttackDamageRate = 10                                  # 8
+
+[P_Eve_Sword_Burst_SpinAttack1_1]
+AttackDamageRate = 50                                        # 8
+FirstSkillActiveAlias = "P_Eve_Tachy_Start2_Cast1"           # "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
+ShieldAttackDamageRate = 50                                  # 8
+
+[P_Eve_Sword_Burst_SpinAttack2_1]
+AttackDamageRate = 50                                        # 8
+FirstSkillActiveAlias = "P_Eve_Tachy_Start2_Cast1"           # "P_Eve_Sword_Burst_SpinAttack2_1_Cast1"
+ShieldAttackDamageRate = 50                                  # 8
+
+[P_Eve_Sword_Lockon_Evade2_1]
+JustActionTime_StoryMode = 0.15                              # 0.3
+
+[P_Eve_Sword_Normal_DashAttack1_1]
+CoolTime = 3                                                 # 8
+
+[P_Eve_Sword_Normal_DashAttack3_1]
+CoolTime = 3                                                 # 8
+
+[P_Eve_Sword_Normal_DashAttack4_1]
+CoolTime = 3                                                 # 8
+
+[P_Eve_Sword_Normal_Evade2_1]
+JustActionTime_StoryMode = 0.15                              # 0.3
+
+[P_Eve_Sword_Normal_Guard1_1]
+CoolTime = 0.25                                              # 0.4
+
+[P_Eve_Sword_Normal_Guard2_1]
+CoolTime = 0.25                                              # 0.4
+JustActionTime_StoryMode = 0.15                              # 0.2
+
+[P_Eve_Tachy_Start2_1]
+TargetFilterAlias = "P_Eve_Tachy_Start2_Cast1"               # "P_Eve_Tachy_Start2_1_Target"
+

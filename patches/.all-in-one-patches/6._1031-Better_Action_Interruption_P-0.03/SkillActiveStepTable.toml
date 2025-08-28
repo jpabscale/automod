@@ -1,0 +1,375 @@
+# ...                                                        # Old Value
+[P_Eve_Sword_Evade_Evade1_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\",\"Time\":0.1}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}]"
+
+[P_Eve_Sword_LockonEvade_Evade1_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\",\"Time\":0.1}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}]"
+
+[P_Eve_Sword_Lockon_Evade1_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\",\"Time\":0.1}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"
+
+[P_Eve_Sword_Lockon_Evade2_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\",\"Time\":0.1}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"
+
+[P_Eve_Sword_Normal_DashAttack1_2_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockAction_Step\", \"Time\":0.5}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_DashAttack1_2_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttack1_2_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockAction_Step\", \"Time\":0.5}]"
+
+[P_Eve_Sword_Normal_DashAttack1_2_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Cast3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.3}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockAction_Step\", \"Time\":0.3}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Hit3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.3}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockAction_Step\", \"Time\":0.3}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Hit3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo2_1_Cast1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}, {\"Alias\":\"AddHitDefense_EveSkill\", \"CalculationValue\":2}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_EveSkill\", \"CalculationValue\":2}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo2_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":1}, {\"Alias\":\"BlockMove_Step\", \"Time\":1}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":1}, {\"Alias\":\"BlockAction_Step\", \"Time\":1}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_DashAttackCombo2_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_Evade1_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\",\"Time\":0.1}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"
+
+[P_Eve_Sword_Normal_Evade2_1_Cast1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"NoDamageNoHit_BNSkill\",\"Time\":0.1}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"P_Eve_BlockRangeMode_Step\"}, {\"Alias\":\"P_Eve_Evade_Skill\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack1_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack2_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack3_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.2}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.2}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.2}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.2}, {\"Alias\":\"BlockMove_Step\", \"Time\":0.5}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack3_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack3_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.2}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.2}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.2}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.2}, {\"Alias\":\"BlockMove_Step\", \"Time\":0.5}]"
+
+[P_Eve_Sword_Normal_FinishAttack3_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.7}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.7}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.7}, {\"Alias\":\"BlockAction_Step\", \"Time\":0.7}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.7}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.7}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.7}, {\"Alias\":\"BlockAction_Step\", \"Time\":0.7}]"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack1_1_Hit1_LRotation]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack1_1_Hit1_Lfront]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack1_1_Hit1_Rfront]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack2_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack3_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack4_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockMove_Step\", \"Time\":0.8}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_LightAttack4_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack4_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockMove_Step\", \"Time\":0.8}]"
+
+[P_Eve_Sword_Normal_LightAttack4_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack5_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack5_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack5_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack6_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack6_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack6_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack7_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack7_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack7_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttack8_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttackChain1_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttackChain1_1_Cast3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttackChain1_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttackChain1_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_LightAttackChain1_1_Hit3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack10_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.3}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockMove_Step\", \"Time\":1.6}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack10_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack10_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.3}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.3}, {\"Alias\":\"BlockMove_Step\", \"Time\":1.6}]"
+
+[P_Eve_Sword_Normal_StrongAttack10_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack1_1_Hit1_Lfront]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack1_1_Hit1_Rfront]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack2_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack3_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Cast3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Cast4]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Cast5]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Cast3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Cast4]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Cast5]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.45}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.45}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.45}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.45}, {\"Alias\":\"BlockMove_Step\", \"Time\":1.05}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex_Hit3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.45}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.45}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.45}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.45}, {\"Alias\":\"BlockMove_Step\", \"Time\":0.85}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Hit3]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Cast1]
+CanCutoff = true                                             # false
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Cast1]
+CanCutoff = true                                             # false
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":1.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":1.3}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":1.3}, {\"Alias\":\"BlockAction_Step\", \"Time\":1.3}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":1.3}, {\"Alias\":\"BlockSkill_Step\", \"Time\":1.3}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":1.3}, {\"Alias\":\"BlockAction_Step\", \"Time\":1.3}]"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack7_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockMove_Step\", \"Time\":1.1}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack7_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack7_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Cast2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockMove_Step\", \"Time\":1.3}, {\"Alias\":\"AddHitDefense_EveSkillDispel\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Finish1]
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}]"    # "[{\"Alias\":\"UseSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockSkill_Step\", \"Time\":0.5}, {\"Alias\":\"BlockMove_Step\", \"Time\":1.3}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Hit2]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+
+[P_Eve_Sword_Normal_StrongAttack9_1_Hit1]
+CanCutoff = true                                             # false
+StartSelfEffect = "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockMove_Step\"}]"    # "[{\"Alias\":\"UseSkill_Step\"}, {\"Alias\":\"BlockAction_Step\"}]"
+

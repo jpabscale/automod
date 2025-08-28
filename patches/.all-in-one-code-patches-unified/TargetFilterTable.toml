@@ -1,0 +1,8 @@
+[N_Drone_Normal_Scan1_1_Target_Enemy]
+FarDistance = 30000.0
+TargetCheckValue1 = 3000.0
+
+[N_Drone_Normal_Scan1_1_Target_Owner]
+FarDistance = 30000.0
+TargetCheckValue1 = 3000.0
+

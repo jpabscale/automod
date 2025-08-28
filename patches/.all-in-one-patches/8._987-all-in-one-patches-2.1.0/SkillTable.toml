@@ -1,0 +1,54 @@
+# ...                                                        # Old Value
+[P_Eve_Sword_Burst_SpinAttack1_1]
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"    # "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"
+
+[P_Eve_Sword_Burst_SpinAttack2_1]
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_SpinAttack2_1_Cast1"    # "P_Eve_Sword_Burst_SpinAttack2_1_Cast1"
+
+[P_Eve_Tachy_Start2_1]
+TargetFilterAlias = "P_Eve_Tachy_Start2_1_Target"            # "P_Eve_Tachy_Start2_1_Target"
+
+[P_Eve_Sword_Air_GuardBreakAttack1_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Air_StrongAttack1_1_Cast1"    # "P_Eve_Sword_Air_GuardBreakAttack1_1_Cast1"
+
+[P_Eve_Sword_Air_GuardBreakAttack1_1_Ex]
+FirstSkillActiveAlias = "P_Eve_Fusion_Air_StrongAttack1_1_Cast1"    # "P_Eve_Sword_Air_GuardBreakAttack1_1_Ex_Cast1"
+
+[P_Eve_Sword_Air_LightAttack1_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Air_LightAttack1_1_Cast1"    # "P_Eve_Sword_Air_LightAttack1_1_Cast1"
+
+[P_Eve_Sword_Air_LightAttack2_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Air_LightAttack2_1_Cast1"    # "P_Eve_Sword_Air_LightAttack2_1_Cast1"
+
+[P_Eve_Sword_Air_LightAttack3_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Air_LightAttack3_1_Cast1"    # "P_Eve_Sword_Air_LightAttack3_1_Cast1"
+
+[P_Eve_Sword_Air_LightAttack4_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Skill_ScrewAttack1_1_Cast1"    # "P_Eve_Sword_Air_LightAttack4_1_Cast1"
+
+[P_Eve_Sword_Normal_DashAttack1_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack1_1_Cast1"
+
+[P_Eve_Sword_Normal_DashAttack1_2]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack1_2_Cast1"
+
+[P_Eve_Sword_Normal_DashAttack1_2_Ex]
+FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack1_2_Ex_Cast1"
+
+[P_Eve_Sword_Normal_DashAttack2_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack2_1_Cast1"
+
+[P_Eve_Sword_Normal_DashAttack3_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack3_1_Cast1"
+
+[P_Eve_Sword_Normal_DashAttack4_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttack1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttack4_1_Cast1"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo1_1_Cast1"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex]
+FirstSkillActiveAlias = "P_Eve_Fusion_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo1_1_Ex_Cast1"
+
+[P_Eve_Sword_Normal_DashAttackCombo2_1]
+FirstSkillActiveAlias = "P_Eve_Tachy_Normal_DashAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_DashAttackCombo2_1_Cast1"

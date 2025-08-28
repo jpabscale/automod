@@ -1,0 +1,166 @@
+[Gear_AdditiveFixedDamage_3_MK2]
+CalculationValue = 340.0
+
+[Gear_AdditiveFixedDamage_3_MK2_Damage]
+CalculationValue = 340.0
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_MK2_AtkPwrUp_Melee]
+CalculationValue = 0.7599999904632568
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_MK2_AtkPwrUp_Range]
+CalculationValue = 0.7599999904632568
+
+[Gear_AdditiveGiveAndReciveDamageRate_3_MK2_HitDmgUp_Range]
+CalculationValue = -1.1399999856948853
+
+[Gear_AdditiveSkillDamageGroup5_3_MK2_Beta]
+CalculationValue = 0.23999999463558197
+
+[Gear_AdditiveSkillDamageGroup5_3_MK2_BetaCombo]
+CalculationValue = 0.23999999463558197
+
+[Gear_AdditiveSkillDamageGroup6_3_MK2_Burst]
+CalculationValue = 0.699999988079071
+
+[Gear_AdditiveSkillDamageGroup6_3_MK2_BurstCombo]
+CalculationValue = 0.699999988079071
+
+[Gear_AttackSpeed_3_MK2]
+CalculationValue = 0.36000001430511475
+
+[Gear_BetaCrystalAdditiveRate_3_MK2]
+CalculationValue = 3.0
+
+[Gear_BetaGaugeAdditiveRate_3_MK2]
+CalculationValue = 0.25999999046325684
+
+[Gear_BurstGaugeAdditiveRate_3_MK2]
+CalculationValue = 0.8199999928474426
+
+[Gear_ComboAttackAdditiveDamage_3_MK2_BetaCombo]
+CalculationValue = 0.7200000286102295
+
+[Gear_ComboAttackAdditiveDamage_3_MK2_BurstCombo]
+CalculationValue = 0.7200000286102295
+
+[Gear_ComboAttackAdditiveDamage_3_MK2_Combo]
+CalculationValue = 0.7200000286102295
+
+[Gear_CriticalPercentage_3_MK2]
+CalculationValue = 24.0
+
+[Gear_CriticalPercentage_3_MK2_ForStatViewer]
+CalculationValue = 0.23999999463558197
+
+[Gear_CriticalValueRate_3_MK2]
+CalculationValue = 0.4699999988079071
+
+[Gear_GainBetaGaugeValueOnDamaged_3_MK2]
+CalculationValue = 900.0
+
+[Gear_GainBurstGaugeValueOnDamaged_3_MK2]
+CalculationValue = 1100.0
+
+[Gear_HighHpDamageAdditiveRate_3_MK2]
+CalculationValue = 0.3400000035762787
+
+[Gear_KillEnemyAdditiveDamageRate_3_MK2_Condition]
+CalculationValue = 0.30000001192092896
+
+[Gear_KillEnemyAdditiveDamageRate_3_MK2_Melee]
+CalculationValue = 0.30000001192092896
+
+[Gear_KillEnemyAdditiveDamageRate_3_MK2_Range]
+CalculationValue = 0.30000001192092896
+
+[Gear_KillEnemyHealHP_3_MK2_Condition]
+CalculationValue = 480.0
+
+[Gear_KillEnemyHealHP_3_MK2_Effect]
+CalculationValue = 480.0
+
+[Gear_LowHpDamageAdditiveRate_3_MK2]
+CalculationValue = 0.41999998688697815
+
+[Gear_MaxBurstGauge_3_MK2]
+CalculationValue = 1200.0
+
+[Gear_MaxShield_3_MK2_MaxShield]
+CalculationValue = 900.0
+
+[Gear_MaxShield_3_MK2_Shield]
+CalculationValue = 900.0
+
+[Gear_MaxShield_3_MK2_ShieldRegen]
+CalculationValue = 1.7999999523162842
+
+[Gear_MaxShield_3_MK2_ShieldRegenWhenBattle]
+CalculationValue = 1.7999999523162842
+
+[Gear_MeleeAttackDamageReductionRate_3_MK2]
+CalculationValue = 0.36000001430511475
+
+[Gear_MeleeRangeDamageReductionRate_3_MK2_Melee]
+CalculationValue = 0.23999999463558197
+
+[Gear_MeleeRangeDamageReductionRate_3_MK2_Range]
+CalculationValue = 0.23999999463558197
+
+[Gear_RangeAttackDamageAdditiveRate_3_MK2]
+CalculationValue = 0.23999999463558197
+
+[Gear_RangeAttackDamageReductionRate_3_MK2]
+CalculationValue = 0.41999998688697815
+
+[Gear_SPExpAdditiveRate_3_MK2]
+CalculationValue = 0.6000000238418579
+
+[Gear_ShieldAttackPowerRate_3_MK2]
+CalculationValue = 0.9599999785423279
+
+[Gear_ShieldIgnorePercentage_3_MK2]
+CalculationValue = 0.47999998927116394
+
+[N_Drone_Scan]
+LifeTime = 30.0
+
+[P_Eve_SkillTree_JustEvade_BurstGauge1]
+ActiveTargetFilterAlias = "Self"
+CalculationMultipleValue = 4.0
+LifeTime = 11.0
+LifeType = "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1.0
+LoopTargetFilterAlias = "Self"
+OverlapCount = 1
+StartDelayTime = 1.0
+
+[P_Eve_SkillTree_JustEvade_BurstGauge2]
+ActiveTargetFilterAlias = "Self"
+CalculationMultipleValue = 3.0
+LifeTime = 11.0
+LifeType = "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1.0
+LoopTargetFilterAlias = "Self"
+OverlapCount = 1
+StartDelayTime = 1.0
+
+[P_Eve_SkillTree_JustParry_BetaGauge1]
+ActiveTargetFilterAlias = "Self"
+CalculationMultipleValue = 8.0
+LifeTime = 11.0
+LifeType = "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1.0
+LoopTargetFilterAlias = "Self"
+OverlapCount = 1
+StartDelayTime = 1.0
+
+[P_Eve_SkillTree_JustParry_BetaGauge2]
+ActiveTargetFilterAlias = "Self"
+CalculationMultipleValue = 6.0
+LifeTime = 11.0
+LifeType = "EffectLifeType_IndependentTime"
+LoopIntervalTime = 1.0
+LoopTargetFilterAlias = "Self"
+OverlapCount = 1
+StartDelayTime = 1.0
+

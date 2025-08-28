@@ -1,3 +1,5 @@
+2.2.1: More VSCode fixes. Added automod.bat auto-generation during the first launch. Included all-in-one-patches and all-in-one-code-patches-unified in the main distribution, but disabled by default using names with a leading dot (.).
+
 2.2.0: Cached .uasset JSON to speed up subsequent runs if all of the files in the Paks directory have not been modified (based on each file's last modified time and retoc/UAssetGUI versions). Improved VSCode .config.json handling. Refactored sbmod.sc into separate files.
 
 2.1.1: Made the patch loader to ignore files/folders whose name starts with a dot (.) in the patches directory. Prioritized to use a JSON configuration file for some game and tool information (e.g., usmap URL, UE and modding tool versions, etc.) that can be edited directly/via VSCode settings.

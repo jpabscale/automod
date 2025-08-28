@@ -1,0 +1,12 @@
+[P_Eve_Sword_JustEvade_LightAttack1_1]
+HoldDuration = 0.12
+
+[P_Eve_Sword_JustEvade_StrongAttack1_1]
+HoldDuration = 0.12
+
+[P_Eve_Sword_JustParry_LightAttack1_1]
+HoldDuration = 0.12
+
+[P_Eve_Sword_JustParry_StrongAttack1_1]
+HoldDuration = 0.12
+

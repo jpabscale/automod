@@ -1,0 +1,124 @@
+# ...                                                        # Old Value
+[M_Scarlet_AirDashCut_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1}]"
+
+[M_Scarlet_AirDashCut_Hit4]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
+
+[M_Scarlet_AirDashSpaceCut_Hit1]
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_050_100"     # "Hit_Back_080_300"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"},  {\"Alias\":\"SkillCancel\"}, {\"Alias\":\"Stun\"}, {\"Alias\":\"BlockSkill\", \"Time\":1}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+
+[M_Scarlet_AirDashSpaceCut_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_AirDashSpaceCut_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_AirDashSpaceCut_Hit4]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_AirDashSpaceCut_Hit6]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}]"
+
+[M_Scarlet_BackDashSpaceCut_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.2}]"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}, {\"Alias\":\"SkillCancel\"}, {\"Alias\":\"Stun\"}, {\"Alias\":\"BlockSkill\", \"Time\":1}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+
+[M_Scarlet_BackDashSpaceCut_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.4}]"
+
+[M_Scarlet_BackDashSpaceCut_Hit4]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_BackDashSpaceCut_Hit5]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_BackDashSpaceCut_Hit6]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}]"
+
+[M_Scarlet_BlinkCut_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}, {\"Alias\":\"KnockDownForward_Eve\"}, {\"Alias\":\"KnockDownBackward_Eve\"}]"
+
+[M_Scarlet_BlinkShot_Projectile1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
+
+[M_Scarlet_BlinkShot_Projectile2_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
+
+[M_Scarlet_BlinkShot_Projectile3_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Range\"}, {\"Alias\":\"HitImpactProjectile\"}, {\"Alias\":\"SkillCancel\"}, {\"Alias\":\"Stun\"}, {\"Alias\":\"BlockSkill\", \"Time\":0.5}]"    # "[{\"Alias\":\"SkillDamage_Range\"}, {\"Alias\":\"HitImpactProjectile\"}]"
+
+[M_Scarlet_CounterMoveAttack_Hit1]
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_020"     # "Hit_Back_080_300"
+HitLevelResultTargetDownMoveAlias = "Hit_Back_0"             # "None"
+
+[M_Scarlet_MoveBackShot2_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}, {\"Alias\":\"HitStun\", \"Time\":1}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Light\"}]"
+
+[M_Scarlet_MoveBackShot2_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_MoveBackShot2_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.8}]"
+
+[M_Scarlet_MoveBackShot2_Hit4]
+ResultTargetCommonEffect = "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"},  {\"Alias\":\"SkillCancel\"}, {\"Alias\":\"BlockSkill\", \"Time\":2}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactSlash_Strong\"}]"
+
+[M_Scarlet_MoveBackShot_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":0.8}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_SwingCombo_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.4}]"
+
+[M_Scarlet_SwingCombo_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[M_Scarlet_SwingCombo_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.2}]"
+
+[M_Scarlet_SwingCombo_Hit4]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":1.0}, {\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\", \"startDelayTime\":0.05}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.3}]"
+
+[P_Eve_Sword_Beta_ChainStab1_1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Beta_ChainStab1_1_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"P_Eve_SkillTree_ChainStab_HitStun\", \"Time\":0.5}]"    # ""
+
+[P_Eve_Sword_Beta_ChainStab1_1_Hit3]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
+
+[P_Eve_Sword_Beta_ChainStab1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":0.5}]"
+
+[P_Eve_Sword_Beta_ChainStab1_Ex_Hit8]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
+
+[P_Eve_Sword_Beta_ChargeSlash1_1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
+
+[P_Eve_Sword_Beta_ChargeSlash1_1_Hit2]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":2}]"
+
+[P_Eve_Sword_Beta_ChargeSlash1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.5}]"
+
+[P_Eve_Sword_Beta_ChargeSlash1_Ex_Hit5]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":3.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":2}]"
+
+[P_Eve_Sword_Beta_SwordAura1_Projectile1_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Beta_SwordAura1_Projectile1_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+
+[P_Eve_Sword_Beta_SwordAura1_Projectile2_Ex_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # "[{\"Alias\":\"HitStun\", \"Time\":1.0}]"
+HitLevelResultTargetCommonMoveAlias = "Hit_Back_030_300"     # "None"
+
+[P_Eve_Sword_Beta_SwordAura1_Projectile2_Hit1]
+HitLevelResultTargetCommonEffect = "[{\"Alias\":\"HitStun\", \"Time\":2.0}]"    # ""
+

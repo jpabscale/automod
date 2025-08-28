@@ -1,0 +1,23 @@
+[Player]
+AttackSpeed = 1.5
+DamageReductionPerShieldBock = 0.25
+DrainHpByAttackPowerRate = 0.035
+DrainHpFixedValue = 50
+FishingAttackPower = 100
+MaxBurstGauge = 1800
+ShieldRegenPerSecond = 100
+ShieldRegenPerSecondWhenBattle = 20
+StackBullet1 = 999
+StackBullet2 = 999
+StackBullet3 = 999
+StackBullet4 = 999
+StackBullet5 = 999
+StackBullet6 = 999
+StackConsumable1 = 99
+StackConsumable2 = 99
+StackConsumable3 = 99
+StackConsumable4 = 99
+StackConsumable5 = 99
+StackConsumable6 = 99
+StackConsumable7 = 99
+
