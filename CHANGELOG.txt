@@ -1,3 +1,5 @@
+2.1.0: Added .diff.into command and .code support for .toml. Better patch form check and other improvements.
+
 2.0.1: Fixed a critical bug in VSCode extension.
 
 2.0.0: Added VSCode extension. [sigh, very broken; archived]

@@ -22,7 +22,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 if (!scala.util.Properties.isWin) exit(-1, "This script can only be used in Windows")
 
-val header = s"Stellar Blade Auto Modding Script v2.0.1"
+val header = s"Stellar Blade Auto Modding Script v2.1.0"
 
 def printUsage(): Unit = {
   exit(0,
@@ -30,15 +30,15 @@ def printUsage(): Unit = {
        |
        |Usage: scala-cli sbmod.sc -- [ <mod-name> <path-to-StellarBlade>
        |                             | .code <path-to-jd-patch-file>
-       |                             | .diff <from-path> <to-path> <out-path>
-       |                             | .setup
-       |                             | .setup.vscode [ <path-to-vscode> ]
+       |                             | .diff[.into] <from-path> <to-path> <out-path>
+       |                             | .setup[.vscode [ <path-to-vscode> ]]
        |                             | .toml <out-path>
        |                             | .toml.all <path-to-StellarBlade> <out-path>
        |                             ]
        |
-       |  .code            Print Auto Modding Script patching code from a jd patch file
+       |  .code            Print Auto Modding Script patching code from a jd/TOML patch file
        |  .diff            Recursively diff JSON files and write jd and TOML patch files
+       |  .diff.into       Use .diff between <from-path> with each sub-folder of <to-path>
        |  .setup           Only set up modding tools
        |  .setup.vscode    Set up modding tools and VSCode extensions
        |  .toml            Merge existing patch files in patches as TOML patch files
@@ -143,7 +143,7 @@ def jdPatchTree(path: os.Path): UAssetPatchTree = {
   val grouped = {
     var r = Vector.empty[Vector[String]]
     var i = 0
-    def unrecognized(): Unit = println(s"Unrecognized patch form at line $i (skipped): ${lines(i)}")
+    def unrecognized(): Unit = exit(-1, s"Unsupported patch form at line $i: ${lines(i)}")
     while (i < lines.length) {
       if (lines(i).startsWith(entryPathPrefix) && i + 1 < lines.length) {
         if (lines(i + 1).startsWith("- ")) {
@@ -167,8 +167,7 @@ def jdPatchTree(path: os.Path): UAssetPatchTree = {
           i += 2
         }
       } else {
-        println(s"Unrecognized patch form at line $i (skipped): ${lines(i)}")
-        i += 1
+        exit(-1, s"Unsupported patch form at line $i: ${lines(i)}")
       }
     }
     r
@@ -245,32 +244,33 @@ def jdPatchTree(path: os.Path): UAssetPatchTree = {
   map
 }
 
+def tomlPatchTree(path: os.Path): UAssetPatchTree = {
+  val toml: JMap[String, JMap[String, Object]] =
+    new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, JMap[String, Object]]] {})
+  import scala.jdk.CollectionConverters._
+  var map: UAssetPatchTree = TreeMap.empty
+  for (name <- toml.keySet.asScala) {
+    var m: PropertyMap = TreeMap.empty
+    val properties = toml.get(name)
+    for (property <- properties.keySet.asScala) {
+      val value = properties.get(property)
+      def add(value: String): Unit = 
+        m = m + (property -> ValuePair(if (value.isEmpty) None else Some(value), None))
+      value match {
+        case value: java.lang.Boolean => add(BooleanNode.valueOf(value.booleanValue).toPrettyString)
+        case value: java.lang.Integer => add(IntNode.valueOf(value.intValue).toPrettyString)
+        case value: java.math.BigDecimal => add(DoubleNode.valueOf(value.doubleValue).toPrettyString)
+        case value: String => add(TextNode.valueOf(value).toPrettyString)
+        case _ => exit(-1, s"Unsupported property value form for $name/$property (${value.getClass}): $value")
+      }
+    }
+    map = map + (name -> m)
+  }
+  map
+}
+
 var _patches: PatchTree = null
 def updatePatches(): Unit = {
-  def tomlPatchTree(path: os.Path): UAssetPatchTree = {
-    val toml: JMap[String, JMap[String, String]] =
-      new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, JMap[String, String]]] {})
-    import scala.jdk.CollectionConverters._
-    var map: UAssetPatchTree = TreeMap.empty
-    for (name <- toml.keySet.asScala) {
-      var m: PropertyMap = TreeMap.empty
-      val properties = toml.get(name)
-      for (property <- properties.keySet.asScala) {
-        val value = properties.get(property)
-        val json = value.toIntOption match {
-          case Some(n) => IntNode.valueOf(n)
-          case _ => value.toDoubleOption match {
-            case Some(n) => DoubleNode.valueOf(n)
-            case _ => TextNode.valueOf(value)
-          }
-        }
-        m = m + (property -> ValuePair(if (value.isEmpty) None else Some(json.toPrettyString), None))
-      }
-      map = map + (name -> m)
-    }
-    map
-  }
-
   var map: PatchTree = if (_patches == null) TreeMap.empty else _patches
 
   def add(uassetName: String, data: UAssetPatchTree): Unit = {
@@ -514,10 +514,11 @@ def generateMod(pack: Boolean): () => Unit = () => {
     println()
   }
 
-  def packMod(): os.Path = {
+  def packMod(): os.Path = {  
     val zip = workingDir / s"$argName.zip"
     os.remove.all(zip)
 
+    os.makeDir.all(modDir)
     val utoc = modDir / s"${argName}_P.utoc"
     println(s"Converting to $utoc ...")
     os.proc(retocExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utoc).call(cwd = workingDir)
@@ -529,8 +530,6 @@ def generateMod(pack: Boolean): () => Unit = () => {
 
     zip
   }
-
-  os.makeDir.all(modDir)
 
   val uassetCodeMap = TreeMap(
     // add more/change to uasset patching of interest here, e.g.,
@@ -575,7 +574,10 @@ def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
 }
 
 def code(path: os.Path): Unit = {
-  val map = jdPatchTree(path)
+  val map = path.ext match {
+    case "patch" => jdPatchTree(path)
+    case "toml" => tomlPatchTree(path)
+  } 
 
   val name = {
     val i = path.last.indexOf('.')
@@ -611,8 +613,7 @@ def writeToml(old: Boolean, path: os.Path, data: UAssetPatchTree): Unit = {
     for ((property, valuePair) <- properties) {
       val v = toJsonPrettyString(valuePair.newValueOpt, default = "\"\"")
       if (v(0) == '[' || v(0) == '{') {
-        println(s"Unsupported TOML patch form for $name/$property: $v")
-        return
+        exit(-1, s"Unsupported TOML patch form for $name/$property: $v")
       } else {
         val comment = toJsonPrettyString(valuePair.oldValueOpt, default = "N/A")
         var line = s"$property = $v"
@@ -699,6 +700,7 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
     os.Path(s"${System.getenv("LOCALAPPDATA")}\\Programs\\Microsoft VS Code\\bin\\code.cmd"),
     os.Path("C:\\Program Files\\Microsoft VS Code\\bin\\code.cmd"),
     os.Path("C:\\Program Files (x86)\\Microsoft VS Code\\bin\\code.cmd"),
+    os.Path(s"${System.getenv("LOCALAPPDATA")}\\Programs\\VSCodium\\bin\\codium.cmd"),
     os.Path("C:\\Program Files\\VSCodium\\bin\\codium.cmd")
   )
   for (vsc <- vscOpt) cmds = Vector(vsc / "bin" / "code.cmd", vsc / "bin" / "codium.cmd") ++ cmds
@@ -716,7 +718,7 @@ if (cliArgs.length == 0) printUsage()
 val argName = cliArgs.head
 argName match {
   case ".setup" => if (cliArgs.length != 1) printUsage()
-  case ".diff" => if (cliArgs.length != 4) printUsage()
+  case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
   case ".toml.all" => if (cliArgs.length != 3) printUsage()
   case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
   case _ => if (cliArgs.length != 2) printUsage()
@@ -730,6 +732,9 @@ val setup = setupModTools()
 argName match {
   case ".code" => code(argPath)
   case ".diff" => diff(argPath, absPath(cliArgs(2)), absPath(cliArgs(3)))
+  case ".diff.into" =>
+    val out = absPath(cliArgs(3))
+    for (d <- os.list(absPath(cliArgs(2))) if os.isDir(d)) diff(argPath, d, out / d.last)
   case ".setup" => if (setup) println("All modding tools have been set up")
   case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(argPath) else None)
   case ".toml" => toml(all = false, argPath)()
