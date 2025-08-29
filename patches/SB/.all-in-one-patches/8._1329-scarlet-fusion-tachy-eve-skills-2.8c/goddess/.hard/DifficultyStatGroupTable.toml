@@ -1,6 +1,6 @@
 # based on https://www.nexusmods.com/stellarblade/mods/1156
 
-['=> Multiply HP/SP on objects 17-32 and 301-327 by 6, and object 324 & 327 to 420/420.']
+['=> Multiply HP/SH on objects 17-32 and 301-327 by 6, and object 324 & 327 to 420/420.']
 '=>' = '''{
   v.toIntOption match {
     case Some(n) => (17 <= n && n <= 32) | (301 <= n && n <= 327)

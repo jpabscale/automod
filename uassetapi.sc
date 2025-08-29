@@ -174,6 +174,7 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
   }
 
   def setJson(property: String, value: JsonNode): Option[JsonNode] = {
+    assert(!value.isMissingNode)
     def toEnumPrettyString(enumType: TextNode)(node: JsonNode): JsonNode = TextNode.valueOf(s"${enumType.asText}::${node.asText}")
     val (rOpt, valueOpt) = value match {
       case value: TextNode if value.asText.contains("::") => 

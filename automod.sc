@@ -13,7 +13,8 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val header = s"Auto Modding Script v2.9.2"
+val version = "3.0.0"
+val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
 
@@ -82,20 +83,43 @@ val automodDir = {
   os.Path(file.getCanonicalFile.getAbsolutePath)
 }
 
-val maxLogs = Option(System.getenv("AUTOMOD_MAX_LOGS")).flatMap(_.toDoubleOption.map(Math.ceil(_).toInt)).getOrElse(30)
-
-val noPar = "true" == System.getenv("AUTOMOD_NO_PAR") || osKind.isLinux || osKind.isMac || osKind.isArm
-
 val dataTablePath = "/Exports/0/Table/Data"
 val noCodePatching = "--no-code-patching"
 val dryRun = "--dry-run"
 val includePatches = "--include-patches"
 val ultraCompression = "--ultra-compression"
 
-var cliArgs = args match {
-  case Array("-s", _*) => args.drop(1)
-  case _ => args
+var gameId = "SB"
+var maxLogs = 30
+var noPar = false
+var cliArgs = {
+  var r = args match {
+    case Array("-s", _*) => args.tail
+    case _ => args
+  }
+  var done = false
+  while (!done && r.nonEmpty) {
+    r match {
+      case Array("-g", id, _*) =>
+        gameId = id
+        r = r.drop(2)
+      case Array("-p", _*) =>
+        noPar = true
+        r = r.tail
+      case Array("-l", num, _*) =>
+        num.toIntOption match {
+          case Some(n) if n > 0 => 
+            maxLogs = n
+            r = r.drop(2)
+          case _ => exit(-1, s"$num is not a positive integer")
+        }
+      case _ => done = true
+    }
+  }
+  r
 }
+
+noPar = noPar || osKind.isLinux || osKind.isMac || osKind.isArm
 
 def exit(code: Int, msg: String = null): Nothing = {
   Option(msg).foreach((if (code == 0) Console.out else Console.err).println(_))
@@ -105,40 +129,67 @@ def exit(code: Int, msg: String = null): Nothing = {
 
 val zipToolVersion = "25.01"
 var modExt = "zip"
-val usmapUrlPrefix = "https://github.com/jpabscale/UAssetCLI/releases/download/usmap/"
+val usmapUrlPrefix = "https://github.com/jpabscale/automod/releases/download/usmap/"
 val autoupdateUsmaps = TreeSet[String]()
 
+val sbGameId = "SB"
+val soaGameId = "SandsOfAura"
+
 class Game {
-  @BeanProperty var contentPaks: String = "SB/Content/Paks"
-  @BeanProperty var unrealEngine: String = "4.26"
-  @BeanProperty var mapUri: String = s"${usmapUrlPrefix}StellarBlade_1.3.1.usmap"
   @BeanProperty var aesKey: String = ""
+  @BeanProperty var contentPaks: String = ""
+  @BeanProperty var directory: String = ""
+  @BeanProperty var mapUri: String = ""
   @BeanProperty var repakPackOptions: String = ""
+  @BeanProperty var unrealEngine: String = ""
   @BeanProperty var zen: Boolean = true
 }
 
-val sbGame = new Game
+val sbGame = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = s"$sbGameId/Content/Paks"
+  g.unrealEngine = "4.26"
+  g.mapUri = s"${usmapUrlPrefix}StellarBlade_1.3.2.usmap.7z"
+  g.repakPackOptions = ""
+  g.zen = true
+  g
+}
 val soaGame = {
   val g = new Game
-  g.contentPaks = "SandsOfAura/Content/Paks"
+  g.directory = ""
+  g.contentPaks = s"$soaGameId/Content/Paks"
   g.unrealEngine = "4.25"
-  g.mapUri = s"${usmapUrlPrefix}SandsOfAura_1.01.25.usmap"
+  g.mapUri = s"${usmapUrlPrefix}SandsOfAura_1.01.25.usmap.7z"
   g.repakPackOptions = "--version V11"
   g.zen = false
   g
 }
 
 class Tools {
-  @BeanProperty var retoc: String = "0.1.3-pre.1"
-  @BeanProperty var repak: String = "0.2.3-pre.1"
-  @BeanProperty var uassetCli: String = "1.0.0"
-  @BeanProperty var fmodel: String = "528603e1478b37e306a204629086504410e68312"
+  @BeanProperty var fmodel: String = "17d3586032856efb8d8d892060f8ad0bc0df5628"
   @BeanProperty var jd: String = "2.3.0"
+  @BeanProperty var repak: String = "0.2.3-pre.1"
+  @BeanProperty var retoc: String = "0.1.3-pre.1"
+  @BeanProperty var uassetCli: String = "1.0.0"
 }
 
 class Config {
-  @BeanProperty var game: Game = sbGame
-  @BeanProperty var tools: Tools = new Tools
+  @BeanProperty var games: java.util.TreeMap[String, Game] = null
+  @BeanProperty var tools: Tools = null
+  lazy val game: Game = Option(games.get(gameId)) match {
+    case Some(g) => g
+    case _ => exit(-1, s"Could not find configuration for game identifier: $gameId")
+  }
+}
+
+def initConfig: Config = {
+  val r = new Config
+  r.games = new java.util.TreeMap[String, Game]
+  r.games.put(sbGameId, sbGame)
+  r.games.put(soaGameId, soaGame)
+  r.tools = new Tools
+  r
 }
 
 final case class ValuePair(newValueOpt: Option[JsonNode], oldValueOpt: Option[JsonNode])
@@ -263,22 +314,26 @@ lazy val logDir = {
 val localAppData = if (osKind.isWin) os.Path(System.getenv("LOCALAPPDATA")) else os.home / ".local" / "share"
 val userName = if (osKind.isWin) System.getenv("USERNAME") else os.proc("whoami").call().out.toString.trim
 val config = {
-  var r = new Config
   var ok = true
-  if (os.exists(configPath)) try {
-    r = readConfig(configPath)
+  val r: Config = if (os.exists(configPath)) try {
+    readConfig(configPath)
   } catch {
     case _: Throwable => 
       ok = false
+      initConfig
   } finally {
     if (!ok && os.exists(configPath)) {
       val backup = configPath / os.up / s".config-${getTimestamp()}.json"
       os.move.over(configPath, backup)
       println(s"Could not load $configPath; backed up to ${absPath(backup)}")
+      println()
     }
-  }
+  } else initConfig
   r
 }
+
+val toolsDir = automodDir / "tools"
+val usmapDir = toolsDir / "usmap"
 
 val retocVersion = config.tools.retoc
 val repakVersion = config.tools.repak
@@ -290,9 +345,7 @@ val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
 val usmapUri = config.game.mapUri
-val usmapFilename = usmapUri.substring(usmapUri.lastIndexOf('/') + 1)
-val toolsDir = automodDir / "tools"
-val usmapDir = toolsDir / "usmap"
+val usmapFilename = usmapUri.substring(usmapUri.lastIndexOf('/') + 1, usmapUri.lastIndexOf('.'))
 val usmapPath = usmapDir / usmapFilename
 
 val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
@@ -302,12 +355,14 @@ val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSh
 val jdUrlPrefix = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion"
 val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
 val z7UrlPrefix = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion"
+val vsixUrl = s"https://github.com/jpabscale/automod/releases/download/automod-vsix/automod-vscode-$version.vsix"
 val retocExe = toolsDir / "retoc" / (if (osKind.isWin) "retoc.exe" else "retoc")
 val repakExe = toolsDir / "repak" / (if (osKind.isWin) "repak.exe" else "repak")
 val retocPakExe = if (config.game.zen) retocExe else repakExe
 val fmodelExe = toolsDir / "FModel.exe"
 val jdExe = toolsDir / (if (osKind.isWin) "jd.exe" else "jd")
 val zipExe = toolsDir / "7z" / (if (osKind.isWin) "7z.exe" else "7zz")
+val automodVsix = automodDir / "vscode" / s"automod-vscode-$version.vsix"
 val repakPackOptions: Seq[os.Shellable] = {
   val opts = config.game.repakPackOptions.trim
   if (opts.isEmpty) Vector.empty[os.Shellable]
@@ -321,8 +376,6 @@ val uassetCliDir = toolsDir / "UAssetCLI"
 val uassetGuiSettingsDir = localAppData / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
-
-val gameId = config.game.contentPaks.split('/').head
 val automodGameCacheDir = automodDir / ".cache" / usmapFilename.replace(".usmap", "") / gameId
 val cacheDir = workingDir / ".cache"
 lazy val dotnet = if (os.exists(os.home / ".dotnet" / "dotnet")) absPath(os.home / ".dotnet" / "dotnet") else "dotnet"
@@ -462,7 +515,7 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
       os.proc(zipExe, "x", repakBundle).call(cwd = repakExe / os.up)
     } else {
       os.proc("tar", "xf", repakBundle).call(cwd = toolsDir)
-      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("repack-")) {
+      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("repak_")) {
         os.move.over(p, toolsDir / "repak")
       }
     }
@@ -482,7 +535,10 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
   if (!os.exists(usmapPath)) {
     setup = false
     println(s"Setting up $usmapPath ...")
-    os.move.over(downloadCheck(usmapUri), usmapPath)
+    val f = downloadCheck(usmapUri)
+    os.proc(zipExe, "x", f.last).call(cwd = f / os.up, stdout = os.Inherit, stderr = os.Inherit)
+    os.move.over(f / os.up / usmapFilename, usmapPath)
+    os.remove.all(f)
     println()
   }
 
@@ -525,9 +581,10 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
 
   if (usmapUri.startsWith(usmapUrlPrefix) && (autoupdateUsmaps.contains(usmapPath.baseName) || !os.exists(automodGameCacheDir) && gameDirOpt.isEmpty)) {
     val msg = s"Setting up $automodGameCacheDir ..."
-    download(usmapUri.replace("/usmap/", "/cache/").replace(".usmap", ".7z"), 
+    download(usmapUri.replace("/usmap/", "/cache/").replace(".usmap.7z", ".7z"), 
              if (os.exists(automodGameCacheDir)) Some(msg) else None) match {
       case Some(p) =>
+        setup = false
         if (!os.exists(automodGameCacheDir)) println(msg)
         os.remove.all(automodGameCacheDir) 
         os.proc(zipExe, "x", p).call(cwd = automodDir, stdout = os.Inherit, stderr = os.Inherit)
@@ -536,6 +593,18 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
       case _ =>
     }
     println()
+  }
+
+  if (!os.exists(automodVsix)) {
+    println(s"Setting up $automodVsix ...")
+    download(vsixUrl) match {
+      case Some(p) =>
+        os.makeDir.all(automodVsix / os.up) 
+        os.move.over(p, automodVsix)
+        println()
+      case _ =>
+        exit(-1, s"Could not download $vsixUrl")
+    }
   }
 
   if (!os.exists(configPath) && automodDir.toString == workingDir.toString) writeConfig(config)
@@ -759,12 +828,14 @@ def updatePatches(): Unit = {
               var relPath = p.relativeTo(patchesDir).toString
               if (osKind.isWin) relPath = relPath.replace('/' , '\\')
               map = applyChanges(relPath, map, uassetName, jdFilePatches(p)())
+              logPatch(uassetName, "", console = false)
             case "toml" =>
               val uassetName = p.baseName
               logPatch(uassetName, s"Loading $p ...", console = true)
               var relPath = p.relativeTo(patchesDir).toString
               if (osKind.isWin) relPath = relPath.replace('/' , '\\')
               map = applyChanges(relPath, map, uassetName, tomlFilePatches(p))
+              logPatch(uassetName, "", console = false)
             case _ =>
           }
         }
@@ -804,7 +875,11 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
   for (kfc <- atKfcMap.values) {
     kfc.applyChanges(ast)
   }
-  val data = ast.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
+
+  val data = ast.json[JsonNode].at(dataTablePath) match {
+    case d: ArrayNode => d
+    case _ => return
+  }
   val origData = origAst.json[JsonNode].at(dataTablePath).asInstanceOf[ArrayNode]
   val dataMap = toDataMap(data)
   def updateProperties(obj: uassetapi.Struct, orig: JsonNode, properties: PropertyChanges): Unit = {
@@ -992,12 +1067,14 @@ def generateMod(addToFilePatches: Boolean,
     os.copy.over(retocPakExe, retocPakExeCopy)
 
     println(s"Extracting $uassetFilename ...")
-    val args: Seq[os.Shellable] = if (config.game.zen) Seq[os.Shellable](retocPakExeCopy, "to-legacy", "--no-shaders", "--no-compres-shaders", "--no-parallel", "--version", ueVersionCode, "--filter", uassetFilename, gamePakDir, retocPakCopyDir)
-                                  else {
-                                    var r = Seq[os.Shellable](retocPakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$name.*")
-                                    for (p <- os.list(gamePakDir) if p.ext == "pak") r = r :+ p
-                                    r
-                                  }
+    val args = if (config.game.zen) {
+                 retocPak(retocPakExeCopy, "to-legacy", "--no-shaders", "--no-compres-shaders", "--no-parallel", 
+                          "--version", ueVersionCode, "--filter", uassetFilename, gamePakDir, retocPakCopyDir)
+               } else {
+                  var r = retocPak(retocPakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$name.*")
+                  for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
+                  r
+               }
     val pRetocPak = os.proc(args: _*)
     if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0 || !os.exists(retocPakCopyDir / gameId) || os.walk(retocPakCopyDir / gameId).isEmpty)
       retocPakFailed(s"extract $uassetFilename (double check the .uasset name)", pRetocPak, retocPakCopyDir)
@@ -1245,15 +1322,19 @@ def writeToml(path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[Jso
   os.remove.all(path)
   val uassetName = path.baseName
   val sep = Properties.lineSeparator
+  var isDataTable = true
   val objectMap = origAstOpt match {
     case Some(origAst) =>
-      val map = collection.mutable.HashMap.empty[String, uassetapi.Struct]
-      val array = origAst.at(dataTablePath).asInstanceOf[ArrayNode]
-      for (i <- 0 until array.size) {
-        val o = uassetapi.Struct(uassetName, array.get(i), addToFilePatches = true) 
-        map.put(o.name, o)
+      origAst.at(dataTablePath) match {
+        case array: ArrayNode =>
+          val map = collection.mutable.HashMap.empty[String, uassetapi.Struct]
+          for (i <- 0 until array.size) {
+            val o = uassetapi.Struct(uassetName, array.get(i), addToFilePatches = true) 
+            map.put(o.name, o)
+          }
+          map
+        case _ => isDataTable = false; null
       }
-      map
     case _ => null
   }
   os.write.append(path, s"# ... ${(for (_ <- 0 until oldValueColumn - 7) yield ' ').mkString} # Game Original Value$sep")
@@ -1267,8 +1348,8 @@ def writeToml(path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[Jso
       val old = if (obj == null) None else Option(obj.getJson(property))
       val comment = tomlString(old, default = "N/A")
       var line = s"$property = $v"
-      if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString} # $comment$sep"
-      else line = s"$line    # $comment$sep"
+      if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString}${if (isDataTable) s" # $comment$sep" else ""}"
+      else line = s"$line${if (isDataTable) s"    # $comment$sep" else ""}"
       os.write.append(path, line)
     }
     os.write.append(path, sep)
@@ -1351,9 +1432,8 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
     println(s"Setting up $name using ${absPath(cmd)} ...")
     println()
     val extensions = Vector(
-      "scalameta.metals", 
       "tamasfe.even-better-toml",
-      absPath(automodDir / "vscode" / "automod-vscode.vsix")
+      absPath(automodVsix)
     )
     if (osKind.isWin) {
       os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
@@ -1379,7 +1459,7 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
     os.Path(s"$localAppData\\Programs\\VSCodium\\bin\\codium.cmd"),
     os.Path("C:\\Program Files\\VSCodium\\bin\\codium.cmd")
   ) else if (osKind.isLinux) Vector(
-    os.Path("/usr/bin/code"), os.Path("/usr/bin/codium")
+    os.Path("/usr/bin/code"), os.Path("/usr/bin/codium"), os.Path("/snap/bin/code"), os.Path("/snap/bin/codium")
   ) else if (osKind.isMac) Vector(
     os.home / "Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
     os.home / "Applications/VSCodium.app/Contents/Resources/app/bin/codium",
@@ -1405,10 +1485,9 @@ def execute(p: os.proc): Unit = {
 }
 
 def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
-  val oldConfigOpt = writeConfig({ val c = new Config; c.game = soaGame; c })
   val modName = "all-in-one"
   val modPatches = patchesDir / modName
-  val aioPatches = automodDir / "patches" / "SandsOfAura" / ".all-in-one-patches"
+  val aioPatches = automodDir / "patches" / soaGameId / ".all-in-one-patches"
   os.remove.all(modPatches)
 
   if (!os.exists(patchesDir)) {
@@ -1421,8 +1500,8 @@ def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
   try {
     println()
     gameDirOpt match {
-      case Some(gameDir) => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, gameDir, noCodePatching, includePatches))
-      case _ => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, noCodePatching, includePatches))
+      case Some(gameDir) => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", "-g", soaGameId, modName, gameDir, noCodePatching, includePatches))
+      case _ => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", "-g", soaGameId, modName, noCodePatching, includePatches))
     }
     val src = workingDir / s"$modName.$modExt"
     val dest = workingDir / s"soa-$modName.$modExt"
@@ -1431,14 +1510,13 @@ def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
   } catch {
     case _: Throwable => exit(-1)
   } finally {
-    oldConfigOpt.foreach(writeConfig)
     if (osKind.isWin) execute(os.proc("cmd", "/D", "/C", "rmdir", "/s", "/q", modPatches))
     else execute(os.proc("rm", "-fR", modPatches))
   }
 }
 
 def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Option[os.Path]): Unit = {
-  val oldConfigOpt = writeConfig(new Config)
+  val oldConfigOpt = writeConfig(initConfig)
 
   var modName = if (isAIO) "all-in-one" 
                 else if (isEffect) "effect-table" 
@@ -1452,7 +1530,7 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
     else execute(os.proc("mkdir", patchesDir))
   }
   
-  val aioPatches = automodDir / "patches" / "SB" / ".all-in-one-patches"
+  val aioPatches = automodDir / "patches" / sbGameId / ".all-in-one-patches"
   if (isAIO) {
     val dotAIO = aioPatches / os.up / ".all-in-one-patches-unified"
     if (!os.exists(dotAIO)) exit(-1, s"$dotAIO does not exist")
@@ -1519,17 +1597,6 @@ case class SearchPath(labelOpt: Option[String], path: String)
 case class UAssetSearch(uassetName: String, searchPaths: Vector[SearchPath])
 
 def search(gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path): Unit = {
-  def objectNameOpt(array: ArrayNode): Option[String] = {
-    if (array.size != 1) return None
-    array.get(0) match {
-      case o: ObjectNode => o.get("Name") match {
-        case name: TextNode => return Some(name.textValue)
-        case _ =>
-      }
-      case _ =>
-    }
-    None
-  }
   def isLabelChar(c: Char): Boolean = c == '_' || c == '-' || c.isLetterOrDigit
   def getLabelLineOpt(line: String): Option[(String, String)] = {
     var i = 0
@@ -1573,27 +1640,51 @@ def search(gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path)
   os.makeDir.all(outDir)
 
   for (UAssetSearch(uassetName, paths) <- uassetPaths) {
-    val f = cacheDir / s"$uassetName.json"
+    val f = {
+      val filename = s"$uassetName.json" 
+      var rOpt: Option[os.Path] = None
+      if (os.exists(cacheDir / gameId)) {
+        for (p <- os.walk(cacheDir / gameId) if rOpt.isEmpty && os.isFile(p) && p.last == filename) {
+          rOpt = Some(p)
+        }
+      }
+      if (os.exists(automodGameCacheDir)) {
+        for (p <- os.walk(automodGameCacheDir) if rOpt.isEmpty && os.isFile(p) && p.last == filename) {
+          rOpt = Some(p)
+        }
+      }
+      rOpt match {
+        case Some(r) => r
+        case _ => exit(-1, s"Could not find cached $filename")
+      }
+    }
     val dc = jp.parse(f.toIO)
+    val dcPath = jpPathList.parse(f.toIO)
 
     for (j <- 1 to paths.length) {
       val SearchPath(labelOpt, path) = paths(j - 1)
       try {
         val o = JsonNodeFactory.instance.objectNode
-        val r = dc.read[ArrayNode](path)
+        val array = JsonNodeFactory.instance.arrayNode
+        val rPaths = dcPath.read[ArrayNode](path)
+        for (i <- 0 until rPaths.size) {
+          val rPath = rPaths.get(i)
+          val r = dc.read[ArrayNode](rPath.asText)
+          val o2 = JsonNodeFactory.instance.objectNode
+          o2.set("resolvePath", rPath)
+          o2.set("result", r)
+          array.add(o2)
+        }
         o.set("path", TextNode.valueOf(path))
-        o.set("result", r)
+        o.set("results", array)
         val out = labelOpt match {
           case Some(label) => outDir / s"$uassetName-$j-$label.json"
-          case _ => objectNameOpt(r) match {
-            case Some(name) => outDir / s"$uassetName-$j-$name.json"
-            case _ => outDir / s"$uassetName-$j.json"
-          }
-        } 
+          case _ => outDir / s"$uassetName-$j.json"
+        }
         os.remove.all(out)
         writeJson(out, o)
         println(s"Wrote $out") 
-      }catch {
+      } catch {
         case t: Throwable => 
           println(s"""Could not search $uassetName using path (skipped): $path
                      |  reason: ${t.getMessage}""".stripMargin)
@@ -1606,15 +1697,20 @@ def printUsage(): Nothing = {
   exit(0,
     s"""$header
        |
-       |Usage: automod [-s] [ <mod-name> [ <path-to-game> ] option*
-       |                    | .demo.[sb|soa] [ <path-to-game> ]
-       |                    | .diff[.into] <from-path> <to-path> <out-path>
-       |                    | .search [ <path-to-game> ] <paths-input>.sam <out-path>
-       |                    | .setup[.vscode [ <path-to-vscode> ]]
-       |                    | .toml[.all] [ <path-to-game> ] <out-path>
-       |                    ]
+       |Usage: automod [-s] opt* [ <mod-name> option*
+       |                         | .demo.[sb|soa]
+       |                         | .diff[.into] <from-path> <to-path> <out-path>
+       |                         | .search <paths-input>.sam <out-path>
+       |                         | .setup[.vscode [ <path-to-vscode> ]]
+       |                         | .toml[.all] <out-path>
+       |                         ]
        |
        | -s                   Disable Scala CLI server
+       |
+       |opt:
+       | -g <game-id>         Active game identifier (default: SB)
+       | -l <num>             Maximum task logs to keep (default: 30)
+       | -p                   Disable parallelization
        |
        |option:
        | --dry-run            Disable actual mod generation and just test patches
@@ -1639,21 +1735,24 @@ def checkDirAvailable(p: os.Path): os.Path = if (os.isFile(p)) exit(-1, s"$p is 
 
 def run(): Unit = {
   if (cliArgs.length == 0) printUsage()
+
   val argName = cliArgs.head
-  val hasGameDir: Boolean = argName match {
-    case "" => printUsage(); false
-    case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage(); false
-    case ".toml" | ".toml.all" => if (cliArgs.length == 2) false else if (cliArgs.length == 3) true else printUsage()
-    case ".search" => if (cliArgs.length == 3) false else if (cliArgs.length == 4) true else printUsage()
-    case ".setup" => if (cliArgs.length != 1) printUsage(); false
-    case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage(); false
-    case _ if argName.startsWith(".demo.") => if (cliArgs.length == 1) false else if (cliArgs.length == 2) true else printUsage()
+  argName match {
+    case "" => printUsage()
+    case _ if argName.startsWith(".demo.") => if (cliArgs.length != 1) printUsage()
+    case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
+    case ".search" => if (cliArgs.length != 3) printUsage()
+    case ".setup" => if (cliArgs.length != 1) printUsage()
+    case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
+    case ".toml" | ".toml.all" => if (cliArgs.length != 2) printUsage()
     case _ if argName.head != '.' => cliArgs.length >= 2 && !cliArgs(1).startsWith("--")
-    case _ => if (cliArgs.length != 2) printUsage(); false
+    case _ => printUsage()
   }
 
-  lazy val gameDir = absPath(cliArgs(1))
-  val (gamePakDirOpt, gameDirOpt, next) = if (hasGameDir) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 2) 
+  if (!config.game.contentPaks.startsWith(s"$gameId/")) exit(-1, s"Invalid configuration for $gameId's contentPaks: ${config.game.contentPaks}")
+
+  val gameDir = absPath(config.game.directory)
+  val (gamePakDirOpt, gameDirOpt, next) = if (config.game.directory.nonEmpty) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 1) 
                                           else (None, None, 1)
   println(header)
   println(

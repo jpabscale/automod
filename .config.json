@@ -1,17 +1,29 @@
 {
-  "game" : {
-    "contentPaks" : "SB/Content/Paks",
-    "unrealEngine" : "4.26",
-    "mapUri" : "https://github.com/jpabscale/UAssetCLI/releases/download/usmap/StellarBlade_1.3.1.usmap",
-    "aesKey" : "",
-    "repakPackOptions" : "",
-    "zen" : true
+  "games" : {
+    "SB" : {
+      "aesKey" : "",
+      "contentPaks" : "SB/Content/Paks",
+      "directory" : "",
+      "mapUri" : "https://github.com/jpabscale/automod/releases/download/usmap/StellarBlade_1.3.2.usmap.7z",
+      "repakPackOptions" : "",
+      "unrealEngine" : "4.26",
+      "zen" : true
+    },
+    "SandsOfAura" : {
+      "aesKey" : "",
+      "contentPaks" : "SandsOfAura/Content/Paks",
+      "directory" : "",
+      "mapUri" : "https://github.com/jpabscale/automod/releases/download/usmap/SandsOfAura_1.01.25.usmap.7z",
+      "repakPackOptions" : "--version V11",
+      "unrealEngine" : "4.25",
+      "zen" : false
+    }
   },
   "tools" : {
-    "retoc" : "0.1.3-pre.1",
+    "fmodel" : "17d3586032856efb8d8d892060f8ad0bc0df5628",
+    "jd" : "2.3.0",
     "repak" : "0.2.3-pre.1",
-    "uassetCli" : "1.0.0",
-    "fmodel" : "528603e1478b37e306a204629086504410e68312",
-    "jd" : "2.3.0"
+    "retoc" : "0.1.3-pre.1",
+    "uassetCli" : "1.0.0"
   }
 }

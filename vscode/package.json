@@ -1,0 +1,198 @@
+{
+  "name": "automod-vscode",
+  "displayName": "automod-vscode",
+  "description": "VSCode extension for Auto Modding Script",
+  "version": "3.0.0",
+  "publisher": "jpabscale",
+  "icon": "images/automod.png",
+  "private": true,
+  "license": "",
+  "repository": {},
+  "engines": {
+    "vscode": "^1.92.2"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [ "onStartupFinished", "workspaceContains:*" ],
+  "contributes": {
+    "configuration": [
+      {
+        "title": "automod",
+        "properties": {
+          "automod.general": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { 
+               "Installation Directory": {
+                 "type": "string",
+                 "description": "Automod installation directory path"
+               },
+               "No Parallelization": {
+                 "type": "boolean",
+                 "description": "Disable parallelization"
+               },
+               "Max Logs": {
+                 "type": "integer",
+                 "description": "Maximum task logs to keep"
+               },
+               "Scala CLI Server": {
+                "type": "boolean",
+                "description": "Use Scala CLI Server"
+               },
+               "Active Game ID": {
+                "type": "string",
+                "description": "The game identifier for the mod (i.e., the game folder name containing Content\\Paks; default: SB)"
+               }
+            },
+            "default": {
+              "Installation Directory": "",
+              "No Parallelization": false,
+              "Max Logs": 30,
+              "Scala CLI Server": true,
+              "Active Game ID": ""
+            },
+            "scope": "resource"
+          },
+          "automod.modGeneration": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { 
+               "Mod Name": {
+                 "type": "string",
+                 "description": "Mod name"
+               },
+               "No Code Patching": {
+                 "type": "boolean",
+                 "description": "Disable code patching"
+               },
+               "Dry Run": {
+                 "type": "boolean",
+                 "description": "Test patches without generating the mod"
+               },
+               "Include Patches": {
+                "type": "boolean",
+                "description": "Include patches when generating the mod"
+               },
+               "Ultra Compression": {
+                "type": "boolean",
+                "description": "Use 7z ultra compression"
+               }
+            },
+            "default": {
+              "Mod Name": "",
+              "No Code Patching": false,
+              "Dry Run": false,
+              "Include Patches": false,
+              "Ultra Compression": false
+            },
+            "scope": "resource"
+          },
+          "automod.games": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {
+            },
+            "scope": "resource"
+          },
+          "automod.tools": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { 
+               "retoc": {
+                 "type": "string",
+                 "description": "retoc version"
+               },
+               "repak": {
+                 "type": "string",
+                 "description": "repak version"
+               },
+               "uassetCli": {
+                 "type": "string",
+                 "description": "UAssetCLI version"
+               },
+               "jd": {
+                 "type": "string",
+                 "description": "jd version"
+               },
+               "fmodel": {
+                 "type": "string",
+                 "description": "FModel sha"
+               }
+            },
+            "default": {
+              "retoc": "",
+              "repak": "",
+              "uassetCli": "",
+              "jd": "",
+              "fmodel": ""
+            },
+            "scope": "resource"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "automod.config.import",
+        "title": "automod .config.json import"
+      },
+      {
+        "command": "automod.diff",
+        "title": "automod .diff"
+      },
+      {
+        "command": "automod.diff.into",
+        "title": "automod .diff.into"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "filesExplorerFocus && foldersViewVisible && explorerResourceIsFolder",
+          "command": "automod.diff",
+          "alt": "",
+          "group": "navigation"
+        },
+        {
+          "when": "filesExplorerFocus && foldersViewVisible && explorerResourceIsFolder",
+          "command": "automod.diff.into",
+          "alt": "",
+          "group": "navigation"
+        }
+      ]
+    },
+    "taskDefinitions": [
+      {
+        "type": "automod",
+        "when": "shellExecutionSupported",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "prebuild": "npm install",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint \"src/**/*.ts\"",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/vscode": "^1.92.0",
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
+    "eslint": "^9.9.1",
+    "typescript": "^5.5.4"
+  }
+}

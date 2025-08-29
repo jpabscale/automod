@@ -1,10 +1,13 @@
 .bsp
 .cache
+.log
 .metals
 .scala-build
+.temp
 .vscode
 tools
 node_modules
 out
 *.tsbuildinfo
 *.vsix
+*.zip
