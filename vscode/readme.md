@@ -1,4 +1,8 @@
-https://github.com/jpabscale/automod
+Website: https://jpabscale.github.io/automod
+
+Source: https://github.com/jpabscale/automod
+
+----
 
 Copyright (c) 2025, jpabscale
 

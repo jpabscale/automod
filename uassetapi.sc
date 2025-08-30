@@ -154,6 +154,26 @@ def fromValue(v: Any): JsonNode = {
   }
 }
 
+def objSetJson(addToFilePatches: Boolean, uassetName: String, name: String, o: ObjectNode, property: String, value: JsonNode): Option[JsonNode] = {
+  assert(!value.isMissingNode)
+  def toEnumPrettyString(enumType: TextNode)(node: JsonNode): JsonNode = TextNode.valueOf(s"${enumType.asText}::${node.asText}")
+  val (rOpt, valueOpt) = value match {
+    case value: TextNode if value.asText.contains("::") => 
+      var text = value.asText
+      val enumType = TextNode.valueOf(text.substring(0, text.indexOf("::")))
+      val oldEnumOpt = Option(o.replace("EnumType", enumType)).map(_.toPrettyString)
+      val newValue = TextNode.valueOf(text.substring(text.indexOf("::") + 2))
+      val oldValueOpt = Option(o.replace("Value", newValue))
+      (oldValueOpt, Some(toEnumPrettyString(enumType)(newValue)))
+    case _ =>
+      val oldValueOpt = Option(o.replace("Value", value))  
+      (oldValueOpt, Option(value))
+  }
+  automod.logPatch(uassetName, s"* $name/$property: ${automod.toJsonPrettyString(rOpt)} => ${automod.toJsonPrettyString(valueOpt)}", console = false)
+  if (addToFilePatches) automod.updatePatch(uassetName, name, property, automod.ValuePair(valueOpt, rOpt))
+  rOpt
+}
+
 case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean) {
   var objectMap: HashMap[String, ObjectNode] = {
     var r = HashMap.empty[String, ObjectNode]
@@ -173,25 +193,8 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
     }
   }
 
-  def setJson(property: String, value: JsonNode): Option[JsonNode] = {
-    assert(!value.isMissingNode)
-    def toEnumPrettyString(enumType: TextNode)(node: JsonNode): JsonNode = TextNode.valueOf(s"${enumType.asText}::${node.asText}")
-    val (rOpt, valueOpt) = value match {
-      case value: TextNode if value.asText.contains("::") => 
-        var text = value.asText
-        val enumType = TextNode.valueOf(text.substring(0, text.indexOf("::")))
-        val oldEnumOpt = Option(obj(property).replace("EnumType", enumType)).map(_.toPrettyString)
-        val newValue = TextNode.valueOf(text.substring(text.indexOf("::") + 2))
-        val oldValueOpt = Option(obj(property).replace("Value", newValue))
-        (oldValueOpt, Some(toEnumPrettyString(enumType)(newValue)))
-      case _ =>
-        val oldValueOpt = Option(obj(property).replace("Value", value))  
-        (oldValueOpt, Option(value))
-    }
-    automod.logPatch(uassetName, s"* $name/$property: ${automod.toJsonPrettyString(rOpt)} => ${automod.toJsonPrettyString(valueOpt)}", console = false)
-    if (addToFilePatches) automod.updatePatch(uassetName, name, property, automod.ValuePair(valueOpt, rOpt))
-    rOpt
-  }
+  def setJson(property: String, value: JsonNode): Option[JsonNode] =
+    objSetJson(addToFilePatches, uassetName, name, obj(property), property, value)
   
   def set(name: String, value: Boolean): Boolean = setJson(name, BooleanNode.valueOf(value)).map(_.asBoolean).getOrElse(false)
   def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).map(_.asInt).getOrElse(0)

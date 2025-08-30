@@ -313,14 +313,10 @@ case class AtFilteredChanges(addToFilePatches: Boolean,
       if (node.isMissingNode) automod.exit(-1, s"Could not find $uassetName's path: $path")
       Seq((node, orig.json[JsonNode].at(path)))
     } else if (path.head == '$') {
-      def checkStruct(o: JsonNode): Boolean = o match {
-        case o: ObjectNode => Option(o.get("Value")).map(_.isArray).getOrElse(false)
-        case _ => false
-      }
       try {
         val array = ast.read[ArrayNode](path)
         val origArray = orig.read[ArrayNode](path)
-        for (i <- 0 until array.size if checkStruct(array.get(i))) yield (array.get(i), origArray.get(i))
+        for (i <- 0 until array.size if array.get(i).isInstanceOf[ObjectNode]) yield (array.get(i), origArray.get(i))
       } catch {
         case t: Throwable => automod.exit(-1, 
           s"""Failed to search $uassetName path: $path
@@ -331,8 +327,16 @@ case class AtFilteredChanges(addToFilePatches: Boolean,
     }
     if (nodes.isEmpty) automod.exit(-1, s"Could not find objects for $uassetName: $path")
     for ((node, orig) <- nodes) {
-      if (!node.get("Value").isInstanceOf[ArrayNode]) automod.exit(-1, s"$uassetName @$path is not a UAssetAPI's struct")
-      applyPathChanges(path, node, orig)
+      if (node.get("Value").isInstanceOf[ArrayNode]) applyPathChanges(path, node, orig)
+      else node match {
+        case node: ObjectNode =>
+          for ((property, valuePair) <- changes) Option(node.get(property)) match {
+            case Some(old) => 
+              uassetapi.objSetJson(addToFilePatches, uassetName, path, node, property, valuePair.newValueOpt.get)
+            case _ => automod.exit(-1, s"$uassetName @$path does not have the property: $property")
+          }
+        case _ => automod.exit(-1, s"$uassetName @$path is neither a UAssetAPI's struct nor a JSON object node")
+      }
     }
   }
 }

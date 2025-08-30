@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val version = "3.0.0"
+val version = "3.0.1"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -345,8 +345,12 @@ val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
 val usmapUri = config.game.mapUri
-val usmapFilename = usmapUri.substring(usmapUri.lastIndexOf('/') + 1, usmapUri.lastIndexOf('.'))
-val usmapPath = usmapDir / usmapFilename
+val usmapFilename = { 
+  var r = usmapUri.substring(usmapUri.lastIndexOf('/') + 1, usmapUri.length)
+  if (r.endsWith(".7z")) r = r.substring(0, r.lastIndexOf('.'))
+  r
+}
+val usmapPath = usmapDir / (if (usmapFilename == "Mappings.usmap") s"$gameId.usmap" else usmapFilename)
 
 val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
 val repakUrlPrefix = s"https://github.com/jpabscale/repak/releases/download/v$repakVersion"
@@ -536,14 +540,14 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     setup = false
     println(s"Setting up $usmapPath ...")
     val f = downloadCheck(usmapUri)
-    os.proc(zipExe, "x", f.last).call(cwd = f / os.up, stdout = os.Inherit, stderr = os.Inherit)
+    if (f.ext == "7z") os.proc(zipExe, "x", f.last).call(cwd = f / os.up, stdout = os.Inherit, stderr = os.Inherit)
     os.move.over(f / os.up / usmapFilename, usmapPath)
     os.remove.all(f)
     println()
   }
 
   {
-    val dest = uassetGuiMappingsDir / usmapFilename
+    val dest = uassetGuiMappingsDir / usmapPath.last
     if (!os.exists(dest)) {
       setup = false
       os.makeDir.all(uassetGuiMappingsDir)
@@ -1086,7 +1090,7 @@ def generateMod(addToFilePatches: Boolean,
       else if (p.last == uexpFilename) {}
       else os.remove(p)
 
-    assert(uasset != null)
+    if (uasset == null) retocPakFailed(s"extract $uassetFilename (no result)", pRetocPak, retocPakCopyDir)
     val relPath = uasset.relativeTo(retocPakCopyDir)
     val jsonRelPath = relPath / os.up / s"${relPath.baseName}.json"
     jsonCache = cacheDir / jsonRelPath
