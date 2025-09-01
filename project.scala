@@ -2,10 +2,9 @@
 //> using javaOptions --enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow
 //> using scala 2.13.16
 //> using options --deprecation -feature -language:implicitConversions
-//> using repository jitpack
 //> using dep com.fasterxml.jackson.core:jackson-databind:2.20.0
 //> using dep com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.20.0
-//> using dep com.github.jpabscale.luaj:luaj-jse:1.0.0
+//> using jar lib/luaj-jse-1.0.0.jar
 //> using dep com.jayway.jsonpath:json-path:2.9.0
 //> using dep org.apache.bcel:bcel:6.10.0
 //> using dep org.graalvm.polyglot:js:24.2.2

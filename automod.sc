@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.1.0"
+var version = "3.1.1"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -167,7 +167,7 @@ val soaGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "17d3586032856efb8d8d892060f8ad0bc0df5628"
+  @BeanProperty var fmodel: String = "d3f93021c66b8861c2f8415cf182c6296864cb18"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
   @BeanProperty var retoc: String = "0.1.3-pre.1"
@@ -1883,12 +1883,15 @@ def run(): Unit = {
     println(s"Backing up $automodDir ...")
     os.makeDir.all(backup)
     for (path <- os.list(automodDir) if path.last != ".backup") {
-      os.move.over(path, backup / path.last)
+      if (path.last == "lib") {
+        os.copy.over(path, backup / path.last)
+        for (p <- os.list(path)) p.toIO.deleteOnExit()
+      } else os.move.over(path, backup / path.last)
     }
     println()
     
-    for (path <- os.list(temp); p <- os.list(path)) os.move.over(p, automodDir / p.last)
-  
+    for (path <- os.list(temp); p <- os.list(path)) os.copy.over(p, automodDir / p.last)
+
     init(gameDirOpt)
   
     if (os.isFile(setupVscodeDir)) {

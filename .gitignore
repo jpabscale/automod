@@ -1,3 +1,4 @@
+.backup
 .bsp
 .cache
 .log
@@ -5,6 +6,7 @@
 .scala-build
 .temp
 .vscode
+lib
 tools
 node_modules
 out

@@ -200,11 +200,7 @@ async function settingAutomodGames(merge: boolean, value: Games | undefined = un
   return r;
 }
 
-async function getConfigFileContent(workspaceOnly: boolean): Promise<string | undefined> {
-  const configPath = await getConfigPath(workspaceOnly);
-  if (!configPath) {
-    return undefined;
-  }
+async function readFile(configPath: string): Promise<string | undefined> {
   try {
     return new TextDecoder('utf-8').decode(await vscode.workspace.fs.readFile(vscode.Uri.file(configPath)));
   } catch {
@@ -212,15 +208,25 @@ async function getConfigFileContent(workspaceOnly: boolean): Promise<string | un
   }
 }
 
+async function getConfigFileContent(workspaceOnly: boolean): Promise<string | undefined> {
+  const configPath = await getConfigPath(workspaceOnly);
+  if (!configPath) {
+    return undefined;
+  }
+  return await readFile(configPath);
+}
+
 async function loadConfigH(merge: boolean, configPath: string): Promise<boolean> {
   try {
-    const content = await getConfigFileContent(false);
+    const content = await readFile(configPath);
     if (!content) return false;
     const config = JSON.parse(content) as Config;
     await settingAutomodGames(merge, config.games);
     await settingAutomodTools(config.tools);
+    if (merge) vscode.window.showInformationMessage(`Successfully imported ${configPath}`)
     return true;
   } catch {
+    vscode.window.showInformationMessage(`Could not import ${configPath}`)
     return false
   }
 }
@@ -246,6 +252,11 @@ async function getConfigString(): Promise<string | undefined> {
   return config? JSON.stringify(config, null, "  ") : undefined;
 }
 
+async function writeFile(path: string, content: string) {
+  await vscode.workspace.fs.writeFile(vscode.Uri.file(path), new TextEncoder().encode(content));
+  await vscode.commands.executeCommand("workbench.files.action.refreshFilesExplorer");
+}
+
 async function updateConfig() {
   if (!getWorkspacePath()) return;
   const configInFile = (await getConfigFileContent(true))!;
@@ -263,12 +274,10 @@ async function updateConfig() {
           return; 
         }
       }
-      await vscode.workspace.fs.writeFile(vscode.Uri.file(configPath), 
-         new TextEncoder().encode(JSON.stringify(currentConfig, null, "  ")));
+      await writeFile(configPath, JSON.stringify(currentConfig, null, "  "));
     }
   } else {
-    await vscode.workspace.fs.writeFile(vscode.Uri.file(configPath), 
-      new TextEncoder().encode(JSON.stringify(currentConfig, null, "  ")));
+    await writeFile(configPath, JSON.stringify(currentConfig, null, "  "));
     vscode.window.showInformationMessage(`Wrote updated .config.json`);
   }
 }
@@ -303,11 +312,10 @@ function getOutputDir(): string {
 }
 
 async function getCommandPrefix(): Promise<string[]> {
-  const r: string[] = [ "scala-cli", "--suppress-outdated-dependency-warning" ];
-  const setting = await settingAutomod();
-  if (!setting["Scala CLI Server"]) r.push("--server=false");
   const automodDir = await getAutomodDir();
-  r.push(`${automodDir}${fsep}project.scala`, "--");
+  const r: string[] = [ isWindows? `${automodDir}\\automod.cmd` : `${automodDir}/automod` ];
+  const setting = await settingAutomod();
+  if (!setting["Scala CLI Server"]) r.push("-s");
   if (setting["Active Game ID"].length > 0) {
     r.push("-g");
     r.push(setting["Active Game ID"]);
