@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-val version = "3.0.1"
+var version = "3.1.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -302,15 +302,21 @@ def absPath(p: os.Path): String = p.toString
 def absPath(p: String): os.Path = os.Path(new java.io.File(p).getCanonicalFile.getAbsolutePath)
 
 val workingDir = os.pwd
-val patchesDir = workingDir / "patches"
+var patchesDir = workingDir / "patches"
 val configPath = workingDir / ".config.json"
-lazy val logDir = {
-  val d = workingDir / ".log"
-  os.makeDir.all(d)
-  for (p <- os.list(d).filter(os.isDir).sortWith((p1, p2) => p1.toIO.lastModified >= p2.toIO.lastModified).drop(maxLogs)) 
-    os.remove.all(p)
-  d / s"${cliArgs.head}-${getTimestamp()}"
+def getLogDir(relOpt: Option[String]): os.Path = {
+  relOpt match {
+    case Some(rel) => 
+      logDir / rel
+    case _ =>
+      var d = workingDir / ".log"
+      os.makeDir.all(d)
+      for (p <- os.list(d).filter(os.isDir).sortWith((p1, p2) => p1.toIO.lastModified >= p2.toIO.lastModified).drop(maxLogs)) 
+      os.remove.all(p)
+      d / (if (cliArgs.nonEmpty) s"${cliArgs.head}-${getTimestamp()}" else s"${getTimestamp()}")
+  }
 }
+var logDir = getLogDir(None)
 val localAppData = if (osKind.isWin) os.Path(System.getenv("LOCALAPPDATA")) else os.home / ".local" / "share"
 val userName = if (osKind.isWin) System.getenv("USERNAME") else os.proc("whoami").call().out.toString.trim
 val config = {
@@ -350,7 +356,7 @@ val usmapFilename = {
   if (r.endsWith(".7z")) r = r.substring(0, r.lastIndexOf('.'))
   r
 }
-val usmapPath = usmapDir / (if (usmapFilename == "Mappings.usmap") s"$gameId.usmap" else usmapFilename)
+val usmapPath = usmapDir / (if (usmapFilename.isEmpty || usmapFilename == "Mappings.usmap") s"$gameId.usmap" else usmapFilename)
 
 val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
 val repakUrlPrefix = s"https://github.com/jpabscale/repak/releases/download/v$repakVersion"
@@ -359,14 +365,14 @@ val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSh
 val jdUrlPrefix = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion"
 val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
 val z7UrlPrefix = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion"
-val vsixUrl = s"https://github.com/jpabscale/automod/releases/download/automod-vsix/automod-vscode-$version.vsix"
+def vsixUrl = s"https://github.com/jpabscale/automod/releases/download/automod-vsix/automod-vscode-$version.vsix"
 val retocExe = toolsDir / "retoc" / (if (osKind.isWin) "retoc.exe" else "retoc")
 val repakExe = toolsDir / "repak" / (if (osKind.isWin) "repak.exe" else "repak")
 val retocPakExe = if (config.game.zen) retocExe else repakExe
 val fmodelExe = toolsDir / "FModel.exe"
 val jdExe = toolsDir / (if (osKind.isWin) "jd.exe" else "jd")
 val zipExe = toolsDir / "7z" / (if (osKind.isWin) "7z.exe" else "7zz")
-val automodVsix = automodDir / "vscode" / s"automod-vscode-$version.vsix"
+def automodVsix = automodDir / "vscode" / s"automod-vscode-$version.vsix"
 val repakPackOptions: Seq[os.Shellable] = {
   val opts = config.game.repakPackOptions.trim
   if (opts.isEmpty) Vector.empty[os.Shellable]
@@ -380,8 +386,10 @@ val uassetCliDir = toolsDir / "UAssetCLI"
 val uassetGuiSettingsDir = localAppData / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
-val automodGameCacheDir = automodDir / ".cache" / usmapFilename.replace(".usmap", "") / gameId
+val automodGameCacheDir = automodDir / ".cache" / (if (usmapFilename.nonEmpty) usmapFilename.replace(".usmap", "") else gameId) / gameId
 val cacheDir = workingDir / ".cache"
+val tempDir = localAppData / "Temp" / "automod"
+val setupVscodeDir = tempDir / ".setup.vscode.dir"
 lazy val dotnet = if (os.exists(os.home / ".dotnet" / "dotnet")) absPath(os.home / ".dotnet" / "dotnet") else "dotnet"
 
 val discardProcessOutput = new os.ProcessOutput {
@@ -389,68 +397,68 @@ val discardProcessOutput = new os.ProcessOutput {
   def processOutput(out: => os.SubProcess.OutputStream): Option[Runnable] = None
 }
 
+def sha256(path: os.Path, length: Int = 64): String =
+  java.security.MessageDigest.getInstance("SHA-256").digest(os.read.bytes(path)).
+    take(length).map(String.format("%02x", _)).mkString 
+
+def download(uri: String, sha256TitleOpt: Option[String] = None): Option[os.Path] = {
+  os.makeDir.all(tempDir)
+  val cacheName = java.util.Base64.getEncoder().encodeToString(uri.getBytes(java.nio.charset.StandardCharsets.UTF_8))
+  val cachePath = tempDir / cacheName
+  val dest = toolsDir / uri.substring(uri.lastIndexOf('/') + 1)
+  var redownload = !os.exists(cachePath)
+  val cacheSha256Path = tempDir / s"$cacheName.sha256"
+  val (cacheSha256LastModified, cached) = if (os.exists(cacheSha256Path)) (cacheSha256Path.toIO.lastModified, os.read(cacheSha256Path))
+                                          else (0L, "")
+  val dayMillis = 86400000
+  if (sha256TitleOpt.nonEmpty && System.currentTimeMillis - cacheSha256LastModified > dayMillis * 7) {
+    println(s"Checking for updated $uri ...")
+    download(s"$uri.sha256") match {
+      case Some(p) =>
+        println()
+        val pValue = os.read(p)
+        os.remove.all(p)
+        if (pValue != cached) {
+          redownload = true
+          os.write.over(cacheSha256Path, pValue)
+        }
+      case _ => println()
+    }
+  }
+  if (cachePath.toIO.length <= 1024) {
+    redownload = true
+  }
+  if (redownload) {
+    sha256TitleOpt.foreach(println)
+    os.remove.all(cachePath)
+    if (uri.startsWith("https://")) os.proc("curl", "-JLo", cachePath, uri).call(cwd = toolsDir, stdout = os.Inherit, stderr = os.Inherit)
+    else if (uri.startsWith("file://")) os.copy.over(os.Path(new java.io.File(new java.net.URI(uri)).getCanonicalFile.getAbsolutePath), cachePath)
+    else if (os.exists(automodDir / os.RelPath(uri))) os.copy.over(automodDir / os.RelPath(uri), cachePath)
+  } else {
+    if (sha256TitleOpt.nonEmpty) return None
+  }
+  if (cachePath.toIO.length == 9) {
+    os.remove.all(cachePath)
+    return None
+  }
+  if (os.exists(cachePath)) os.copy.over(cachePath, dest)
+  if (os.exists(dest)) Some(dest) else None
+}
+
+def downloadCheck(uri: String): os.Path = {
+  download(uri) match {
+    case Some(p) => p
+    case _ => exit(-1, s"Could not set up from $uri")
+  }
+}
+
 def init(gameDirOpt: Option[os.Path]): Boolean = {
   var setup = true
 
-  val tempDir = localAppData / "Temp" / "automod"
   os.makeDir.all(tempDir)
   os.write.over(tempDir / ".automod.dir", automodDir.toString)
   
   os.makeDir.all(usmapDir)
-
-  def sha256(path: os.Path, length: Int = 64): String =
-    java.security.MessageDigest.getInstance("SHA-256").digest(os.read.bytes(path)).
-      take(length).map(String.format("%02x", _)).mkString
-
-  def download(uri: String, sha256TitleOpt: Option[String] = None): Option[os.Path] = {
-    val cacheName = java.util.Base64.getEncoder().encodeToString(uri.getBytes(java.nio.charset.StandardCharsets.UTF_8))
-    val cachePath = tempDir / cacheName
-    val dest = toolsDir / uri.substring(uri.lastIndexOf('/') + 1)
-    var redownload = !os.exists(cachePath)
-    val cacheSha256Path = tempDir / s"$cacheName.sha256"
-    val (cacheSha256LastModified, cached) = if (os.exists(cacheSha256Path)) (cacheSha256Path.toIO.lastModified, os.read(cacheSha256Path))
-                                            else (0L, "")
-    val dayMillis = 86400000
-    if (sha256TitleOpt.nonEmpty && System.currentTimeMillis - cacheSha256LastModified > dayMillis * 7) {
-      println(s"Checking for updated $uri ...")
-      download(s"$uri.sha256") match {
-        case Some(p) =>
-          println()
-          val pValue = os.read(p)
-          os.remove.all(p)
-          if (pValue != cached) {
-            redownload = true
-            os.write.over(cacheSha256Path, pValue)
-          }
-        case _ => println()
-      }
-    }
-    if (cachePath.toIO.length <= 1024) {
-      redownload = true
-    }
-    if (redownload) {
-      sha256TitleOpt.foreach(println)
-      os.remove.all(cachePath)
-      if (uri.startsWith("https://")) os.proc("curl", "-JLo", cachePath, uri).call(cwd = toolsDir, stdout = os.Inherit, stderr = os.Inherit)
-      else if (uri.startsWith("file://")) os.copy.over(os.Path(new java.io.File(new java.net.URI(uri)).getCanonicalFile.getAbsolutePath), cachePath)
-      else if (os.exists(automodDir / os.RelPath(uri))) os.copy.over(automodDir / os.RelPath(uri), cachePath)
-    } else {
-      if (sha256TitleOpt.nonEmpty) return None
-    }
-    if (cachePath.toIO.length == 9) {
-      os.remove.all(cachePath)
-      return None
-    }
-    if (os.exists(cachePath)) os.copy.over(cachePath, dest)
-    if (os.exists(dest)) Some(dest) else None
-  }
-
-  def downloadCheck(uri: String): os.Path = {
-    download(uri) match {
-      case Some(p) => p
-      case _ => exit(-1, s"Could not set up from $uri")
-    }
-  }
 
   if (!os.exists(zipExe)) {
     setup = false
@@ -597,18 +605,6 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
       case _ =>
     }
     println()
-  }
-
-  if (!os.exists(automodVsix)) {
-    println(s"Setting up $automodVsix ...")
-    download(vsixUrl) match {
-      case Some(p) =>
-        os.makeDir.all(automodVsix / os.up) 
-        os.move.over(p, automodVsix)
-        println()
-      case _ =>
-        exit(-1, s"Could not download $vsixUrl")
-    }
   }
 
   if (!os.exists(configPath) && automodDir.toString == workingDir.toString) writeConfig(config)
@@ -1430,32 +1426,46 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
         |${errors.mkString(Properties.lineSeparator)}""".stripMargin)
 }
 
-def vscode(vscOpt: Option[os.Path]): Unit = {
-  def setup(cmd: os.Path): Unit = {
-    val name = if (cmd.last == "code.cmd" || cmd.last == "code") "VSCode"  else "VSCodium"
-    println(s"Setting up $name using ${absPath(cmd)} ...")
-    println()
-    val extensions = Vector(
-      "tamasfe.even-better-toml",
-      absPath(automodVsix)
-    )
-    if (osKind.isWin) {
-      os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
-        call(check = false, stdout = discardProcessOutput, mergeErrIntoOut = true)
+def vscodeSetup(cmd: os.Path): Unit = {
+  if (!os.exists(automodVsix)) {
+    println(s"Setting up $automodVsix ...")
+    download(vsixUrl) match {
+      case Some(p) =>
+        os.makeDir.all(automodVsix / os.up) 
+        os.move.over(p, automodVsix)
+        println()
+      case _ =>
+        exit(-1, s"Could not download $vsixUrl")
     }
-    for (extension <- extensions) {
-      println(s"Installing $extension ...")
-      if (osKind.isWin) {
-        os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--install-extension", extension).
-          call(check = false, stdout = os.Inherit, stderr = os.Inherit)
-      } else {
-        os.proc(cmd, "--force", "--install-extension", extension).
-          call(check = false, stdout = os.Inherit, stderr = os.Inherit)
-      }
-      println()
+  }
+  val name = if (cmd.last == "code.cmd" || cmd.last == "code") "VSCode"  else "VSCodium"
+  println(s"Setting up $name using ${absPath(cmd)} ...")
+  println()
+  val extensions = Vector(
+    "tamasfe.even-better-toml",
+    absPath(automodVsix)
+  )
+  if (osKind.isWin) {
+    os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--uninstall-extension", "jpabscale.sbmod-vscode").
+      call(check = false, stdout = discardProcessOutput, mergeErrIntoOut = true)
+  }
+  for (extension <- extensions) {
+    println(s"Installing $extension ...")
+    if (osKind.isWin) {
+      os.proc("cmd.exe", "/D", "/C", cmd, "--force", "--install-extension", extension).
+        call(check = false, stdout = os.Inherit, stderr = os.Inherit)
+    } else {
+      os.proc(cmd, "--force", "--install-extension", extension).
+        call(check = false, stdout = os.Inherit, stderr = os.Inherit)
     }
     println()
   }
+  println()
+
+  os.write.over(setupVscodeDir, absPath(cmd))
+}
+
+def vscode(vscOpt: Option[os.Path]): Unit = {
   var cmds = if (osKind.isWin) Vector(
     os.Path(s"$localAppData\\Programs\\Microsoft VS Code\\bin\\code.cmd"),
     os.Path("C:\\Program Files\\Microsoft VS Code\\bin\\code.cmd"),
@@ -1476,7 +1486,7 @@ def vscode(vscOpt: Option[os.Path]): Unit = {
     else Vector(vsc / "bin" / "code", vsc / "bin" / "codium")
   ) ++ cmds
   for (cmd <- cmds if os.isFile(cmd)) {
-    setup(cmd)
+    vscodeSetup(cmd)
     return
   }
   exit(-1, "Could not find a suitable VSCode/VSCodium to install into")
@@ -1698,15 +1708,18 @@ def search(gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path)
 }
 
 def printUsage(): Nothing = {
+  val fsep = if (osKind.isWin) "\\" else "/"
   exit(0,
     s"""$header
        |
        |Usage: automod [-s] opt* [ <mod-name> option*
+       |                         | .batch option*
        |                         | .demo.[sb|soa]
        |                         | .diff[.into] <from-path> <to-path> <out-path>
        |                         | .search <paths-input>.sam <out-path>
        |                         | .setup[.vscode [ <path-to-vscode> ]]
        |                         | .toml[.all] <out-path>
+       |                         | .upgrade
        |                         ]
        |
        | -s                   Disable Scala CLI server
@@ -1722,6 +1735,7 @@ def printUsage(): Nothing = {
        | --no-code-patching   Disable code patching
        | --ultra-compression  Use 7z ultra compression
        |
+       |.batch                Generate a mod for each sub-folder in patches${fsep}<game-id> 
        |.demo.sb              Generate all Stellar Blade demonstration mods
        |.demo.soa             Generate Sands of Aura demonstration mod
        |.diff                 Recursively diff JSON files and write jd and TOML patch files
@@ -1730,12 +1744,44 @@ def printUsage(): Nothing = {
        |.setup                Only set up modding tools
        |.setup.vscode         Set up modding tools and VSCode extensions
        |.toml                 Merge existing patch files in patches as TOML patch files
-       |.toml.all             Merge script code patches with patch files in patches as TOML""".stripMargin)
+       |.toml.all             Merge script code patches with patch files in patches as TOML
+       |.upgrade              Upgrade automod to the latest version""".stripMargin)
 }
 
 def checkDir(p: os.Path): os.Path = if (os.isDir(p)) p else exit(-1, s"$p is not a directory")
 def checkFileExt(p: os.Path, ext: String): os.Path = if (os.isFile(p) && p.ext == ext) p else exit(-1, s"$p is not a file with .$ext extension")
 def checkDirAvailable(p: os.Path): os.Path = if (os.isFile(p)) exit(-1, s"$p is a file") else p
+
+class Options {
+  var dryRun: Boolean = false
+  var includePatches: Boolean = false 
+  var noCodePatching: Boolean = false 
+  var ultraCompression: Boolean = false
+}
+
+def parseOptions(next: Int): Options = {
+  def redundant(option: String): Nothing = exit(-1, s"Redundant option $option")
+  var r = new Options
+  for (i <- next until cliArgs.length) {
+    cliArgs(i) match {
+      case `dryRun` =>
+        if (r.dryRun) redundant(dryRun)
+        r.dryRun = true
+      case `includePatches` =>
+        if (r.includePatches) redundant(includePatches)
+        r.includePatches = true
+      case `noCodePatching` =>
+        if (r.noCodePatching) redundant(noCodePatching)
+        r.noCodePatching = true
+      case `ultraCompression` =>
+        if (r.ultraCompression) redundant(ultraCompression)
+        r.ultraCompression = true
+        modExt = "7z"
+      case arg => exit(-1, s"Unrecognized $arg")
+    }
+  }
+  r
+}
 
 def run(): Unit = {
   if (cliArgs.length == 0) printUsage()
@@ -1744,11 +1790,13 @@ def run(): Unit = {
   argName match {
     case "" => printUsage()
     case _ if argName.startsWith(".demo.") => if (cliArgs.length != 1) printUsage()
+    case ".batch" => if (cliArgs.tail.exists(!_.startsWith("--"))) printUsage()
     case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
     case ".search" => if (cliArgs.length != 3) printUsage()
     case ".setup" => if (cliArgs.length != 1) printUsage()
     case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
     case ".toml" | ".toml.all" => if (cliArgs.length != 2) printUsage()
+    case ".upgrade" => if (cliArgs.length != 1) printUsage()
     case _ if argName.head != '.' => cliArgs.length >= 2 && !cliArgs(1).startsWith("--")
     case _ => printUsage()
   }
@@ -1758,6 +1806,104 @@ def run(): Unit = {
   val gameDir = absPath(config.game.directory)
   val (gamePakDirOpt, gameDirOpt, next) = if (config.game.directory.nonEmpty) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 1) 
                                           else (None, None, 1)
+
+  def genMod(modName: String, options: Options): Unit =
+    setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
+                             disableFilePatching = false, options.noCodePatching, options.dryRun, options.includePatches))
+
+  def batch(options: Options): Unit = {
+    def hasTomlOrPatchFiles(root: os.Path): Boolean = {
+      var r = false
+      def rec(p: os.Path): Unit = {
+        if (r) return
+        if (os.isDir(p) && !p.last.startsWith(".")) {
+          os.list(p).foreach(rec)
+        } else if (os.isFile(p) && (p.ext == "toml" || p.ext == "patch") && !p.last.startsWith(".")) r = true
+      }
+      rec(root)
+      r
+    }
+    val gamePatches = patchesDir / gameId
+    var ok = false
+    if (os.isDir(gamePatches)) {
+      for (p <- os.list(gamePatches) if os.isDir(p) && hasTomlOrPatchFiles(p)) {
+        val modName = p.last
+        val oldPatchesDir = patchesDir
+        val oldLogDir = logDir
+        try {
+          patchesDir = p
+          _patches = null
+          patchesInitialized = false
+          logDir = getLogDir(Some(modName))
+          genMod(modName, options)
+          ok = true
+        } finally {
+          patchesDir = oldPatchesDir
+          logDir = oldLogDir
+        }
+      }
+    }
+    if (!ok) {
+      exit(1, s"Could not find any patch files in $gamePatches")
+    }
+  }
+
+  def upgrade(): Unit = {
+    val latest = {
+      println("Checking the latest version ...")
+      val p = download("https://jpabscale.github.io/automod/VERSION.txt") match {
+        case Some(path) => path
+        case _ => exit(-1, s"Could not determine the latest version from https://jpabscale.github.io/automod/VERSION.txt")
+      }
+      val r = os.read(p)
+      os.remove.all(p)
+      println()
+      r
+    }
+  
+    if (latest == version) {
+      println("automod is up-to-date!")
+      return
+    }
+  
+    val temp = {
+      println(s"Downloading and extracting the latest version: v$latest")
+      val url = "https://codeload.github.com/jpabscale/automod/legacy.zip/master"
+      val p = download(url) match {
+        case Some(path) => path
+        case _ => exit(-1, s"Could not download https://codeload.github.com/jpabscale/automod/legacy.zip/master")
+      }
+      val r = os.temp.dir()
+      os.proc(zipExe, "x", p).call(cwd = r, stdout = os.Inherit, stderr = os.Inherit)
+      println()
+      r
+    }
+  
+    val backup = automodDir / ".backup" / getTimestamp()
+    println(s"Backing up $automodDir ...")
+    os.makeDir.all(backup)
+    for (path <- os.list(automodDir) if path.last != ".backup") {
+      os.move.over(path, backup / path.last)
+    }
+    println()
+    
+    for (path <- os.list(temp); p <- os.list(path)) os.move.over(p, automodDir / p.last)
+  
+    init(gameDirOpt)
+  
+    if (os.isFile(setupVscodeDir)) {
+      val cmd = os.Path(os.read(setupVscodeDir))
+      println(s"Updating ${if (cmd.last.contains("ium")) "VSCodium" else "VSCode"} ...")
+      version = latest
+      vscodeSetup(cmd)
+      println()
+    }
+  
+    println()
+    println(s"The previous version has been backed up to $backup")
+    println(s"automod has been updated to v$latest!")
+  }
+
   println(header)
   println(
     s"""* Platform: $osKind
@@ -1770,6 +1916,7 @@ def run(): Unit = {
   if (gamePakDirOpt.nonEmpty) println(s"* Game directory: $gameDir")
   println(s"* Working directory: $workingDir")
   if (argName.head != '.') println(s"* Mod name to generate: $argName")
+  if (argName.head != '.' || argName.startsWith(".toml")) println(s"* Log directory: $logDir")
   println()
   val setup = init(gameDirOpt)
 
@@ -1780,6 +1927,7 @@ def run(): Unit = {
   def demoSbAll(): Unit = { demoSbFirst(); demoSbAio(); demoSbAioHard(); demoSbEffect() }
 
   argName match {
+    case ".batch" => checkPatchesDir(); batch(parseOptions(next))
     case ".demo.sb" => demoSbAll()
     case ".demo.soa" => demoSoA(gameDirOpt)
     case ".diff" => diff(checkDir(absPath(cliArgs(1))), checkDir(absPath(cliArgs(2))), checkDirAvailable(absPath(cliArgs(3))))
@@ -1797,35 +1945,13 @@ def run(): Unit = {
       val outDir = checkDirAvailable(absPath(cliArgs(next)))
       checkPatchesDir()
       setUAssetGUIConfigAndRun(toml(gamePakDirOpt, outDir, argName == ".toml"))
+    case ".upgrade" => upgrade()
     case _ =>
       if (argName.head == '.') exit(-1, s"Unrecognized command $argName")
       checkPatchesDir()
       val modName = argName
-      var _dryRun = false
-      var _includePatches = false
-      var _noCodePatching = false
-      var _ultraCompression = false
-      def redundant(option: String): Nothing = exit(-1, s"Redundant option $option")
-      for (i <- next until cliArgs.length) {
-        cliArgs(i) match {
-          case `dryRun` =>
-            if (_dryRun) redundant(dryRun)
-            _dryRun = true
-          case `includePatches` =>
-            if (_includePatches) redundant(includePatches)
-            _includePatches = true
-          case `noCodePatching` =>
-            if (_noCodePatching) redundant(noCodePatching)
-            _noCodePatching = true
-          case `ultraCompression` =>
-            if (_ultraCompression) redundant(ultraCompression)
-            _ultraCompression = true
-            modExt = "7z"
-          case arg => exit(-1, s"Unrecognized $arg")
-        }
-      }
-      setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
-                                           disableFilePatching = false, _noCodePatching, _dryRun, _includePatches))
+      val option = parseOptions(next)
+      genMod(modName, option)
   }
   println("... done!")
 }

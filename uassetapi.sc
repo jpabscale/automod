@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import org.graalvm.polyglot.{Context, Value}
 import org.graalvm.polyglot.proxy.{Proxy, ProxyArray, ProxyObject}
+import org.luaj.vm2.{LuaValue, LuaBoolean, LuaDouble, LuaInteger, LuaNil, LuaString, LuaTable}
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable.HashMap
 import scala.jdk.CollectionConverters._
@@ -102,6 +103,66 @@ def fromPolyValue(v: Value): JsonNode = {
     r
   } else {
     automod.exit(-1, s"fromPolyValue: Unsupported value (${v.getClass}): '$v'")
+  }
+}
+
+def fromLuaValue(v: LuaValue): JsonNode = {
+  if (v.isnil) NullNode.instance
+  else if (v.isboolean) BooleanNode.valueOf(v.toboolean)
+  else if (v.isint) IntNode.valueOf(v.toint)
+  else if (v.isnumber) DoubleNode.valueOf(v.todouble)
+  else if (v.isstring) TextNode.valueOf(v.tojstring)
+  else if (v.istable && !v.get(LuaValue.valueOf(1)).isnil) {
+    val r = JsonNodeFactory.instance.arrayNode
+    var k = LuaValue.NIL;
+    var stop = false
+    while (!stop) {
+      val n = v.next(k)
+      k = n.arg1
+      if (k.isnil) stop = true
+      else r.add(fromLuaValue(n.arg(2)))
+    }
+    r
+  } else if (v.istable) {
+    val r = JsonNodeFactory.instance.objectNode
+    var k = LuaValue.NIL;
+    var stop = false
+    while (!stop) {
+      val n = v.next(k)
+      k = n.arg1
+      if (k.isnil) stop = true
+      else r.replace(fromLuaValue(k).textValue, fromLuaValue(n.arg(2)))
+    }
+    r
+  } else automod.exit(-1, s"Unsupported value (${v.getClass}): '${v.tojstring}'")
+}
+
+def toLuaValue(node: JsonNode): LuaValue = {
+  node match {
+    case node: BooleanNode => LuaValue.valueOf(node.booleanValue)
+    case node: IntNode => LuaValue.valueOf(node.intValue)
+    case node: DoubleNode => LuaValue.valueOf(node.doubleValue)
+    case node: ArrayNode => 
+      var seq = Vector[LuaValue]()
+      for (i <- 0 until node.size) {
+        seq = seq :+ toLuaValue(node.get(i))
+      }
+      LuaValue.listOf(seq.toArray)
+    case node: ObjectNode => 
+      var seq = Vector[LuaValue]()
+      for (property <- node.fieldNames.asScala) {
+        seq = seq :+ LuaValue.valueOf(property)
+        seq = seq :+ toLuaValue(node.get(property))
+      }
+      LuaValue.tableOf(seq.toArray)
+    case node: TextNode => 
+      val text = node.textValue
+      text match {
+        case "+0.0" | "-0.0" | "+0" | "-0" => LuaValue.valueOf(0d)
+        case _ => LuaValue.valueOf(text)
+      }
+    case null | _: NullNode => LuaValue.NIL
+    case _ => automod.exit(-1, s"Unsupported value (${node.getClass}): '${node.toPrettyString}'")
   }
 }
 
@@ -222,3 +283,6 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
     case t if t =:= typeOf[String] => getString(name).asInstanceOf[T]
   }
 }
+
+def isStruct(node: JsonNode): Boolean = node.get("Value").isInstanceOf[ArrayNode] && 
+  Option(node.get("$type")).map(_.asText.contains("UAssetAPI.PropertyTypes.Structs")).getOrElse(false)

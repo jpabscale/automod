@@ -342,13 +342,14 @@ export class AutomodTaskProvider implements vscode.TaskProvider {
     let gameId = "SB";
     if (setting["Active Game ID"].length > 0) gameId = setting["Active Game ID"];
     if (!games[gameId]) vscode.window.showInformationMessage(`Could not find configuration for the game identifier: ${gameId}`);
-    if (settingModGen["Mod Name"].length > 0 && hasPatches) {
-      const args = [ ...cmdPrefix, settingModGen["Mod Name"]];
-      if (settingModGen["No Code Patching"]) args.push("--no-code-patching");
-      if (settingModGen["Dry Run"]) args.push("--dry-run");
-      if (settingModGen["Include Patches"]) args.push("--include-patches")
-      if (settingModGen["Ultra Compression"]) args.push("--ultra-compression")
-      tasks.push(newTask({type: type, kind: settingModGen["Mod Name"], args: args}));
+    if (hasPatches) {
+      const options = [];
+      if (settingModGen["No Code Patching"]) options.push("--no-code-patching");
+      if (settingModGen["Dry Run"]) options.push("--dry-run");
+      if (settingModGen["Include Patches"]) options.push("--include-patches")
+      if (settingModGen["Ultra Compression"]) options.push("--ultra-compression")
+      tasks.push(newTask({type: type, kind: ".batch", args: [ ...cmdPrefix, ".batch"].concat(options)}));
+      if (settingModGen["Mod Name"].length > 0) tasks.push(newTask({type: type, kind: settingModGen["Mod Name"], args: [ ...cmdPrefix, settingModGen["Mod Name"]].concat(options)}));
     }
     tasks.push(newTask({type: type, kind: ".demo.sb", args: [ ...cmdPrefix, ".demo.sb"]}));
     tasks.push(newTask({type: type, kind: ".demo.soa", args: [ ...cmdPrefix, ".demo.soa"]}));
@@ -356,6 +357,7 @@ export class AutomodTaskProvider implements vscode.TaskProvider {
       tasks.push(newTask({type: type, kind: ".search", args: [ ...cmdPrefix, ".search", "${file}", `${output}${fsep}search-\${fileBasenameNoExtension}-${getTimestamp()}`].filter(isNotUndefined)}));
     if (hasPatches) tasks.push(newTask({type: type, kind: ".toml", args: [ ...cmdPrefix, ".toml", `${output}${fsep}toml-${getTimestamp()}`].filter(isNotUndefined)}));
     if (hasPatches) tasks.push(newTask({type: type, kind: ".toml.all", args: [ ...cmdPrefix, ".toml.all", `${output}${fsep}toml.all-${getTimestamp()}`].filter(isNotUndefined)}));
+    tasks.push(newTask({type: type, kind: ".upgrade", args: [ ...cmdPrefix, ".upgrade"]}));
     return tasks;
   }
 

@@ -1,3 +1,5 @@
+3.1.0: Added Lua patchlet support. Added .batch and .upgrade commands. Added Lost Soul Aside patch files for .batch. Only download VSCode extension on .setup.vscode. Refined .@ UAssetAPI Struct check. Fixed empty mapUri handling.
+
 3.0.1: Added support for uncompressed usmap URI. Generalized .@ so it can be used for patching any JSON object node.
 
 3.0.0: Fixed repak installation. Fixed missing AES key retoc/repak argument. Fixed .config.json loading. Fixed handling of .@: in .toml and .toml.all Fixed .search (broken after .cache reorganization), and improved it by adding resolved path of each query result. Reorganized .config.json and VSCode settings. Changed to download usmap, .cache, and VSCode extension from automod releases. Removed scala-metals in .setup.vscode. Removed AUTOMOD_XXX env vars and updated CLI to accepts game id, no par, and max logs.

@@ -1,7 +1,8 @@
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import com.jayway.jsonpath
 import java.util.{List => JList}
+import org.luaj.vm2.{LuaValue, LuaFunction}
 import org.graalvm.polyglot.{Context, HostAccess, Value}
 import scala.collection.immutable.TreeMap
 import scala.jdk.CollectionConverters._
@@ -14,6 +15,7 @@ object Constants {
   val codePrefixTypescript: String = "=ts>"
   val codePrefixJavascript: String = "=js>"
   val codePrefixPython: String = "=py>"
+  val codePrefixLua: String = "=lua>"
   val atPrefix = ".@:"
   val javaRegexPrefix = ".*:"
   val addValueKey = "value"
@@ -24,6 +26,16 @@ object Constants {
     case Some(n) => s"[$n]"
     case _ => s"['$s']"
   })).mkString
+
+  val luaJson = {
+    val parse = new LuaFunction {
+      override def call(arg: LuaValue): LuaValue = uassetapi.toLuaValue(new ObjectMapper().readTree(arg.tojstring))
+    }
+    val stringify = new LuaFunction {
+      override def call(arg: LuaValue): LuaValue = LuaValue.valueOf(uassetapi.fromLuaValue(arg).toString)
+    }
+    LuaValue.tableOf(Array(LuaValue.valueOf("parse"), parse, LuaValue.valueOf("stringify"), stringify))
+  }
 }
 
 import Constants._
@@ -34,6 +46,7 @@ object Lang {
   case object Typescript extends Lang
   case object Js extends Lang
   case object Python extends Lang
+  case object Lua extends Lang
 }
 
 def graalContext(id: String): Context =
@@ -74,11 +87,32 @@ def evalTypescript(preamble: String)(v: Context => Value, exp: String): (Context
   }
   evalJs(v, js)
 }
+
 def evalPython(v: Context => Value, code: String): (Context, Value) = {
   val context = graalContext("python")
   context.getBindings("python").putMember("v", v(context))
   (context, evalPoly(context, "python", code.trim))
-}  
+}
+
+def evalLua(v: LuaValue, code: String, err: String => String): JsonNode = {
+  try {
+    val g = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals
+    org.luaj.vm2.luajc.LuaJC.install(g)
+    g.set(LuaValue.valueOf("JSON"), luaJson)
+    val chunk = g.load(
+      s"""function __f(v)
+         |  $code
+         |end
+         |
+         |_f = __f""".stripMargin)
+    chunk.call()
+    assert(!chunk.isclosure)
+    val f = g.get("_f").asInstanceOf[LuaValue]
+    uassetapi.fromLuaValue(f.call(v))
+  } catch {
+    case t: Throwable => automod.exit(-1, err(t.getMessage))
+  }
+}
 
 def evalObjectNamePredicate(lang: Lang, code: String): String => Boolean = {
   def graal(f: (Context => Value, String) => (Context, Value)): String => Boolean = { (v: String) => 
@@ -90,6 +124,14 @@ def evalObjectNamePredicate(lang: Lang, code: String): String => Boolean = {
     case Lang.Typescript => graal(evalTypescript("declare var v: string"))
     case Lang.Js => graal(evalJs)
     case Lang.Python => graal(evalPython)
+    case Lang.Lua => (s: String) => evalLua(LuaValue.valueOf(s), code, 
+        msg => s"""Failed to evaluate Lua code with v as $s: $msg
+                  |$code""".stripMargin) match {
+      case node: BooleanNode => node.booleanValue
+      case _ => 
+        automod.exit(-1, 
+          s"""The Lua code does not return a boolean value: $code""")
+    }
   }
 }
 
@@ -121,6 +163,7 @@ def checkPatches(uassetName: String, map: automod.UAssetPropertyChanges): automo
           case Some(`codePrefixTypescript`) =>
           case Some(`codePrefixJavascript`) =>
           case Some(`codePrefixPython`) =>
+          case Some(`codePrefixLua`) =>
           case Some(prefix) => automod.exit(-1, s"Unrecognized value prefix for $uassetName/$objName/$property: $prefix")
           case _ =>
         }
@@ -139,6 +182,7 @@ def getKeyPrefix(key: String): Option[String] = {
   if (key.startsWith(codePrefixTypescript)) return Some(key.substring(0, codePrefixTypescript.length)) 
   if (key.startsWith(codePrefixJavascript)) return Some(key.substring(0, codePrefixJavascript.length)) 
   if (key.startsWith(codePrefixPython)) return Some(key.substring(0, codePrefixPython.length)) 
+  if (key.startsWith(codePrefixLua)) return Some(key.substring(0, codePrefixLua.length)) 
   return None
 }
 
@@ -148,6 +192,7 @@ def isKeyPrefix(title: String, key: String): Boolean = getKeyPrefix(key) match {
     case `codePrefixTypescript` => true
     case `codePrefixJavascript` => true
     case `codePrefixPython` => true
+    case `codePrefixLua` => true
     case `javaRegexPrefix` => true
     case `atPrefix` => true
     case _ => automod.exit(-1, s"Unrecognized prefix for $title: '$prefix'")
@@ -235,9 +280,32 @@ def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, data
         case t: Throwable =>
           automod.exit(-1, 
             s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
-               |the current value ${currentValue} using $code:
-               |  ${t.getMessage}""".stripMargin)
+               |the current value ${currentValue}: ${t.getMessage}
+               |$code""".stripMargin)
       }
+    case Lang.Lua =>
+      val v = LuaValue.tableOf(Array[LuaValue](
+        LuaValue.valueOf("objName"), LuaValue.valueOf(obj.name),
+        LuaValue.valueOf("orig"), uassetapi.toLuaValue(origValue),
+        LuaValue.valueOf("current"), uassetapi.toLuaValue(currentValue),
+        LuaValue.valueOf("ast"), uassetapi.toLuaValue(_ast.json[JsonNode]),
+        LuaValue.valueOf("origAst"), uassetapi.toLuaValue(_origAst.json[JsonNode]),
+        LuaValue.valueOf("valueOf"), new LuaFunction {
+          override def call(arg1: LuaValue, arg2: LuaValue): LuaValue = {
+            val objName = arg1.tojstring
+            val property = arg2.tojstring
+            dataMap.get(objName) match {
+              case Some(node) =>
+                val obj = uassetapi.Struct(uassetName, node, addToFilePatches)
+                uassetapi.toLuaValue(obj.getJson(property))
+              case _ => LuaValue.NIL
+            }
+          }
+        }))
+      evalLua(v, code, msg => 
+            s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
+               |the current value ${currentValue}: $msg
+               |$code""".stripMargin)
     case _ =>
       val v = (c: Context) => c.asValue(
           new PolyCodeContext(c, uassetName, addToFilePatches, dataMap,
@@ -289,6 +357,7 @@ sealed trait FilteredChanges {
             case Some(`codePrefixTypescript`) => code(codePrefixTypescript, Lang.Typescript)
             case Some(`codePrefixJavascript`) => code(codePrefixJavascript, Lang.Js)
             case Some(`codePrefixPython`) => code(codePrefixPython, Lang.Python)
+            case Some(`codePrefixLua`) => code(codePrefixLua, Lang.Lua)
             case _ =>
           }
         case _ =>
@@ -327,7 +396,7 @@ case class AtFilteredChanges(addToFilePatches: Boolean,
     }
     if (nodes.isEmpty) automod.exit(-1, s"Could not find objects for $uassetName: $path")
     for ((node, orig) <- nodes) {
-      if (node.get("Value").isInstanceOf[ArrayNode]) applyPathChanges(path, node, orig)
+      if (uassetapi.isStruct(node)) applyPathChanges(path, node, orig)
       else node match {
         case node: ObjectNode =>
           for ((property, valuePair) <- changes) Option(node.get(property)) match {
@@ -387,6 +456,7 @@ def kfcMap(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetName: Str
         case `codePrefixTypescript` => code(codePrefixTypescript, Lang.Typescript, key)
         case `codePrefixJavascript` => code(codePrefixJavascript, Lang.Js, key)
         case `codePrefixPython` => code(codePrefixPython, Lang.Python, key)
+        case `codePrefixLua` => code(codePrefixLua, Lang.Lua, key)
         case `atPrefix` =>
           var path = key.substring(atPrefix.length).trim
           var i = 0
