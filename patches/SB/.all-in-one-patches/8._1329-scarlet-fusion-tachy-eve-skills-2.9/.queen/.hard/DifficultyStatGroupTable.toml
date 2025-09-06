@@ -1,0 +1,12 @@
+# based on https://www.nexusmods.com/stellarblade/mods/1156
+
+['=> Multiply HP/SH on objects 17-32 and 301-327 (except Levoire bosses 305 & 312) by 5, and object 324 & 327 to 280/280.']
+'=>' = '''{
+  v.toIntOption match {
+    case Some(n) if n != 305 && n != 312 => ((17 <= n && n <= 32) || (301 <= n && n <= 327)) 
+    case _ => false 
+  }
+}'''
+StatValue4 = '=> if (v.objName == "324" || v.objName == "327") 350 else v.orig[Double] * 5'
+StatValue5 = '=> if (v.objName == "324" || v.objName == "327") 350 else v.orig[Double] * 5'
+

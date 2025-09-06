@@ -2,7 +2,7 @@
   "name": "automod-vscode",
   "displayName": "automod-vscode",
   "description": "VSCode extension for Auto Modding Script",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "publisher": "jpabscale",
   "icon": "images/automod.png",
   "private": true,
@@ -21,14 +21,15 @@
       {
         "title": "automod",
         "properties": {
+          "automod.installationDirectory": {
+             "type": "string",
+             "description": "Automod installation directory path",
+             "default": ""
+          },
           "automod.general": {
             "type": "object",
             "additionalProperties": false,
             "properties": { 
-               "Installation Directory": {
-                 "type": "string",
-                 "description": "Automod installation directory path"
-               },
                "No Parallelization": {
                  "type": "boolean",
                  "description": "Disable parallelization"
@@ -47,7 +48,6 @@
                }
             },
             "default": {
-              "Installation Directory": "",
               "No Parallelization": false,
               "Max Logs": 30,
               "Scala CLI Server": true,

@@ -60,7 +60,7 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
-['.*: ^M_Scarlet_(AirDashCut_Hit[1-3]|AreaCombo_Hit[2-5,7]|SwingFast_Hit1)$']
+['.*: ^M_Scarlet_(Stinger_Hit[1-5]|AirDashCut_Hit[1-3]|AreaCombo_Hit[2-5,7]|SwingFast_Hit1)$']
 AttackCollisionGroupArray = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{"CollisionGroupName":"Collision_WeaponBig", "DelayTime":0}"""))
@@ -97,7 +97,7 @@ StartTargetEffect = '''=> {
   newArray.toString
 }'''                                                         # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"DownFaceDown\",\"startDelayTime\":1.9}]"
 
-['.*: ^M_Scarlet_((BlinkCut|BlinkCombo|BlinkShot|SwingFast|AreaCombo|MoveBackShot2|BackDashSpaceCut|AirDashCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*(Cast|Hit).*|(AreaCombo|Swing_|SwingFast).*Finish.*)$']
+['.*: ^M_Scarlet_((Airspin|Stinger|BlinkCut|BlinkCombo|BlinkShot|SwingFast|AreaCombo|MoveBackShot2|BackDashSpaceCut|AirDashCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*(Cast|Hit).*|(AreaCombo|Swing_|SwingFast).*Finish.*)$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
@@ -114,7 +114,7 @@ StartSelfEffect = '''=> {
   newArray.toString
 }'''
 
-['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|BlinkShot|MoveBackShot2|BackDashSpaceCut|AirDashCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Finish.*$']
+['.*: ^M_Scarlet_(Airspin|Stinger|BlinkCut|BlinkCombo|BlinkShot|MoveBackShot2|BackDashSpaceCut|AirDashCut|SwingTriple|Swing_|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Finish.*$']
 StartSelfEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode("""{ "Alias": "NoDamage_Skill", "Time": 2 }"""))
@@ -139,7 +139,7 @@ Duration = '''=> {
   val orig = v.orig[Double]
   v.objName match {
     case "M_Scarlet_JumpStampSlash_Finish1" | "M_Scarlet_AirDashCut_Finish1" | "M_Scarlet_AirDashCut_Finish2" => 0.4
-    case "M_Scarlet_BlinkCut_Finish1" | "M_Scarlet_BlinkCombo_Finish1" | "M_Scarlet_PhaseChange1_EndShieldOwn_Finish1" => 0.1
+    case "M_Scarlet_Airspin_Finish1" | "M_Scarlet_Stinger_Finish1" | "M_Scarlet_BlinkCut_Finish1" | "M_Scarlet_BlinkCombo_Finish1" | "M_Scarlet_PhaseChange1_EndShieldOwn_Finish1" => 0.1
     case _ => if (orig > 2) 2 else orig
   }
 }'''

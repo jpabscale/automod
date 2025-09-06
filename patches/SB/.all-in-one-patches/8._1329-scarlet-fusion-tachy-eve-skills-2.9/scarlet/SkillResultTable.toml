@@ -1,4 +1,4 @@
-[M_Scarlet_BlinkCombo_Hit9]
+['.*: ^M_Scarlet_(Airspin_Hit10|Stinger_Hit5|BlinkCombo_Hit9)$']
 ResultTargetCommonEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode(s"""{ "Alias": "P_Eve_Skill_KnockDown", "startDelayTime": 0.05 }"""))
@@ -17,7 +17,7 @@ ResultTargetAirShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
 ResultTargetSwimmingShowPath = "Hit/Result_Hit_Stand_Sword_Tachy_Attack_NoAnim"
 ResultTargetCriticalShowPath = "Hit/Result_Hit_Stand_Sword_Critical"
 
-['.*: ^M_Scarlet_(BlinkCut|BlinkCombo|SwingFast|AreaCombo|BackDashSpaceCut|AirDashCut|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Hit.*$']
+['.*: ^M_Scarlet_(Airspin|Stinger|BlinkCut|BlinkCombo|SwingFast|AreaCombo|BackDashSpaceCut|AirDashCut|KickStamp|JumpStampSlash|PhaseChange1_EndShieldOwn).*Hit.*$']
 ResultTargetCommonEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
   newArray.add(toJsonNode(s"""{ "Alias": "SkillDamage_Eve" }"""))

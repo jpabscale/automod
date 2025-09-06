@@ -1,4 +1,16 @@
 # ...                                                        # Game Original Value
+[P_Eve_Sword_Normal_FinishAttack4_1] # Incursion IV - Scarlet Stinger: ☐, ☐, ☐, △, Hold △
+FirstSkillActiveAlias = "M_Scarlet_Stinger_Cast1"
+AttackDamageRate = 8
+ShieldAttackDamageRate = 8
+TargetFilterAlias = "M_Scarlet_Stinger_Target"
+
+[P_Eve_Sword_Normal_StrongAttack7_1] # Onslaught IV - Scarlet Airspin: △, ☐, △, ☐, Hold △
+FirstSkillActiveAlias = "M_Scarlet_Airspin_Cast1"
+AttackDamageRate = 8
+ShieldAttackDamageRate = 8
+TargetFilterAlias = "M_Scarlet_Airspin_Target"
+
 ['.*: ^P_Eve_Sword_Beta_ChargeSlashCombo.*$'] # Infinite Slash + Scarlet Blink Combo: L1+△
 AttackDamageRate = 9.0                                       # 2.0
 FirstSkillActiveAlias = "M_Scarlet_BlinkCombo_Cast1"         # "P_Eve_Sword_Beta_ChargeSlashCombo1_1_Cast1"

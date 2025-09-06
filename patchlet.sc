@@ -228,11 +228,17 @@ class PolyCodeContext(context: Context,
   }
 }
 
-def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
-                 code: String, obj: uassetapi.Struct, property: String, orig: JsonNode, _ast: automod.JsonAst, 
-                 _origAst: automod.JsonAst): JsonNode = {
+def evalStructProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
+                       code: String, obj: uassetapi.Struct, property: String, orig: JsonNode, _ast: automod.JsonAst, 
+                       _origAst: automod.JsonAst): JsonNode = {
   val currentValue = obj.getJson(property)
   val origValue = uassetapi.Struct(uassetName, orig, addToFilePatches = false).getJson(property)
+  evalProperty(lang, uassetName, addToFilePatches, dataMap, code, obj.name, currentValue, origValue, property, _ast, _origAst)
+}
+
+def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
+                 code: String, name: String, currentValue: JsonNode, origValue: JsonNode, property: String, _ast: automod.JsonAst, 
+                 _origAst: automod.JsonAst): JsonNode = {
   lang match {
     case Lang.Scala =>
       try {
@@ -261,7 +267,7 @@ def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, data
             |  calc() 
             |}""".stripMargin)              
         val ctx = (new {
-          def objName: String = obj.name
+          def objName: String = name
           def orig[T]: T = uassetapi.toValue[T](origValue).get
           def currentOpt[T]: Option[T] = uassetapi.toValue[T](currentValue)
           def valueOf[T](objName: String, property: String): Option[T] = {
@@ -279,13 +285,13 @@ def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, data
       } catch {
         case t: Throwable =>
           automod.exit(-1, 
-            s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
+            s"""Evaluation failed for $name/$property with the game original value of ${origValue} and 
                |the current value ${currentValue}: ${t.getMessage}
                |$code""".stripMargin)
       }
     case Lang.Lua =>
       val v = LuaValue.tableOf(Array[LuaValue](
-        LuaValue.valueOf("objName"), LuaValue.valueOf(obj.name),
+        LuaValue.valueOf("objName"), LuaValue.valueOf(name),
         LuaValue.valueOf("orig"), uassetapi.toLuaValue(origValue),
         LuaValue.valueOf("current"), uassetapi.toLuaValue(currentValue),
         LuaValue.valueOf("ast"), uassetapi.toLuaValue(_ast.json[JsonNode]),
@@ -303,13 +309,13 @@ def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, data
           }
         }))
       evalLua(v, code, msg => 
-            s"""Evaluation failed for ${obj.name}/$property with the game original value of ${origValue} and 
+            s"""Evaluation failed for $name/$property with the game original value of ${origValue} and 
                |the current value ${currentValue}: $msg
                |$code""".stripMargin)
     case _ =>
       val v = (c: Context) => c.asValue(
           new PolyCodeContext(c, uassetName, addToFilePatches, dataMap,
-                              uassetapi.toPolyValue(c, TextNode.valueOf(obj.name)), 
+                              uassetapi.toPolyValue(c, TextNode.valueOf(name)), 
                               uassetapi.toPolyValue(c, origValue),
                               uassetapi.toPolyValue(c, currentValue),
                               uassetapi.toPolyValue(c, _ast.json[JsonNode]),
@@ -342,16 +348,35 @@ sealed trait FilteredChanges {
   def ast: automod.JsonAst
   def orig: automod.JsonAst
   def dataMap: collection.Map[String, ObjectNode]
-  def changes: automod.PropertyChanges 
-  def applyPathChanges(path: String, node: JsonNode, orig: JsonNode): Unit = {
+  def changes: automod.PropertyChanges
+  def applyAtChange(name: String, o: ObjectNode, property: String, v: JsonNode, vOrig: JsonNode): Unit = {
+    var value = v
+    value match {
+      case v: TextNode => 
+        def code(codePrefix: String, lang: Lang): Unit =
+          value = evalProperty(lang, uassetName, addToFilePatches, dataMap, v.textValue.substring(codePrefix.length), 
+                               name, o.get(property), vOrig, property, this.ast, this.orig)
+        getKeyPrefix(v.textValue) match {
+          case Some(`codePrefixScala`) => code(codePrefixScala, Lang.Scala)
+          case Some(`codePrefixTypescript`) => code(codePrefixTypescript, Lang.Typescript)
+          case Some(`codePrefixJavascript`) => code(codePrefixJavascript, Lang.Js)
+          case Some(`codePrefixPython`) => code(codePrefixPython, Lang.Python)
+          case Some(`codePrefixLua`) => code(codePrefixLua, Lang.Lua)
+          case _ =>
+        }
+      case _ =>
+    }
+    uassetapi.objSetJson(addToFilePatches, uassetName, name, o, property, value)
+  }
+  def applyStructChanges(path: String, node: JsonNode, orig: JsonNode): Unit = {
     val obj = uassetapi.Struct(uassetName, node, addToFilePatches)
     for ((property, valueOldValuePair) <- changes) {
       var value = valueOldValuePair.newValueOpt.get
       value match {
         case v: TextNode => 
           def code(codePrefix: String, lang: Lang): Unit =
-            value = evalProperty(lang, uassetName, addToFilePatches, dataMap, v.textValue.substring(codePrefix.length), 
-                                 obj, property, orig, this.ast, this.orig)
+            value = evalStructProperty(lang, uassetName, addToFilePatches, dataMap, v.textValue.substring(codePrefix.length), 
+                                       obj, property, orig, this.ast, this.orig)
           getKeyPrefix(v.textValue) match {
             case Some(`codePrefixScala`) => code(codePrefixScala, Lang.Scala)
             case Some(`codePrefixTypescript`) => code(codePrefixTypescript, Lang.Typescript)
@@ -396,12 +421,12 @@ case class AtFilteredChanges(addToFilePatches: Boolean,
     }
     if (nodes.isEmpty) automod.exit(-1, s"Could not find objects for $uassetName: $path")
     for ((node, orig) <- nodes) {
-      if (uassetapi.isStruct(node)) applyPathChanges(path, node, orig)
+      if (uassetapi.isStruct(node)) applyStructChanges(path, node, orig)
       else node match {
         case node: ObjectNode =>
           for ((property, valuePair) <- changes) Option(node.get(property)) match {
             case Some(old) => 
-              uassetapi.objSetJson(addToFilePatches, uassetName, path, node, property, valuePair.newValueOpt.get)
+              applyAtChange(path, node, property, valuePair.newValueOpt.get, orig.get(property))
             case _ => automod.exit(-1, s"$uassetName @$path does not have the property: $property")
           }
         case _ => automod.exit(-1, s"$uassetName @$path is neither a UAssetAPI's struct nor a JSON object node")

@@ -110,16 +110,21 @@ async function getConfigPath(workspaceOnly: Boolean): Promise<string | undefined
   return await exists(r)? r : undefined; 
 }
 
-async function setting<T>(group: string, id: string, value: T | undefined): Promise<T | undefined> {
+async function setting<T>(group: string, id: string, value: T | undefined, target: vscode.ConfigurationTarget = vscode.ConfigurationTarget.Global): Promise<T | undefined> {
   const r = vscode.workspace.getConfiguration(group).get<T>(id); 
   if (value) {
-    await vscode.workspace.getConfiguration(group).update(id, value, vscode.ConfigurationTarget.Global);
+    if (target == vscode.ConfigurationTarget.Global || target == vscode.ConfigurationTarget.Workspace && await getWorkspacePath())
+      await vscode.workspace.getConfiguration(group).update(id, value, target);
   }
   return r;
 }
 
+async function settingAutomodDir(value: string | undefined = undefined): Promise<string | undefined> {
+  return await setting<string>("automod", "installationDirectory", value);
+}
+
 async function settingAutomod(value: SettingAutomod | undefined = undefined): Promise<SettingAutomod> {
-  const r = await setting<SettingAutomod>("automod", "general", value);
+  const r = await setting<SettingAutomod>("automod", "general", value, vscode.ConfigurationTarget.Workspace);
   return r!;
 }
 
@@ -381,16 +386,14 @@ export class AutomodTaskProvider implements vscode.TaskProvider {
 
 
 async function getAutomodDir(): Promise<string | undefined> {
-  const setting = await settingAutomod(); 
-  let dir = setting["Installation Directory"];
-  if (dir.length == 0) {
+  let dir = await settingAutomodDir();
+  if (dir && dir.length == 0) {
     const p = getWorkspacePath(); 
     dir = p? p: "";
   } 
   let automodScript = `${dir}${fsep}automod.sc`;
   if (await exists(automodScript)) {
-    setting["Installation Directory"] = dir;
-    await settingAutomod(setting);
+    await settingAutomodDir(dir);
     return dir;
   }
   const temp = `${tempDir}${fsep}.automod.dir`
@@ -398,8 +401,7 @@ async function getAutomodDir(): Promise<string | undefined> {
     dir = await read(temp);
     automodScript = `${dir}${fsep}automod.sc`;
     if (await exists(automodScript)) {
-      setting["Installation Directory"] = dir;
-      await settingAutomod(setting);
+      await settingAutomodDir(dir);
       return dir;
     }
   }

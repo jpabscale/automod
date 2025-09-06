@@ -276,16 +276,22 @@ JustActionTime = 1                                           # 0.150000005960464
 JustActionTime_StoryMode = 1                                 # 0.30000001192092896
 
 [P_Eve_Sword_Normal_FinishAttack3_4_Ex]
-AttackDamageRate = 8                                         # 5.0
-FirstSkillActiveAlias = "P_Eve_Sword_Beta_ChainStab1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack3_1_Ex_Cast1"
-ShieldAttackDamageRate = 4                                   # 2.5
+AttackDamageRate = 9.5                                       # 5.0
+FirstSkillActiveAlias = "P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack3_1_Ex_Cast1"
+ShieldAttackDamageRate = 9.5                                 # 2.5
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 
+[P_Eve_Sword_Normal_FinishAttack4_1]
+AttackDamageRate = 8                                         # 3.799999952316284
+FirstSkillActiveAlias = "M_Scarlet_Stinger_Cast1"            # "P_Eve_Sword_Normal_FinishAttack4_1_Cast1"
+ShieldAttackDamageRate = 8                                   # 1.899999976158142
+TargetFilterAlias = "M_Scarlet_Stinger_Target"               # "P_Eve_Sword_0500_180_500_Target"
+
 [P_Eve_Sword_Normal_FinishAttack4_1_Ex]
-AttackDamageRate = 6                                         # 5.699999809265137
-FirstSkillActiveAlias = "P_Eve_Fusion_Skill_SwordAura1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"
-ShieldAttackDamageRate = 6                                   # 2.9000000953674316
-TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
+AttackDamageRate = 8                                         # 5.699999809265137
+FirstSkillActiveAlias = "P_Eve_Tachy_JustParry_StrongAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"
+ShieldAttackDamageRate = 8                                   # 2.9000000953674316
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Normal_Guard1_1]
 CoolTime = 0.1                                               # 0.4000000059604645
@@ -306,17 +312,11 @@ FirstSkillActiveAlias = "P_Eve_Fusion_JustParry_LightAttackCombo2_1_Cast1"    # 
 ShieldAttackDamageRate = 10.4                                # 1.399999976158142
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 
-[P_Eve_Sword_Normal_LightAttackChain1_1]
-AttackDamageRate = 9.5                                       # 2.299999952316284
-FirstSkillActiveAlias = "P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1"    # "P_Eve_Sword_Normal_LightAttackChain1_1_Cast1"
-ShieldAttackDamageRate = 9.5                                 # 1.2000000476837158
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
-
 [P_Eve_Sword_Normal_StrongAttack10_1_Ex]
-AttackDamageRate = 8                                         # 6.0
-FirstSkillActiveAlias = "P_Eve_Tachy_JustParry_StrongAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
-ShieldAttackDamageRate = 8                                   # 3.0
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+AttackDamageRate = 6                                         # 6.0
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_SwordAura1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
+ShieldAttackDamageRate = 6                                   # 3.0
+TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Normal_StrongAttack5_1_Ex]
 AttackDamageRate = 4                                         # 4.5
@@ -329,6 +329,12 @@ AttackDamageRate = 10                                        # 4.099999904632568
 FirstSkillActiveAlias = "P_Eve_Sword_Beta_ChargeSlashCombo1_Ex_Cast1"    # "P_Eve_Sword_Normal_StrongAttack6_1_Ex_Cast1"
 ShieldAttackDamageRate = 4                                   # 2.0999999046325684
 TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
+
+[P_Eve_Sword_Normal_StrongAttack7_1]
+AttackDamageRate = 8                                         # 3.4000000953674316
+FirstSkillActiveAlias = "M_Scarlet_Airspin_Cast1"            # "P_Eve_Sword_Normal_StrongAttack7_1_Cast1"
+ShieldAttackDamageRate = 8                                   # 1.7000000476837158
+TargetFilterAlias = "M_Scarlet_Airspin_Target"               # "P_Eve_Sword_0500_180_500_Target"
 
 [P_Eve_Sword_Normal_StrongAttack7_1_Ex]
 AttackDamageRate = 8                                         # 5.099999904632568

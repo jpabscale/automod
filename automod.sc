@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.1.1"
+var version = "3.2.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -170,7 +170,7 @@ class Tools {
   @BeanProperty var fmodel: String = "d3f93021c66b8861c2f8415cf182c6296864cb18"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
-  @BeanProperty var retoc: String = "0.1.3-pre.1"
+  @BeanProperty var retoc: String = "0.1.3-pre.2"
   @BeanProperty var uassetCli: String = "1.0.0"
 }
 
@@ -591,12 +591,17 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     println()
   }
 
-  if (usmapUri.startsWith(usmapUrlPrefix) && (autoupdateUsmaps.contains(usmapPath.baseName) || !os.exists(automodGameCacheDir) && gameDirOpt.isEmpty)) {
+  if (!os.exists(configPath) && automodDir.toString == workingDir.toString) writeConfig(config)
+
+  setup
+}
+
+def initCache(hasGameDir: Boolean): Unit = {
+  if (usmapUri.startsWith(usmapUrlPrefix) && (autoupdateUsmaps.contains(usmapPath.baseName) || !os.exists(automodGameCacheDir) && !hasGameDir)) {
     val msg = s"Setting up $automodGameCacheDir ..."
     download(usmapUri.replace("/usmap/", "/cache/").replace(".usmap.7z", ".7z"), 
              if (os.exists(automodGameCacheDir)) Some(msg) else None) match {
       case Some(p) =>
-        setup = false
         if (!os.exists(automodGameCacheDir)) println(msg)
         os.remove.all(automodGameCacheDir) 
         os.proc(zipExe, "x", p).call(cwd = automodDir, stdout = os.Inherit, stderr = os.Inherit)
@@ -606,10 +611,6 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     }
     println()
   }
-
-  if (!os.exists(configPath) && automodDir.toString == workingDir.toString) writeConfig(config)
-
-  setup
 }
 
 def toJsonNode(content: String): JsonNode = new ObjectMapper().readTree(content)
@@ -888,8 +889,8 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
       value match {
         case v: TextNode =>
           def code(codePrefix: String, lang: patchlet.Lang): Unit =
-            value = patchlet.evalProperty(lang, uassetName, addToFilePatches, dataMap, 
-                                          v.textValue.substring(codePrefix.length), obj, property, orig, ast, origAst)
+            value = patchlet.evalStructProperty(lang, uassetName, addToFilePatches, dataMap, 
+                                                v.textValue.substring(codePrefix.length), obj, property, orig, ast, origAst)
           patchlet.getKeyPrefix(v.textValue) match {
             case Some(patchlet.Constants.codePrefixScala) => code(patchlet.Constants.codePrefixScala, patchlet.Lang.Scala)
             case Some(patchlet.Constants.codePrefixJavascript) => code(patchlet.Constants.codePrefixJavascript, patchlet.Lang.Js)
@@ -902,7 +903,7 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
     }
   }
   def applyKfcs(i: Int, obj: uassetapi.Struct, origObj: uassetapi.Struct, kfcs: Iterable[patchlet.KeyFilteredChanges]): Unit = {
-    for (kfc <- kfcs) kfc.applyPathChanges(s"$dataTablePath/$i", obj.value, origObj.value)
+    for (kfc <- kfcs) kfc.applyStructChanges(s"$dataTablePath/$i", obj.value, origObj.value)
   }
 
   val indices = for (i <- 0 until data.size) yield i
@@ -944,6 +945,8 @@ def generateMod(addToFilePatches: Boolean,
                 currentAstMap: collection.mutable.HashMap[String, (JsonAst, JsonAst, JsonAst)] = collection.mutable.HashMap.empty,
                 origAstMap: collection.mutable.HashMap[String, JsonNode] = null,
                 uassetNameRequests: Vector[String] = Vector())(): Unit = {
+  initCache(gamePakDirOpt.nonEmpty)
+
   val cacheKey = cacheDir / gameId / "key.properties"
   val output = workingDir / "out"
   os.remove.all(output)
@@ -969,8 +972,6 @@ def generateMod(addToFilePatches: Boolean,
   val tempDir = workingDir / ".temp"
   recreateDir(tempDir)
   recreateDir(logDir)
-
-  val modDirOpt = modNameOpt.map(tempDir / _)
 
   val cacheHit = {
     val key = computeCacheKey()
@@ -1068,7 +1069,7 @@ def generateMod(addToFilePatches: Boolean,
 
     println(s"Extracting $uassetFilename ...")
     val args = if (config.game.zen) {
-                 retocPak(retocPakExeCopy, "to-legacy", "--no-shaders", "--no-compres-shaders", "--no-parallel", 
+                 retocPak(retocPakExeCopy, "to-legacy", "--verbose", "--no-shaders", "--no-compres-shaders", "--no-parallel", 
                           "--version", ueVersionCode, "--filter", uassetFilename, gamePakDir, retocPakCopyDir)
                } else {
                   var r = retocPak(retocPakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$name.*")
@@ -1142,8 +1143,13 @@ def generateMod(addToFilePatches: Boolean,
     os.remove.all(outputName)
   }
 
-  def packMod(modName: String): os.Path = {
-    val modDir = modDirOpt.get  
+  def packMod(name: String): os.Path = {
+    val logicModsPrefix = "LogicMods"
+    val (modName, modDir, packDirName) = if (name.startsWith(logicModsPrefix + '.')) {
+      val mn = name.substring(logicModsPrefix.length + 1)
+      (mn, tempDir / logicModsPrefix / mn, logicModsPrefix) 
+    } else (name, tempDir / name, name)
+ 
     if (os.exists(modDir)) {
       exit(-1, s"$modDir already exists")
     }
@@ -1175,8 +1181,8 @@ def generateMod(addToFilePatches: Boolean,
 
     println(s"Archiving $pack ...")
     modExt match {
-      case "zip" => os.proc(zipExe, "a", s"-t$modExt", "-mtm-", pack, modName).call(cwd = tempDir)
-      case "7z" => os.proc(zipExe, "a", s"-t$modExt", "-mx=9", "-mfb=273", "-mtm=off", pack, modName).call(cwd = tempDir)
+      case "zip" => os.proc(zipExe, "a", s"-t$modExt", "-mtm-", pack, packDirName).call(cwd = tempDir)
+      case "7z" => os.proc(zipExe, "a", s"-t$modExt", "-mx=9", "-mfb=273", "-mtm=off", pack, packDirName).call(cwd = tempDir)
     }
     
     println()
@@ -1267,8 +1273,6 @@ def generateMod(addToFilePatches: Boolean,
       if ((jsonMap.keySet -- skippedUassets).nonEmpty) packMod(modName)
     case _ =>
   }
-
-  modDirOpt.foreach(os.remove.all)
 
   if (skippedUassets.nonEmpty) println(s"The following .uassets were skipped: ${skippedUassets.mkString(", ")}")
   messageOpt match {

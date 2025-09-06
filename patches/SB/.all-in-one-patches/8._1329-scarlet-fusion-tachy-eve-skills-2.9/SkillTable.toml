@@ -5,11 +5,11 @@ FirstSkillActiveAlias = "P_Eve_Fusion_JustParry_LightAttackCombo2_1_Cast1"    # 
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 ShieldAttackDamageRate = 10.4                                # 1.4
 
-[P_Eve_Sword_Normal_StrongAttack10_1_Ex] # Incursion I β - ++Punishing Edge: ☐, △, △, Hold △
-AttackDamageRate = 8                                         # 6.0
-FirstSkillActiveAlias = "P_Eve_Tachy_JustParry_StrongAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
-ShieldAttackDamageRate = 8                                   # 3.0
+[P_Eve_Sword_Normal_StrongAttack10_1_Ex] # Incursion I β - Fusion Judgement Wave: ☐, △, △, Hold △
+AttackDamageRate = 6                                         # 5.7
+FirstSkillActiveAlias = "P_Eve_Fusion_Skill_SwordAura1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"
+TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 6                                   # 2.9
 
 [P_Eve_Sword_Normal_DashAttack1_2_Ex] # Incursion II β - Fusion Blade Fury: ☐, ☐, △, Hold △
 AttackDamageRate = 6                                         # 4.1
@@ -17,17 +17,23 @@ FirstSkillActiveAlias = "P_Eve_Fusion_Skill_ScrewAttack1_1_Cast1"    # "P_Eve_Sw
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 ShieldAttackDamageRate = 6                                   # 2.1
 
-[P_Eve_Sword_Normal_LightAttackChain1_1] # Incursion III β - Shield Break: ☐, △, Hold ☐
+[P_Eve_Sword_Normal_FinishAttack3_4_Ex] # Incursion III β - Shield Break: ☐, △, ☐, Hold △
 AttackDamageRate = 9.5                                       # 2.3
 FirstSkillActiveAlias = "P_Eve_Fusion_JustEvade_LightAttack1_1_Cast1"    # "P_Eve_Sword_Normal_LightAttackChain1_1_Cast"
 TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 ShieldAttackDamageRate = 9.5                                 # 1.2
 
-[P_Eve_Sword_Normal_FinishAttack4_1_Ex] # Incursion IV β - Fusion Judgement Wave: ☐, ☐, ☐, △, Hold △
-AttackDamageRate = 6                                         # 5.7
-FirstSkillActiveAlias = "P_Eve_Fusion_Skill_SwordAura1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack4_1_Ex_Cast1"
-TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
-ShieldAttackDamageRate = 6                                   # 2.9
+[P_Eve_Sword_Normal_FinishAttack4_1] # Incursion IV - Punishing Edge: ☐, ☐, ☐, △, △
+AttackDamageRate = 8                                         # 6.0
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_FinishAttack1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 8                                   # 3.0
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Ex] # Incursion IV β - ++Punishing Edge: ☐, ☐, ☐, △, Hold △
+AttackDamageRate = 8                                         # 6.0
+FirstSkillActiveAlias = "P_Eve_Tachy_JustParry_StrongAttackCombo1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack10_1_Ex_Cast1"
+TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
+ShieldAttackDamageRate = 8                                   # 3.0
 
 [P_Eve_Sword_Normal_StrongAttack5_1_Ex] # Onslaught I β - Quadruplet++: △, △, Hold △
 AttackDamageRate = 4                                         # 4.5
@@ -47,6 +53,12 @@ FirstSkillActiveAlias = "P_Eve_Sword_Beta_ChargeSlashCombo1_Ex_Cast1"    # "P_Ev
 TargetFilterAlias = "P_Eve_Tachy_Skill_SwordAura_Target"     # "P_Eve_Sword_0500_180_500_Target"
 ShieldAttackDamageRate = 4                                   # 2.1
 
+[P_Eve_Sword_Normal_StrongAttack7_1] # Onslaught IV - Descending Break: △, ☐, △, ☐, Hold △
+AttackDamageRate = 8                                         # 5.1
+FirstSkillActiveAlias = "P_Eve_Sword_Burst_SpinAttack1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack7_1_Ex_Cast1"
+TargetFilterAlias = "P_Eve_Sword_1800_360_500_Target"        # "P_Eve_Sword_0800_180_500_Target"
+ShieldAttackDamageRate = 8                                   # 2.6
+
 [P_Eve_Sword_Normal_StrongAttack7_1_Ex] # Onslaught IV β - ++Descending Break: △, ☐, △, ☐, Hold △
 AttackDamageRate = 8                                         # 5.1
 FirstSkillActiveAlias = "P_Eve_Fusion_JustEvade_StrongAttack1_1_Cast1"    # "P_Eve_Sword_Normal_StrongAttack7_1_Ex_Cast1"
@@ -58,12 +70,6 @@ AttackDamageRate = 12                                        # 10.4
 FirstSkillActiveAlias = "P_Eve_Sword_Burst_MassiveAttack1_1_Cast1"    # "P_Eve_Sword_JustParry_LightAttackCombo2_1_Cast1"
 TargetFilterAlias = "P_Eve_Sword_0800_360_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
 ShieldAttackDamageRate = 12                                  # 10.4
-
-[P_Eve_Sword_Normal_FinishAttack3_4_Ex] # ???
-AttackDamageRate = 8                                         # 5.0
-FirstSkillActiveAlias = "P_Eve_Sword_Beta_ChainStab1_1_Cast1"    # "P_Eve_Sword_Normal_FinishAttack3_4_Cast1"
-TargetFilterAlias = "P_Eve_Sword_0500_180_500_Target"        # "P_Eve_Sword_0500_180_500_Target"
-ShieldAttackDamageRate = 4                                   # 2.5
 
 ['.*: ^P_Eve_Sword_Air_GuardBreakAttack1_1.*'] # Fusion Air Nosedive: [Hold] △
 AttackDamageRate = 6                                         # 2
