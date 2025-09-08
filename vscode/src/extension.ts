@@ -456,6 +456,22 @@ export async function activate(_context: vscode.ExtensionContext) {
     };
     vscode.window.showOpenDialog(options).then(fileUri => { if (fileUri && fileUri[0]) loadConfigH(true, fileUri[0].fsPath) });   
   });
+  vscode.commands.registerCommand(`automod.jd`, async (_contextSelection: vscode.Uri, allSelections: vscode.Uri[]) => {    
+    const automodDir = await getAutomodDir();
+    if (!automodDir) {
+      vscode.window.showInformationMessage(`Please configure the automod installation directory`);
+      return;
+    }
+    if (allSelections.length == 2) {
+      const first = allSelections[0].fsPath;
+      const second = allSelections[1].fsPath;
+      const jd = `${automodDir}${fsep}tools${fsep}${isWindows? "jd.exe" : "jd"}`;
+      const taskData: TaskData = {type: AutomodTaskProvider.TYPE, kind: `jd`, args: [jd, first, second]};
+      vscode.tasks.executeTask(newTask(taskData));
+    } else {
+      vscode.window.showInformationMessage(`Please select two .json files for jd`);
+    }
+  });
   vscode.workspace.onDidChangeConfiguration(async event => {
     let affected = event.affectsConfiguration("automod.games") || event.affectsConfiguration("automod.tools");
     if (affected) await updateConfig();

@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.2.0"
+var version = "3.2.1"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"

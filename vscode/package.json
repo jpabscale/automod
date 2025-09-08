@@ -2,7 +2,7 @@
   "name": "automod-vscode",
   "displayName": "automod-vscode",
   "description": "VSCode extension for Auto Modding Script",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "publisher": "jpabscale",
   "icon": "images/automod.png",
   "private": true,
@@ -147,6 +147,10 @@
       {
         "command": "automod.diff.into",
         "title": "automod .diff.into"
+      },
+      {
+        "command": "automod.jd",
+        "title": "automod .jd"
       }
     ],
     "menus": {
@@ -160,6 +164,12 @@
         {
           "when": "filesExplorerFocus && foldersViewVisible && explorerResourceIsFolder",
           "command": "automod.diff.into",
+          "alt": "",
+          "group": "navigation"
+        },
+        {
+          "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsFolder && resourceExtname == .json",
+          "command": "automod.jd",
           "alt": "",
           "group": "navigation"
         }

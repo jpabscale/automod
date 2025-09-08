@@ -426,7 +426,7 @@ case class AtFilteredChanges(addToFilePatches: Boolean,
         case node: ObjectNode =>
           for ((property, valuePair) <- changes) Option(node.get(property)) match {
             case Some(old) => 
-              applyAtChange(path, node, property, valuePair.newValueOpt.get, orig.get(property))
+              applyAtChange(path, node, property, valuePair.newValueOpt.get, if (orig == null) null else orig.get(property))
             case _ => automod.exit(-1, s"$uassetName @$path does not have the property: $property")
           }
         case _ => automod.exit(-1, s"$uassetName @$path is neither a UAssetAPI's struct nor a JSON object node")

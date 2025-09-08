@@ -1,3 +1,5 @@
+3.2.1: Fixed possible NPE in .@ patchlet. Added jd context menu command on two selected .json files in VSCode file explorer.
+
 3.2.0: Separated automod installation directory from automod general settings in VSCode extension (require resetting automod general settings). Changed automod general settings target to Workspace. Added .@ patchlet support. Package mod under LogicMods directory if the mod name starts with "LogicMods.". Lazily download .cache. Updated patches\SB 1329 to v2.9.
 
 3.1.1: Fixed VSCode extension automod .config.json import and refresh workspace after writing/backing up .config.json. Fixed .upgrade. Use automod shell scripts when launching from VSCode. Download luaj from luaj GitHub's release in automod shell scripts (instead of using jitpack.io). Added readme.md and updated .gitignore.
