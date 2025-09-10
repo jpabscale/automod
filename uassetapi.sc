@@ -211,6 +211,7 @@ def fromValue(v: Any): JsonNode = {
       for ((k, v) <- v) r.set[JsonNode](k.toString, fromValue(v))
       r
     case null => NullNode.instance
+    case v: JsonNode => v
     case _ => automod.exit(-1, s"Unsupported value (${v.getClass}): '$v'")
   }
 }

@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.2.1"
+var version = "3.2.2"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -928,9 +928,31 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
   }
 }
 
+val logs = new java.util.concurrent.ConcurrentHashMap[String, java.io.BufferedWriter]
+
 def logPatch(uassetName: String, line: String, console: Boolean): Unit = {
   if (console) println(line)
-  os.write.append(logDir / s"$uassetName.log", s"$line${util.Properties.lineSeparator}")
+  val p = logDir / s"$uassetName.log"
+  val key = absPath(p)
+  var q = logs.get(absPath(logDir / s"$uassetName.log"))
+  if (q == null) {
+    os.makeDir.all(logDir)
+    q = new java.io.BufferedWriter(new java.io.FileWriter(key))
+    logs.put(key, q)
+  }
+  q.write(s"$line${util.Properties.lineSeparator}")
+}
+
+def logFlush(uassetName: String): Unit = {
+  val key = absPath(logDir / s"$uassetName.log")
+  val q = logs.get(key)
+  logs.remove(key)
+  q.flush()
+  q.close()
+}
+
+def logFlush(): Unit = {
+  for (w <- logs.values.asScala) try w.flush() finally w.close()
 }
 
 def checkPatchesDir(): Unit = if (!os.isDir(patchesDir)) exit(-1, s"Missing directory: $patchesDir")
@@ -1200,6 +1222,7 @@ def generateMod(addToFilePatches: Boolean,
   if (!disableCodePatching) {
     uassetNames = uassetNames ++ patchCustom.uassetNames
   }
+
   val jsonMap = Map.empty[String, os.Path] ++ (
     if (noPar) for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName))
     else for (uassetName <- uassetNames.toSeq.par) yield (uassetName, unpackJson(uassetName)))
@@ -1257,10 +1280,13 @@ def generateMod(addToFilePatches: Boolean,
       }
     }
     if (custom && !patchCustom.patch(uassetName, json, getAllPatches(uassetName))) skipUasset(uassetName)
+    logFlush(uassetName)
   }
 
-  if (noPar) uassetNames.foreach(patchUasset) 
-  else uassetNames.toSeq.par.foreach(patchUasset)
+  try 
+    if (noPar) uassetNames.foreach(patchUasset) 
+    else uassetNames.toSeq.par.foreach(patchUasset)
+  finally logFlush()
   
   println()
 

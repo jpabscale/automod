@@ -1,11 +1,12 @@
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, DoubleNode, IntNode, JsonNodeFactory, NullNode, ObjectNode, TextNode}
 import com.jayway.jsonpath
 import java.util.{List => JList}
 import org.luaj.vm2.{LuaValue, LuaFunction}
 import org.graalvm.polyglot.{Context, HostAccess, Value}
 import scala.collection.immutable.TreeMap
 import scala.jdk.CollectionConverters._
+import scala.collection.parallel.CollectionConverters._
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
@@ -420,7 +421,7 @@ case class AtFilteredChanges(addToFilePatches: Boolean,
       automod.exit(-1, s"Unrecognized path for $uassetName: $path")
     }
     if (nodes.isEmpty) automod.exit(-1, s"Could not find objects for $uassetName: $path")
-    for ((node, orig) <- nodes) {
+    for ((node, orig) <- nodes.par) {
       if (uassetapi.isStruct(node)) applyStructChanges(path, node, orig)
       else node match {
         case node: ObjectNode =>
@@ -489,7 +490,11 @@ def kfcMap(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetName: Str
           if (i >= path.length) automod.exit(-1, s"Invalid $atPrefix path: $path")
           path = path.substring(i)
           val isDataTable = if (path.startsWith(automod.dataTablePath + "/")) true else {
-            val r = origAstPath.read(path).asInstanceOf[ArrayNode]
+            val r = (if (path.head == '/') {
+              val array = JsonNodeFactory.instance.arrayNode
+              Option(origAstPath.json[JsonNode].at(path)).foreach(_ => array.add(toJsonPath(path)))
+              array
+            } else origAstPath.read(path)).asInstanceOf[ArrayNode]
             val prefix = dataTableJsonPath + "["
             def allWithPrefix: Boolean = {
               for (i <- 0 until r.size if !r.get(i).textValue.startsWith(prefix)) return false

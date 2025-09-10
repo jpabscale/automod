@@ -1,3 +1,5 @@
+3.2.2: Fixed .@ data table detection. Parallelized .@ patching. Buffered logging. Added support for JsonNode passthrough in Scala patchlet.
+
 3.2.1: Fixed possible NPE in .@ patchlet. Added jd context menu command on two selected .json files in VSCode file explorer.
 
 3.2.0: Separated automod installation directory from automod general settings in VSCode extension (require resetting automod general settings). Changed automod general settings target to Workspace. Added .@ patchlet support. Package mod under LogicMods directory if the mod name starts with "LogicMods.". Lazily download .cache. Updated patches\SB 1329 to v2.9.
