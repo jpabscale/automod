@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.2.2"
+var version = "3.2.3"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -167,7 +167,7 @@ val soaGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "d3f93021c66b8861c2f8415cf182c6296864cb18"
+  @BeanProperty var fmodel: String = "378c911083669b2e4c7de09499ac9a0bcde6efb7"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
   @BeanProperty var retoc: String = "0.1.3-pre.2"
@@ -930,7 +930,8 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
 
 val logs = new java.util.concurrent.ConcurrentHashMap[String, java.io.BufferedWriter]
 
-def logPatch(uassetName: String, line: String, console: Boolean): Unit = {
+def logPatch(uassetName: String, l: String, console: Boolean): Unit = {
+  val line = if (l.length > 1024) l.substring(0, 1024) else l
   if (console) println(line)
   val p = logDir / s"$uassetName.log"
   val key = absPath(p)
@@ -1856,7 +1857,7 @@ def run(): Unit = {
     val gamePatches = patchesDir / gameId
     var ok = false
     if (os.isDir(gamePatches)) {
-      for (p <- os.list(gamePatches) if os.isDir(p) && hasTomlOrPatchFiles(p)) {
+      for (p <- os.list(gamePatches) if os.isDir(p) && !p.last.startsWith(".") && hasTomlOrPatchFiles(p)) {
         val modName = p.last
         val oldPatchesDir = patchesDir
         val oldLogDir = logDir

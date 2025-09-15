@@ -494,7 +494,7 @@ def kfcMap(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetName: Str
               val array = JsonNodeFactory.instance.arrayNode
               Option(origAstPath.json[JsonNode].at(path)).foreach(_ => array.add(toJsonPath(path)))
               array
-            } else origAstPath.read(path)).asInstanceOf[ArrayNode]
+            } else util.Try(origAstPath.read(path)).getOrElse(JsonNodeFactory.instance.arrayNode)).asInstanceOf[ArrayNode]
             val prefix = dataTableJsonPath + "["
             def allWithPrefix: Boolean = {
               for (i <- 0 until r.size if !r.get(i).textValue.startsWith(prefix)) return false
