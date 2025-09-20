@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.2.3"
+var version = "3.2.4"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -1641,7 +1641,7 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
 case class SearchPath(labelOpt: Option[String], path: String)
 case class UAssetSearch(uassetName: String, searchPaths: Vector[SearchPath])
 
-def search(gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path): Unit = {
+def search(flat: Boolean, gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path): Unit = {
   def isLabelChar(c: Char): Boolean = c == '_' || c == '-' || c.isLetterOrDigit
   def getLabelLineOpt(line: String): Option[(String, String)] = {
     var i = 0
@@ -1715,10 +1715,14 @@ def search(gamePakDirOpt: Option[os.Path], pathsInput: os.Path, outDir: os.Path)
         for (i <- 0 until rPaths.size) {
           val rPath = rPaths.get(i)
           val r = dc.read[ArrayNode](rPath.asText)
-          val o2 = JsonNodeFactory.instance.objectNode
-          o2.set("resolvePath", rPath)
-          o2.set("result", r)
-          array.add(o2)
+          if (flat) {
+            for (j <- 0 until r.size) array.add(r.get(j))
+          } else {
+            val o2 = JsonNodeFactory.instance.objectNode
+            o2.set("resolvedPath", rPath)
+            o2.set("result", r)
+            array.add(o2)
+          }
         }
         o.set("path", TextNode.valueOf(path))
         o.set("results", array)
@@ -1747,7 +1751,7 @@ def printUsage(): Nothing = {
        |                         | .batch option*
        |                         | .demo.[sb|soa]
        |                         | .diff[.into] <from-path> <to-path> <out-path>
-       |                         | .search <paths-input>.sam <out-path>
+       |                         | .search[.flat] <paths-input>.sam <out-path>
        |                         | .setup[.vscode [ <path-to-vscode> ]]
        |                         | .toml[.all] <out-path>
        |                         | .upgrade
@@ -1772,6 +1776,7 @@ def printUsage(): Nothing = {
        |.diff                 Recursively diff JSON files and write jd and TOML patch files
        |.diff.into            Use .diff between <from-path> with each sub-folder of <to-path>
        |.search               Query UAssetAPI JSON files using the JSONPaths in <paths-input>
+       |.search.flat          Same as .search but without resolved paths in a single array result
        |.setup                Only set up modding tools
        |.setup.vscode         Set up modding tools and VSCode extensions
        |.toml                 Merge existing patch files in patches as TOML patch files
@@ -1823,7 +1828,7 @@ def run(): Unit = {
     case _ if argName.startsWith(".demo.") => if (cliArgs.length != 1) printUsage()
     case ".batch" => if (cliArgs.tail.exists(!_.startsWith("--"))) printUsage()
     case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
-    case ".search" => if (cliArgs.length != 3) printUsage()
+    case ".search" | ".search.flat" => if (cliArgs.length != 3) printUsage()
     case ".setup" => if (cliArgs.length != 1) printUsage()
     case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
     case ".toml" | ".toml.all" => if (cliArgs.length != 2) printUsage()
@@ -1972,7 +1977,11 @@ def run(): Unit = {
     case ".search" =>
       val input = checkFileExt(absPath(cliArgs(next)), "sam")
       val outDir = checkDirAvailable(absPath(cliArgs(next + 1)))
-      search(gamePakDirOpt, input, outDir)
+      search(flat = false, gamePakDirOpt, input, outDir)
+    case ".search.flat" =>
+      val input = checkFileExt(absPath(cliArgs(next)), "sam")
+      val outDir = checkDirAvailable(absPath(cliArgs(next + 1)))
+      search(flat = true, gamePakDirOpt, input, outDir)
     case ".setup" => if (setup) println("All modding tools have been set up")
     case ".setup.vscode" => vscode(if (cliArgs.length == 2) Some(absPath(cliArgs(1))) else None)
     case ".toml" | ".toml.all" => 

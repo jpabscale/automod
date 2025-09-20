@@ -366,8 +366,10 @@ export class AutomodTaskProvider implements vscode.TaskProvider {
     }
     tasks.push(newTask({type: type, kind: ".demo.sb", args: [ ...cmdPrefix, ".demo.sb"]}));
     tasks.push(newTask({type: type, kind: ".demo.soa", args: [ ...cmdPrefix, ".demo.soa"]}));
-    if (vscode.window.activeTextEditor?.document.fileName.endsWith(".sam"))
+    if (vscode.window.activeTextEditor?.document.fileName.endsWith(".sam")) {
       tasks.push(newTask({type: type, kind: ".search", args: [ ...cmdPrefix, ".search", "${file}", `${output}${fsep}search-\${fileBasenameNoExtension}-${getTimestamp()}`].filter(isNotUndefined)}));
+      tasks.push(newTask({type: type, kind: ".search.flat", args: [ ...cmdPrefix, ".search.flat", "${file}", `${output}${fsep}search.flat-\${fileBasenameNoExtension}-${getTimestamp()}`].filter(isNotUndefined)}));
+    }
     if (hasPatches) tasks.push(newTask({type: type, kind: ".toml", args: [ ...cmdPrefix, ".toml", `${output}${fsep}toml-${getTimestamp()}`].filter(isNotUndefined)}));
     if (hasPatches) tasks.push(newTask({type: type, kind: ".toml.all", args: [ ...cmdPrefix, ".toml.all", `${output}${fsep}toml.all-${getTimestamp()}`].filter(isNotUndefined)}));
     tasks.push(newTask({type: type, kind: ".upgrade", args: [ ...cmdPrefix, ".upgrade"]}));
