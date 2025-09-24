@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.2.4"
+var version = "3.2.5"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -150,7 +150,7 @@ val sbGame = {
   g.directory = ""
   g.contentPaks = s"$sbGameId/Content/Paks"
   g.unrealEngine = "4.26"
-  g.mapUri = s"${usmapUrlPrefix}StellarBlade_1.3.2.usmap.7z"
+  g.mapUri = s"${usmapUrlPrefix}StellarBlade_1.4.0.usmap.7z"
   g.repakPackOptions = ""
   g.zen = true
   g
@@ -947,9 +947,11 @@ def logPatch(uassetName: String, l: String, console: Boolean): Unit = {
 def logFlush(uassetName: String): Unit = {
   val key = absPath(logDir / s"$uassetName.log")
   val q = logs.get(key)
-  logs.remove(key)
-  q.flush()
-  q.close()
+  if (q != null) {
+    logs.remove(key)
+    q.flush()
+    q.close()
+  }
 }
 
 def logFlush(): Unit = {
@@ -1710,20 +1712,24 @@ def search(flat: Boolean, gamePakDirOpt: Option[os.Path], pathsInput: os.Path, o
       val SearchPath(labelOpt, path) = paths(j - 1)
       try {
         val o = JsonNodeFactory.instance.objectNode
-        val array = JsonNodeFactory.instance.arrayNode
         val rPaths = dcPath.read[ArrayNode](path)
+        var seq = Seq[JsonNode]()
         for (i <- 0 until rPaths.size) {
           val rPath = rPaths.get(i)
           val r = dc.read[ArrayNode](rPath.asText)
           if (flat) {
-            for (j <- 0 until r.size) array.add(r.get(j))
+            for (j <- 0 until r.size) seq = seq :+ r.get(j)
           } else {
             val o2 = JsonNodeFactory.instance.objectNode
             o2.set("resolvedPath", rPath)
             o2.set("result", r)
-            array.add(o2)
+            seq = seq :+ o2
           }
         }
+        if (seq.forall(_.isInstanceOf[TextNode])) 
+          seq = (collection.immutable.TreeSet[String]() ++ seq.map(_.asText)).toSeq.map(TextNode.valueOf)
+        val array = JsonNodeFactory.instance.arrayNode
+        for (e <- seq) array.add(uassetapi.fromValue(e))
         o.set("path", TextNode.valueOf(path))
         o.set("results", array)
         val out = labelOpt match {

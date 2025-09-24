@@ -1,3 +1,5 @@
+3.2.5: Fixed possible NPE in logging. Made .search.flat returns ordered string set if the query result is all Strings. Upgraded SB.
+
 3.2.4: Added .search.flat and fixed .search result resolved path typo.
 
 3.2.3: Fixed another .@ data table detection issue. Made .batch to ignore folders whose name starts with dot (.). Set log line limit to 1024 chars.

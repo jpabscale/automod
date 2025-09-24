@@ -1,4 +1,4 @@
-//> using jvm graalvm-oracle:24
+//> using jvm graalvm-oracle:25
 //> using javaOptions --enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow
 //> using scala 2.13.16
 //> using options --deprecation -feature -language:implicitConversions
@@ -7,9 +7,9 @@
 //> using jar lib/luaj-jse-1.0.0.jar
 //> using dep com.jayway.jsonpath:json-path:2.9.0
 //> using dep org.apache.bcel:bcel:6.10.0
-//> using dep org.graalvm.polyglot:js:24.2.2
-//> using dep org.graalvm.polyglot:polyglot:24.2.2
-//> using dep org.graalvm.polyglot:python:24.2.2
+//> using dep org.graalvm.polyglot:js:25.0.0
+//> using dep org.graalvm.polyglot:polyglot:25.0.0
+//> using dep org.graalvm.polyglot:python:25.0.0
 //> using dep com.lihaoyi::os-lib:0.11.5
 //> using dep com.lihaoyi::sourcecode:0.4.4
 //> using dep org.scala-lang:scala-compiler:2.13.16

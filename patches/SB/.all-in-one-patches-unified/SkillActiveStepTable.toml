@@ -442,7 +442,7 @@ StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHi
 StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\", \"CalculationValue\":1}]"
 
 [M_Scarlet_PhaseChange1_EndShieldOwn_Cast1]
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}]"
 StartTargetEffect = "[{\"Alias\":\"Check_LinkSkill\"},{\"Alias\":\"SkillCancel\"},{\"Alias\":\"BlockAction_Skill\",\"Time\":5.7},{\"Alias\":\"BlockRotation_Skill\",\"Time\":5.7},{\"Alias\":\"LinkState_PC\",\"Time\":6.9},{\"Alias\":\"Check_NotDamageScreenFX\"},{\"Alias\":\"Check_NotCameraShake\"}]"    # "[{\"Alias\":\"Check_LinkSkill\"}, {\"Alias\":\"SkillCancel\"}, {\"Alias\":\"BlockAction_Skill\", \"Time\":5.7}, {\"Alias\":\"BlockRotation_Skill\", \"Time\":5.7}, {\"Alias\":\"DelayDeath_Skill\",\"Time\":5.7}, {\"Alias\":\"LinkState_PC\", \"Time\":6.9}, {\"Alias\":\"Check_NotDamageScreenFX\"}, {\"Alias\":\"Check_NotCameraShake\"}]"
 
 [M_Scarlet_PhaseChange1_EndShieldOwn_Finish1]
@@ -453,7 +453,7 @@ StartTargetEffect = "[{\"Alias\":\"P_Eve_SkillTree_SwordAura_KnockDown\",\"start
 [M_Scarlet_PhaseChange1_EndShieldOwn_Hit1]
 SkillAttackDamageRate = 3.0                                  # 1.0
 SkillShieldAttackDamageRate = 3.0                            # 1.0
-StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":1}, {\"Alias\":\"M_Scarlet_Phase2\"}]"
+StartSelfEffect = "[{\"Alias\":\"NoDamage_Skill\",\"Time\":2},{\"Alias\":\"AddHitDefense_Skill\",\"CalculationValue\":4},{\"Alias\":\"AddHitDefense_EveSkill\",\"CalculationValue\":4},{\"Alias\":\"BlockMove_Step\"},{\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}]"    # "[{\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"AddHitDefense_Step\",\"CalculationValue\":4}, {\"Alias\":\"M_Scarlet_Phase2\"}]"
 StartTargetEffect = "[{\"Alias\":\"SkillDamage_Melee\"},{\"Alias\":\"HitImpactStrongLink\"},{\"Alias\":\"BlockAction_Step\"},{\"Alias\":\"BlockRotation_Step\"}]"    # "[{\"Alias\":\"SkillDamage_Melee\"}, {\"Alias\":\"HitImpactStrongLink\"}, {\"Alias\":\"BlockAction_Step\"}, {\"Alias\":\"BlockRotation_Step\"}, {\"Alias\":\"ImmediateDeathPossibleRevival\"}]"
 
 [M_Scarlet_Stinger_Cast1]
