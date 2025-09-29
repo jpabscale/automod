@@ -1,0 +1,4 @@
+['.*: ^.*$']
+requiredOreTypeTag = '=> Seq(v.orig[Seq[Map[String, Any]]].head + ("Value" -> "Item.Resource.Sacrumite.Dust"))'
+requiredOreQuantity = 0
+requiredCurrency = 0

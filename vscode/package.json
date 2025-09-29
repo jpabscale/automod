@@ -2,7 +2,7 @@
   "name": "automod-vscode",
   "displayName": "automod-vscode",
   "description": "VSCode extension for Auto Modding Script",
-  "version": "3.2.5",
+  "version": "3.3.0",
   "publisher": "jpabscale",
   "icon": "images/automod.png",
   "private": true,
@@ -78,6 +78,10 @@
                "Ultra Compression": {
                 "type": "boolean",
                 "description": "Use 7z ultra compression"
+               },
+               "Licenses": {
+                "type": "string",
+                "description": "License path(s) to include when generating the mod (comma-separated)"
                }
             },
             "default": {
@@ -85,7 +89,8 @@
               "No Code Patching": false,
               "Dry Run": false,
               "Include Patches": false,
-              "Ultra Compression": false
+              "Ultra Compression": false,
+              "Licenses": ""
             },
             "scope": "resource"
           },

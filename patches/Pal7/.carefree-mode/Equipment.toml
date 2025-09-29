@@ -1,0 +1,14 @@
+['.*: ^.*$']
+ForgeMaterialRequirement = []
+ForgeMoneyRequirement = 0
+MaxWeaponEnhanceLevel = '=> if (v.orig[Double] > 0) 99 else v.orig[Double]'
+GearLevelRequirement = 0
+
+['.@: $..[?(@.Name == "EnhanceMaterialRequirement")]']
+Value = []
+
+['.@: $..[?(@.Name == "EnhanceMoneyRequirement")]']
+Value = 0
+
+['.@: $..[?(@.Name == "MaxLevel")]']
+Value = '=> if (v.orig[Double] > 0) 99 else v.orig[Double]'

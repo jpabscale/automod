@@ -1,0 +1,4 @@
+['.*: ^.*$']
+runeDustValue = 1000000
+runeDustRequired = 0
+glintRequired = 0

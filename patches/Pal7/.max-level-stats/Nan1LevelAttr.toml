@@ -1,0 +1,8 @@
+['.*: ^.*$']
+HPMAX = '=> v.valueOf("100", "HPMAX").get'
+MPMAX = '=> v.valueOf("100", "MPMAX").get'
+PhysicalAtk = '=> v.valueOf("100", "PhysicalAtk").get'
+PhysicalDef = '=> v.valueOf("100", "PhysicalDef").get'
+SpellAtk = '=> v.valueOf("100", "SpellAtk").get'
+SpellDef = '=> v.valueOf("100", "SpellDef").get'
+LevelGainManaRateByNormalAttack = '=> v.valueOf("100", "LevelGainManaRateByNormalAttack").get'

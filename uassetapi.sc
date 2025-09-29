@@ -241,9 +241,15 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
     var r = HashMap.empty[String, ObjectNode]
     val values = value.get("Value").asInstanceOf[ArrayNode]
     for (j <- 0 until values.size) {
-      val element = values.get(j).asInstanceOf[ObjectNode]
-      val name = element.get("Name").asText
-      r.put(name, element)
+      val node = values.get(j)
+      node match {
+        case node: ObjectNode =>
+          val element = node.asInstanceOf[ObjectNode]
+          val name = element.get("Name").asText
+          r.put(name, element)
+        case _ =>
+          automod.exit(-1, s"Unexpected struct: $value")
+      }
     }
     r
   }
@@ -286,4 +292,4 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
 }
 
 def isStruct(node: JsonNode): Boolean = node.get("Value").isInstanceOf[ArrayNode] && 
-  Option(node.get("$type")).map(_.asText.contains("UAssetAPI.PropertyTypes.Structs")).getOrElse(false)
+  Option(node.get("$type")).map(_.asText.contains("UAssetAPI.PropertyTypes.Structs,")).getOrElse(false)

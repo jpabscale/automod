@@ -1,0 +1,11 @@
+['.@: $..[?(@.Name == "UnlockLevel")]']
+Value = 0
+
+['.@: $..[?(@.Name == "MPCost")]']
+Value = 0
+
+['.@: $..[?(@.Name == "Duration")]']
+Value = 0
+
+['.@: $..[?(@.Name == "AblityUnlockTags" && @["$type"] == "UAssetAPI.PropertyTypes.Structs.GameplayTagContainerPropertyData, UAssetAPI")]']
+Value = []

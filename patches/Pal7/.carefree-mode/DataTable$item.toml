@@ -1,0 +1,3 @@
+['.*: ^.*$']
+BuyPrice = 0
+LimitCountInFight = '=> if (v.orig[Double] > 0) 99 else v.orig[Double]'

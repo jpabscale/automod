@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.2.5"
+var version = "3.3.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -88,10 +88,12 @@ val noCodePatching = "--no-code-patching"
 val dryRun = "--dry-run"
 val includePatches = "--include-patches"
 val ultraCompression = "--ultra-compression"
+val uassetFilterSepChar = '$'
 
 var gameId = "SB"
 var maxLogs = 30
 var noPar = false
+var licenses = Seq[os.Path]()
 var cliArgs = {
   var r = args match {
     case Array("-s", _*) => args.tail
@@ -113,6 +115,11 @@ var cliArgs = {
             r = r.drop(2)
           case _ => exit(-1, s"$num is not a positive integer")
         }
+      case Array("-c", lp, _*) =>
+        val p = absPath(lp)
+        if (!os.isFile(p)) exit(-1, s"$p is not a file")
+        licenses = licenses :+ p
+        r = r.drop(2)
       case _ => done = true
     }
   }
@@ -134,6 +141,7 @@ val autoupdateUsmaps = TreeSet[String]()
 
 val sbGameId = "SB"
 val soaGameId = "SandsOfAura"
+val pal7GameId = "Pal7"
 
 class Game {
   @BeanProperty var aesKey: String = ""
@@ -165,9 +173,19 @@ val soaGame = {
   g.zen = false
   g
 }
+val pal7Game = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = s"$pal7GameId/Content/Paks"
+  g.unrealEngine = "4.25"
+  g.mapUri = ""
+  g.repakPackOptions = ""
+  g.zen = false
+  g
+}
 
 class Tools {
-  @BeanProperty var fmodel: String = "378c911083669b2e4c7de09499ac9a0bcde6efb7"
+  @BeanProperty var fmodel: String = "8eeae5d59b640cdaea0c0d909aa3cb534677c950"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
   @BeanProperty var retoc: String = "0.1.3-pre.2"
@@ -188,6 +206,7 @@ def initConfig: Config = {
   r.games = new java.util.TreeMap[String, Game]
   r.games.put(sbGameId, sbGame)
   r.games.put(soaGameId, soaGame)
+  r.games.put(pal7GameId, pal7Game)
   r.tools = new Tools
   r
 }
@@ -544,7 +563,7 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     println()
   }
 
-  if (!os.exists(usmapPath)) {
+  if (usmapUri.nonEmpty && !os.exists(usmapPath)) {
     setup = false
     println(s"Setting up $usmapPath ...")
     val f = downloadCheck(usmapUri)
@@ -556,7 +575,7 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
 
   {
     val dest = uassetGuiMappingsDir / usmapPath.last
-    if (!os.exists(dest)) {
+    if (usmapUri.nonEmpty && !os.exists(dest)) {
       setup = false
       os.makeDir.all(uassetGuiMappingsDir)
       os.copy.over(usmapPath, dest)
@@ -1044,7 +1063,11 @@ def generateMod(addToFilePatches: Boolean,
 
   val uassetNamePathMap = new ConcurrentHashMap[String, os.RelPath]
 
-  def unpackJson(name: String): os.Path = {
+  def unpackJson(n: String): os.Path = {
+    var name = n
+    if (name.contains(uassetFilterSepChar)) {
+      name = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
+    }
     val json = s"$name.json"
 
     def findCached(dir: os.Path): os.Path = {
@@ -1094,12 +1117,14 @@ def generateMod(addToFilePatches: Boolean,
 
     println(s"Extracting $uassetFilename ...")
     val args = if (config.game.zen) {
+                 val filterName = s"${n.replace(uassetFilterSepChar, '/')}.uasset"
                  retocPak(retocPakExeCopy, "to-legacy", "--verbose", "--no-shaders", "--no-compres-shaders", "--no-parallel", 
-                          "--version", ueVersionCode, "--filter", uassetFilename, gamePakDir, retocPakCopyDir)
+                          "--version", ueVersionCode, "--filter", filterName, gamePakDir, retocPakCopyDir)
                } else {
-                  var r = retocPak(retocPakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$name.*")
-                  for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
-                  r
+                 val filterName = s"${n.replace(uassetFilterSepChar, '/')}"
+                 var r = retocPak(retocPakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$filterName.*")
+                 for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
+                 r
                }
     val pRetocPak = os.proc(args: _*)
     if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0 || !os.exists(retocPakCopyDir / gameId) || os.walk(retocPakCopyDir / gameId).isEmpty)
@@ -1138,7 +1163,11 @@ def generateMod(addToFilePatches: Boolean,
     r
   }
 
-  def packJson(name: String, path: os.Path): Unit = {
+  def packJson(n: String, path: os.Path): Unit = {
+    var name = n
+    if (name.contains(uassetFilterSepChar)) {
+      name = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
+    }
     val outputName = output / name
     val profileCopyDir = outputName / userName
     val uassetGuiSettingsCopyDir = profileCopyDir / "AppData" / "Local" / "UAssetGUI"
@@ -1200,6 +1229,16 @@ def generateMod(addToFilePatches: Boolean,
         val dest = tempDir / modName / relPath
         os.makeDir.all(dest / os.up)
         os.copy.over(p, dest)
+      }
+      println()
+    }
+
+    if (licenses.nonEmpty) {
+      println()
+      println(s"Copying licenses ...")
+      for (l <- licenses) {
+        val dest = tempDir / modName / l.last
+        os.copy.over(l, dest)
       }
       println()
     }
@@ -1534,7 +1573,7 @@ def execute(p: os.proc): Unit = {
 def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
   val modName = "all-in-one"
   val modPatches = patchesDir / modName
-  val aioPatches = automodDir / "patches" / soaGameId / ".all-in-one-patches"
+  val aioPatches = automodDir / "patches" / soaGameId / ".all-in-one"
   os.remove.all(modPatches)
 
   if (!os.exists(patchesDir)) {
@@ -1769,6 +1808,7 @@ def printUsage(): Nothing = {
        | -g <game-id>         Active game identifier (default: SB)
        | -l <num>             Maximum task logs to keep (default: 30)
        | -p                   Disable parallelization
+       | -c <license-path>    Include license file(s) in the generated mod
        |
        |option:
        | --dry-run            Disable actual mod generation and just test patches

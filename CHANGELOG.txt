@@ -1,3 +1,5 @@
+3.3.0: Added -c opt to include license files in generated mod(s). Added support for empty mapURI. Added support for uasset filter path using $ for /. Further refined .@ UAssetAPI Struct check. Added support for Sword and Fairy 7.
+
 3.2.5: Fixed possible NPE in logging. Made .search.flat returns ordered string set if the query result is all Strings. Upgraded SB.
 
 3.2.4: Added .search.flat and fixed .search result resolved path typo.

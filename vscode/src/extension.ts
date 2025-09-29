@@ -79,6 +79,7 @@ interface SettingAutomodModGen {
   "Dry Run": boolean
   "Include Patches": boolean
   "Ultra Compression": boolean
+  "Licenses": string
 }
 
 interface SettingAutomodGames {
@@ -320,6 +321,8 @@ async function getCommandPrefix(): Promise<string[]> {
   const automodDir = await getAutomodDir();
   const r: string[] = [ isWindows? `${automodDir}\\automod.cmd` : `${automodDir}/automod` ];
   const setting = await settingAutomod();
+  const settingModGen = await settingAutomodModGeneration();
+  const licenses = settingModGen["Licenses"];
   if (!setting["Scala CLI Server"]) r.push("-s");
   if (setting["Active Game ID"].length > 0) {
     r.push("-g");
@@ -330,6 +333,12 @@ async function getCommandPrefix(): Promise<string[]> {
   }
   r.push("-l");
   r.push(setting["Max Logs"].toString());
+  if (licenses.length > 0) {
+    for (const l of licenses.split(',')) {
+      r.push("-c");
+      r.push(l.trim());
+    }
+  }
   return r;
 }
 

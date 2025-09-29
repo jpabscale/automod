@@ -1,5 +1,14 @@
 {
   "games" : {
+    "Pal7" : {
+      "aesKey" : "",
+      "contentPaks" : "Pal7/Content/Paks",
+      "directory" : "",
+      "mapUri" : "",
+      "repakPackOptions" : "",
+      "unrealEngine" : "4.25",
+      "zen" : false
+    },
     "SB" : {
       "aesKey" : "",
       "contentPaks" : "SB/Content/Paks",
@@ -20,7 +29,7 @@
     }
   },
   "tools" : {
-    "fmodel" : "378c911083669b2e4c7de09499ac9a0bcde6efb7",
+    "fmodel" : "8eeae5d59b640cdaea0c0d909aa3cb534677c950",
     "jd" : "2.3.0",
     "repak" : "0.2.3-pre.1",
     "retoc" : "0.1.3-pre.2",
