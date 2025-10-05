@@ -2,7 +2,7 @@
   "name": "automod-vscode",
   "displayName": "automod-vscode",
   "description": "VSCode extension for Auto Modding Script",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "publisher": "jpabscale",
   "icon": "images/automod.png",
   "private": true,

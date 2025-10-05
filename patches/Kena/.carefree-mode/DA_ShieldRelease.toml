@@ -1,0 +1,2 @@
+['.@: $..[?(@.Name =~ /.*Damage/)]']
+Value = '=> v.orig[Double] * 2'

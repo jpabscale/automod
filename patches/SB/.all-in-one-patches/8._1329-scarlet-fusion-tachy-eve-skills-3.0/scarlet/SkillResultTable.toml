@@ -142,13 +142,13 @@ ResultTargetCommonEffect = '''=> {
 }'''
 
 ['.*: ^M_Scarlet_(AreaCombo_Hit2|AirDashCut_Hit1|JumpStampSlash_Hit2)$']
-ResultTargetCommonEffect = '''=> {
+HitLevelResultTargetCommonEffect = '''=> {
   val newArray = JsonNodeFactory.instance.arrayNode
-  newArray.add(toJsonNode(s"""{ "Alias": "Stun" }"""))
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": 3 }"""))
   val value = v.currentOpt[String].get
   val array = toJsonNodeT[ArrayNode](value)
   for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
-    case "Stun" =>
+    case "HitStun" => 
     case _ => newArray.add(array.get(i))
   }
   newArray.toString
@@ -164,6 +164,29 @@ ResultTargetCommonEffect = '''=> {
   val array = toJsonNodeT[ArrayNode](value)
   for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
     case "SkillCancel" | "BlockSkill" | "BlockAction" =>
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+HitLevelResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  newArray.add(toJsonNode(s"""{ "Alias": "HitStun", "Time": 3 }"""))
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "HitStun" => 
+    case _ => newArray.add(array.get(i))
+  }
+  newArray.toString
+}'''
+
+['.*: ^M_Scarlet_(AirDashSpaceCut|BackDashSpaceCut|BlinkShot_Projectile3)_Hit1']
+ResultTargetCommonEffect = '''=> {
+  val newArray = JsonNodeFactory.instance.arrayNode
+  val value = v.currentOpt[String].get
+  val array = toJsonNodeT[ArrayNode](value)
+  for (i <- 0 until array.size) array.get(i).get("Alias").asText match {
+    case "Stun" =>
     case _ => newArray.add(array.get(i))
   }
   newArray.toString

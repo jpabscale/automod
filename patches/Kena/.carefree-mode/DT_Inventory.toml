@@ -1,0 +1,2 @@
+['.*: ^(?!.*(Debug|Test).*$).*$']
+StartCount = '=> if (v.objName == "HealthUpgrades") 12 else v.valueOf(v.objName, "MaxCount").get'

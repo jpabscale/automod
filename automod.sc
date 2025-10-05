@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.0"
+var version = "3.3.1"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -142,6 +142,7 @@ val autoupdateUsmaps = TreeSet[String]()
 val sbGameId = "SB"
 val soaGameId = "SandsOfAura"
 val pal7GameId = "Pal7"
+val kenaGameId = "Kena"
 
 class Game {
   @BeanProperty var aesKey: String = ""
@@ -158,7 +159,7 @@ val sbGame = {
   g.directory = ""
   g.contentPaks = s"$sbGameId/Content/Paks"
   g.unrealEngine = "4.26"
-  g.mapUri = s"${usmapUrlPrefix}StellarBlade_1.4.0.usmap.7z"
+  g.mapUri = s"${usmapUrlPrefix}StellarBlade_1.4.1.usmap.7z"
   g.repakPackOptions = ""
   g.zen = true
   g
@@ -183,9 +184,19 @@ val pal7Game = {
   g.zen = false
   g
 }
+val kenaGame = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = s"$kenaGameId/Content/Paks"
+  g.unrealEngine = "4.27"
+  g.mapUri = ""
+  g.repakPackOptions = ""
+  g.zen = false
+  g
+}
 
 class Tools {
-  @BeanProperty var fmodel: String = "8eeae5d59b640cdaea0c0d909aa3cb534677c950"
+  @BeanProperty var fmodel: String = "407be3d1a75282a0f52c006aacd7935761def642"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
   @BeanProperty var retoc: String = "0.1.3-pre.2"
@@ -207,6 +218,7 @@ def initConfig: Config = {
   r.games.put(sbGameId, sbGame)
   r.games.put(soaGameId, soaGame)
   r.games.put(pal7GameId, pal7Game)
+  r.games.put(kenaGameId, kenaGame)
   r.tools = new Tools
   r
 }
@@ -1237,7 +1249,7 @@ def generateMod(addToFilePatches: Boolean,
       println()
       println(s"Copying licenses ...")
       for (l <- licenses) {
-        val dest = tempDir / modName / l.last
+        val dest = modDir / l.last
         os.copy.over(l, dest)
       }
       println()
@@ -1617,6 +1629,7 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
   }
   
   val aioPatches = automodDir / "patches" / sbGameId / ".all-in-one-patches"
+  val noFallDamage = automodDir / "patches" / sbGameId / ".no-fall-damage"
   if (isAIO) {
     val dotAIO = aioPatches / os.up / ".all-in-one-patches-unified"
     if (!os.exists(dotAIO)) exit(-1, s"$dotAIO does not exist")
@@ -1634,6 +1647,8 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
       if (osKind.isWin) execute(os.proc("xcopy", "/e", s"$hard\\", s"$modPatches\\hard\\"))
       else execute(os.proc("cp", "-R", hard, modPatches / "hard"))
     }
+    if (osKind.isWin) execute(os.proc("xcopy", "/e", s"$noFallDamage\\", s"${modPatches / "no-fall-damage"}\\"))
+    else execute(os.proc("cp", "-R", noFallDamage, modPatches / "no-fall-damage"))
   } else if (isEffect) {
     var found = false
     for (p <- os.list(aioPatches) if p.last.contains("987") if !found) {

@@ -1,0 +1,6 @@
+['.@: $..[?(@.Name =~ /(Stagger)?Damage/)]']
+Value = '=> v.orig[Double] * 2'
+
+['.@: $..[?(@.$type =~ /.*FVector2D.*/)]']
+X = '=> v.orig[Double] * 2'
+Y = '=> v.orig[Double] * 2'
