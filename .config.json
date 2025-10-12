@@ -38,10 +38,10 @@
     }
   },
   "tools" : {
-    "fmodel" : "407be3d1a75282a0f52c006aacd7935761def642",
+    "fmodel" : "f366ad1189d8915a11cbc173b7254a5f9e24362c",
     "jd" : "2.3.0",
     "repak" : "0.2.3-pre.1",
-    "retoc" : "0.1.3-pre.2",
-    "uassetCli" : "1.0.0"
+    "retoc" : "0.1.3-pre.3",
+    "uassetCli" : "1.0.1"
   }
 }

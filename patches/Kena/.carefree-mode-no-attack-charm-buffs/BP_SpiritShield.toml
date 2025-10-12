@@ -1,0 +1,17 @@
+['.@: $..[?(@.Name == "RegenRate")]']
+Value = '=> v.orig[Double] * 100'
+
+['.@: $..[?(@.Name == "RegenDisableDamageDuration")]']
+Value = 0
+
+['.@: $..[?(@.Name == "DisableRegenOnDeplete")]']
+Value = false
+
+['.@: $..[?(@.Name == "RegenDisableBreakDuration")]']
+Value = 0
+
+['.@: $..[?(@.Name == "RegenRateAfterBreak")]']
+Value = '=> v.orig[Double] * 20'
+
+['.@: $..[?(@.Name == "BlockDamageOnBreak")]']
+Value = false

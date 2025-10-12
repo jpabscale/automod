@@ -1,3 +1,5 @@
+3.3.2: Upgraded UAssetCLI. Added more Kena Carefree mod without attack/charm buffs. Reorganized SB patches and character table without lifesteal and shield regen buff. Upgraded retoc. Download the latest FModel dev commit sha. Further refined .@ UAssetAPI Struct check.
+
 3.3.1: Fixed license file copy target folder. Updated SB and patches/SB/.no-fall-damage. Changed .demo.sb AIOs to include no-fall-damage. Added Kena: Bridge of Spirits.
 
 3.3.0: Added -c opt to include license files in generated mod(s). Added support for empty mapURI. Added support for uasset filter path using $ for /. Further refined .@ UAssetAPI Struct check. Added support for Sword and Fairy 7.

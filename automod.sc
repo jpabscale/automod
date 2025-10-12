@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.1"
+var version = "3.3.2"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -196,11 +196,11 @@ val kenaGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "407be3d1a75282a0f52c006aacd7935761def642"
+  @BeanProperty var fmodel: String = "f366ad1189d8915a11cbc173b7254a5f9e24362c"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
-  @BeanProperty var retoc: String = "0.1.3-pre.2"
-  @BeanProperty var uassetCli: String = "1.0.0"
+  @BeanProperty var retoc: String = "0.1.3-pre.3"
+  @BeanProperty var uassetCli: String = "1.0.1"
 }
 
 class Config {
@@ -349,7 +349,7 @@ def getLogDir(relOpt: Option[String]): os.Path = {
 }
 var logDir = getLogDir(None)
 val localAppData = if (osKind.isWin) os.Path(System.getenv("LOCALAPPDATA")) else os.home / ".local" / "share"
-val userName = if (osKind.isWin) System.getenv("USERNAME") else os.proc("whoami").call().out.toString.trim
+val userName = if (osKind.isWin) System.getenv("USERNAME") else new String(os.proc("whoami").call().out.bytes).trim
 val config = {
   var ok = true
   val r: Config = if (os.exists(configPath)) try {
@@ -375,8 +375,8 @@ val usmapDir = toolsDir / "usmap"
 val retocVersion = config.tools.retoc
 val repakVersion = config.tools.repak
 val uassetCliVersion = config.tools.uassetCli
-val fmodelSha = config.tools.fmodel
-val fmodelShortSha = fmodelSha.substring(0, 7)
+var fmodelSha = config.tools.fmodel
+var fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = config.tools.jd
 val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
@@ -392,7 +392,7 @@ val usmapPath = usmapDir / (if (usmapFilename.isEmpty || usmapFilename == "Mappi
 val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
 val repakUrlPrefix = s"https://github.com/jpabscale/repak/releases/download/v$repakVersion"
 val uassetCliUrl = s"https://github.com/jpabscale/UAssetCLI/releases/download/v$uassetCliVersion/UAssetCLI.zip"
-val fmodelUrl = s"https://github.com/4sval/FModel/releases/download/qa/$fmodelSha.zip"
+def fmodelUrl(sha: String): String = s"https://github.com/4sval/FModel/releases/download/qa/$sha.zip"
 val jdUrlPrefix = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion"
 val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
 val z7UrlPrefix = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion"
@@ -599,7 +599,17 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
   if (osKind.isWin && !os.exists(fmodelExe)) {
     setup = false
     println(s"Setting up FModel @$fmodelShortSha in $toolsDir ...")
-    val fmodelZip = downloadCheck(fmodelUrl)
+    val devSha = new String(os.proc("curl", "-s", "-H", "Accept: application/vnd.github.VERSION.sha", 
+      "https://api.github.com/repos/4sval/FModel/commits/dev").call().out.bytes).trim
+    val fmodelZip = download(fmodelUrl(devSha)) match {
+      case Some(f) => 
+        fmodelSha = devSha
+        fmodelShortSha = fmodelSha.substring(0, 7)
+        config.tools.fmodel = devSha
+        writeConfig(config)
+        f
+      case _ => downloadCheck(fmodelUrl(fmodelSha))
+    }
     os.proc(zipExe, "x", fmodelZip).call(cwd = toolsDir)
     os.remove.all(fmodelZip)
     println()
@@ -1639,9 +1649,9 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
     else execute(os.proc("cp", "-R", dotAIO, modPatches))
     if (isHard) {
       def hard: os.Path = {
-        for (p <- os.list(aioPatches) if p.last.contains("1329") && os.exists(p / "goddess" / ".hard")) 
-          return p / "goddess" / ".hard"
-        exit(-1, s"Could not find the .hard patch")
+        if (os.exists(automodDir / "patches" / sbGameId / ".harder-mode-6x"))
+          return automodDir / "patches" / sbGameId / ".harder-mode-6x"
+        exit(-1, s"Could not find the .harder-mode-6x patch")
       }
       println()
       if (osKind.isWin) execute(os.proc("xcopy", "/e", s"$hard\\", s"$modPatches\\hard\\"))

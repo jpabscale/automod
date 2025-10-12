@@ -292,4 +292,7 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
 }
 
 def isStruct(node: JsonNode): Boolean = node.get("Value").isInstanceOf[ArrayNode] && 
-  Option(node.get("$type")).map(_.asText.contains("UAssetAPI.PropertyTypes.Structs,")).getOrElse(false)
+  Option(node.get("$type")).map({ t =>
+    val text = t.asText
+    text.contains("UAssetAPI.PropertyTypes.Structs,") || text.contains("UAssetAPI.PropertyTypes.Structs.StructPropertyData,")
+  }).getOrElse(false)

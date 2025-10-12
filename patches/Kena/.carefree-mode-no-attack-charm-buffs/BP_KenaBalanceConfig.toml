@@ -1,0 +1,26 @@
+['.@: $..[?(@.Name == "RegenRate")]']
+Value = '=> v.orig[Double] * 100'
+
+['.@: $..[?(@.Name == "RegenDelay")]']
+Value = 0
+
+['.@: $..[?(@.Name == "UsesFallDamage")]']
+Value = false
+
+['.@: $..[?(@.Name == "AirBowPlayerTimeDilation")]']
+Value = '=> v.orig[Double] / 2'
+
+['.@: $..[?(@.Name == "DriveRotCloudMaxFallDistance")]']
+Value = '=> v.orig[Double] * 2'
+
+['.@: $..[?(@.Name == "Cooldown")]']
+Value = 0
+
+['.@: $..[?(@.Name == "DeadzoneDeathTime")]']
+Value = 999
+
+['.@: $..[?(@.Name == "IsChargedPerSecond")]']
+Value = false
+
+['.@: $..[?(@.Name == "RotCountToUnlockAbility" && @.$type =~ /.*IntPropertyData.*/)]']
+Value = '=> if (v.orig[Double] == 10) 1 else 2'
