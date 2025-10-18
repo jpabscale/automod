@@ -35,13 +35,22 @@
       "repakPackOptions" : "--version V11",
       "unrealEngine" : "4.25",
       "zen" : false
+    },
+    "WDGame" : {
+      "aesKey" : "",
+      "contentPaks" : "WDGame/Content/Paks",
+      "directory" : "",
+      "mapUri" : "",
+      "repakPackOptions" : "",
+      "unrealEngine" : "4.27",
+      "zen" : true
     }
   },
   "tools" : {
-    "fmodel" : "f366ad1189d8915a11cbc173b7254a5f9e24362c",
+    "fmodel" : "b51d539c242270eee23f0489282614e0e73d6a41",
     "jd" : "2.3.0",
     "repak" : "0.2.3-pre.1",
-    "retoc" : "0.1.3-pre.3",
+    "retoc" : "0.1.3-pre.4",
     "uassetCli" : "1.0.1"
   }
 }

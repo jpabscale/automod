@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.2"
+var version = "3.3.3"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -143,6 +143,7 @@ val sbGameId = "SB"
 val soaGameId = "SandsOfAura"
 val pal7GameId = "Pal7"
 val kenaGameId = "Kena"
+val wantedDeadGameId = "WDGame"
 
 class Game {
   @BeanProperty var aesKey: String = ""
@@ -194,12 +195,22 @@ val kenaGame = {
   g.zen = false
   g
 }
+val wantedDeadGame = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = s"$wantedDeadGameId/Content/Paks"
+  g.unrealEngine = "4.27"
+  g.mapUri = ""
+  g.repakPackOptions = ""
+  g.zen = true
+  g
+}
 
 class Tools {
-  @BeanProperty var fmodel: String = "f366ad1189d8915a11cbc173b7254a5f9e24362c"
+  @BeanProperty var fmodel: String = "b51d539c242270eee23f0489282614e0e73d6a41"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
-  @BeanProperty var retoc: String = "0.1.3-pre.3"
+  @BeanProperty var retoc: String = "0.1.3-pre.4"
   @BeanProperty var uassetCli: String = "1.0.1"
 }
 
@@ -219,6 +230,7 @@ def initConfig: Config = {
   r.games.put(soaGameId, soaGame)
   r.games.put(pal7GameId, pal7Game)
   r.games.put(kenaGameId, kenaGame)
+  r.games.put(wantedDeadGameId, wantedDeadGame)
   r.tools = new Tools
   r
 }

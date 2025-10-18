@@ -220,7 +220,7 @@ def objSetJson(addToFilePatches: Boolean, uassetName: String, name: String, o: O
   assert(!value.isMissingNode)
   def toEnumPrettyString(enumType: TextNode)(node: JsonNode): JsonNode = TextNode.valueOf(s"${enumType.asText}::${node.asText}")
   val (rOpt, valueOpt) = value match {
-    case value: TextNode if value.asText.contains("::") => 
+    case value: TextNode if value.asText.contains("::") && Option(o.get("Value")).map(!_.asText.contains("::")).getOrElse(false) => 
       var text = value.asText
       val enumType = TextNode.valueOf(text.substring(0, text.indexOf("::")))
       val oldEnumOpt = Option(o.replace("EnumType", enumType)).map(_.toPrettyString)
@@ -228,7 +228,8 @@ def objSetJson(addToFilePatches: Boolean, uassetName: String, name: String, o: O
       val oldValueOpt = Option(o.replace("Value", newValue))
       (oldValueOpt, Some(toEnumPrettyString(enumType)(newValue)))
     case _ =>
-      val oldValueOpt = Option(o.replace("Value", value))  
+      if (!(o.get("Value") != null || o.get(property) != null)) automod.exit(-1, s"Cannot replace a non-existing property: $name/$property")
+      val oldValueOpt = Option(o.replace(if (o.get("Value") != null) "Value" else property, value))  
       (oldValueOpt, Option(value))
   }
   automod.logPatch(uassetName, s"* $name/$property: ${automod.toJsonPrettyString(rOpt)} => ${automod.toJsonPrettyString(valueOpt)}", console = false)
