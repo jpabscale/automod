@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.3"
+var version = "3.3.4"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,10 +207,10 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "b51d539c242270eee23f0489282614e0e73d6a41"
+  @BeanProperty var fmodel: String = "ae52058d26cf508137c33d7a9ba628e94703d27e"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
-  @BeanProperty var retoc: String = "0.1.3-pre.4"
+  @BeanProperty var retoc: String = "0.1.5-pre.1"
   @BeanProperty var uassetCli: String = "1.0.1"
 }
 
@@ -1416,7 +1416,7 @@ def tomlString(valueOpt: Option[JsonNode], default: String): String = valueOpt m
   case None => default
 }
 
-def writeToml(path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[JsonNode]): Unit = {
+def writeToml(isDiff: Boolean, path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[JsonNode]): Unit = {
   def shouldInclude(name: String): Boolean = {
     patchlet.getKeyPrefix(name) match {
       case Some(patchlet.Constants.atPrefix) => true
@@ -1451,7 +1451,7 @@ def writeToml(path: os.Path, data: UAssetPropertyChanges, origAstOpt: Option[Jso
     val obj = if (objectMap == null) null else objectMap.get(name).orNull
     for ((property, valuePair) <- properties) {
       val v = tomlString(valuePair.newValueOpt, default = "\"null\"")
-      val old = if (obj == null) None else Option(obj.getJson(property))
+      val old = if (isDiff) valuePair.oldValueOpt else if (obj == null) None else Option(obj.getJson(property))
       val comment = tomlString(old, default = "N/A")
       var line = s"$property = $v"
       if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString}${if (isDataTable) s" # $comment$sep" else ""}"
@@ -1490,7 +1490,7 @@ def toml(gamePakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boo
   for ((uassetName, data) <- map) {
     noPatch = false
     val p = path / s"$uassetName.toml"
-    writeToml(p, data, Some(origMap(uassetName)))
+    writeToml(isDiff = false, p, data, Some(origMap(uassetName)))
   }
   if (noPatch) println("No patches to write")
   else println()
@@ -1508,7 +1508,7 @@ def diff(from: os.Path, to: os.Path, out: os.Path): Unit = {
           println("No changes found")
         case 1 =>
           println(s"Wrote $patch")
-          writeToml(out / s"${f.baseName}.toml", jdFilePatches(patch)(msgs => 
+          writeToml(isDiff = true, out / s"${f.baseName}.toml", jdFilePatches(patch)(msgs => 
             errors :+= s"""* $patch
                           |${msgs.map("  " + _).mkString(Properties.lineSeparator)}""".stripMargin), None)
         case code => exit(code, s"Error occurred when running jd")

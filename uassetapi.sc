@@ -240,16 +240,21 @@ def objSetJson(addToFilePatches: Boolean, uassetName: String, name: String, o: O
 case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean) {
   var objectMap: HashMap[String, ObjectNode] = {
     var r = HashMap.empty[String, ObjectNode]
-    val values = value.get("Value").asInstanceOf[ArrayNode]
-    for (j <- 0 until values.size) {
-      val node = values.get(j)
-      node match {
-        case node: ObjectNode =>
-          val element = node.asInstanceOf[ObjectNode]
-          val name = element.get("Name").asText
-          r.put(name, element)
-        case _ =>
-          automod.exit(-1, s"Unexpected struct: $value")
+    if (value != null) {
+      val values = value.get("Value") match {
+        case vs: ArrayNode => vs
+        case _ => automod.exit(-1, s"The JSON node is not a UAssetAPI struct: ${value.toPrettyString}")
+      }
+      for (j <- 0 until values.size) {
+        val node = values.get(j)
+        node match {
+          case node: ObjectNode =>
+            val element = node.asInstanceOf[ObjectNode]
+            val name = element.get("Name").asText
+            r.put(name, element)
+          case _ =>
+            automod.exit(-1, s"Unexpected struct: $value")
+        }
       }
     }
     r

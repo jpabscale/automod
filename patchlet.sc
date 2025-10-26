@@ -497,6 +497,7 @@ def kfcMap(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetName: Str
             } else util.Try(origAstPath.read(path)).getOrElse(JsonNodeFactory.instance.arrayNode)).asInstanceOf[ArrayNode]
             val prefix = dataTableJsonPath + "["
             def allWithPrefix: Boolean = {
+              if (r.isEmpty) return false
               for (i <- 0 until r.size if !r.get(i).textValue.startsWith(prefix)) return false
               true
             }

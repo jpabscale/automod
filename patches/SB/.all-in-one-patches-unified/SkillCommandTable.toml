@@ -1,68 +1,746 @@
 # ...                                                        # Game Original Value
+[P_Eve_BlockSword_Normal_BetaSkill1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_BlockSword_Normal_BurstSkill1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_BlockSword_Normal_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_BlockSword_Normal_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fishing_Aim]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fishing_End]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fishing_ForceEnd]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Air_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Air_LightAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Air_LightAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Air_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Combo_DashAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Combo_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Combo_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
 [P_Eve_Fusion_JustEvade_LightAttack1_1]
 InputDuration = 99                                           # 1.5
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_JustEvade_LightAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Fusion_JustEvade_StrongAttack1_1]
 InputDuration = 99                                           # 1.5
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_JustEvade_StrongAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Fusion_JustParry_LightAttack1_1]
 InputDuration = 99                                           # 1.2000000476837158
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_JustParry_LightAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_JustParry_LightAttackCombo2_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Fusion_JustParry_StrongAttack1_1]
 InputDuration = 99                                           # 1.2000000476837158
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_JustParry_StrongAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Lockon_Evade1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_DashAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_DashAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_Evade1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_FinishAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_Guard1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_LightAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_LightAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_LightAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_LightAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_StrongAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_StrongAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Normal_StrongAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Skill_ChainStab1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Skill_ParrySlash1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Skill_ScrewAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Fusion_Skill_SwordAura1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_BurstSkill1_1]
+ReqEnergyAmount = 0                                          # 1000.0
+
+[P_Eve_GunNikke_BurstSkill2_1]
+ReqEnergyAmount = 0                                          # 1000.0
+
+[P_Eve_GunNikke_BurstSkill3_1]
+ReqEnergyAmount = 0                                          # 1000.0
+
+[P_Eve_GunNikke_Evade1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_Evade1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_Evade1_3]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_Evade1_4]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_ShootSlug1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_ShootSlug1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_ShootSlug2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_GunNikke_ShootSlug2_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootExplosiveSlug1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootExplosiveSlug1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootExplosiveSlugFail1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootExplosiveSlugFail1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootGorgon1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootGorgon1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootMissile1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootMissile1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun2_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun3_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootRailgun4_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootScatterSlug1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootScatterSlug1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootScatterSlugFail1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootScatterSlugFail1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootShockSlug1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootShockSlug1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootShockSlugFail1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootShockSlugFail1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootSlug1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootSlug1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootSlugFail1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootSlugFail1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootTutorialSlug1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Gun_ShootTutorialSlug1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_DropAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_DropAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_Evade1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_GuardBreakAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_GuardBreakAttack1_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Air_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_LightAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_LightAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_LightAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Air_RollingAttack1_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Beta_ChainStab1Ex]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ChainStab1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ChainStabCombo1Ex]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ChainStabCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ChargeSlash1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ChargeSlashCombo1Ex_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ChargeSlashCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_ShieldBreak1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_SwordAura1Ex_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_SwordAura1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_SwordAuraCombo1Ex_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Beta_SwordAuraCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Burst_FinishAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Burst_MassiveAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Burst_MeleeCombatBuff1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Burst_SpinAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Combo_DashAttack1_1]
 InputDuration = 0                                            # 1.0
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Combo_LightAttack1_1]
 InputDuration = 0                                            # 1.0
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Combo_StrongAttack1_1]
 InputDuration = 0                                            # 1.0
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Evade_Evade1_1]
 NextComboCommandArray = [ { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "1", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "2", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" } ]    # [ { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "0", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "1", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "2", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_DashAttack1_1" } ]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Fall_Breakfall1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_JustEvade_DashAttack1_1]
 InputDuration = 99999                                        # 1.5
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_JustEvade_LightAttack1_1]
 HoldDuration = 0.12                                          # 0.25
 InputDuration = 99999                                        # 1.5
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_JustEvade_LightAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_JustEvade_StrongAttack1_1]
 HoldDuration = 0.12                                          # 0.25
 InputDuration = 99999                                        # 1.5
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_JustEvade_StrongAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_JustParry_LightAttack1_1]
 HoldDuration = 0.12                                          # 0.25
 InputDuration = 99999                                        # 1.2000000476837158
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_JustParry_LightAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_JustParry_LightAttackCombo2_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_JustParry_StrongAttack1_1]
 HoldDuration = 0.12                                          # 0.25
 InputDuration = 99999                                        # 1.2000000476837158
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_JustParry_StrongAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_LockonEvade_Evade1_1]
 NextComboCommandArray = [ { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "1", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "2", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" } ]    # [ { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "0", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "1", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "2", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_DashAttack1_1" } ]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Lockon_Evade1_1]
 NextComboCommandArray = [ { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_LockonEvade_Evade1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "1", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "2", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "3", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "4", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "5", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "6", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" } ]    # [ { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "0", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_LockonEvade_Evade1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "1", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "2", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "3", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "4", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "5", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "6", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_DashAttack1_1" } ]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_BackStab1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_BackStab2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_DashAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_DashAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_DashAttack1_2_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_DashAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_DashAttackCombo1_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_DashAttackCombo2_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Normal_Evade1_1]
 NextComboCommandArray = [ { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Evade_Evade1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "1", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "2", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "3", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "4", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "5", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "6", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" } ]    # [ { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "0", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Evade_Evade1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "1", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustEvade_DashAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "2", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustEvade_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "3", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustEvade_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "4", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "5", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "6", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_DashAttack1_1" } ]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetup1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetup1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetup1_3]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetup1_4]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetupDirection1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetupDirection1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetupDirection1_3]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FastGetupDirection1_4]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FinishAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FinishAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FinishAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FinishAttack3_4]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FinishAttack3_4_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_FinishAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FinishAttack4_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_FinishLinkAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack1_3]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack1_4]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack2_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack2_3]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack2_4]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack3_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack3_3]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_FlashBehindAttack4_2]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Sword_Normal_Guard1_1]
 NextComboCommandArray = [ { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Normal_BackStab1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack2_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Air_DropAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "0", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustParry_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "1", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_JustParry_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "2", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_LightAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "3", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_StrongAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" }, { "Name" = "4", "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "ArrayIndex" = 0.0, "Value" = "P_Eve_Sword_Combo_DashAttack1_1", "PropertyTagExtensions" = "NoExtension", "IsZero" = false, "PropertyTagFlags" = "None" } ]    # [ { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "0", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustParry_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "1", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_JustParry_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "2", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_LightAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "3", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_StrongAttack1_1" }, { "$type" = "UAssetAPI.PropertyTypes.Objects.NamePropertyData, UAssetAPI", "Name" = "4", "ArrayIndex" = 0, "IsZero" = false, "PropertyTagFlags" = "None", "PropertyTagExtensions" = "NoExtension", "Value" = "P_Eve_Sword_Combo_DashAttack1_1" } ]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_GunTutorial1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack4_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_LightAttack5_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack6_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack7_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttack8_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LightAttackChain1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LinkAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LinkAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LinkAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_LinkAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_MoveBackAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_MoveBackAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_MoveBackAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_MoveBackAttack2_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack10_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack10_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack5_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack5_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_StrongAttack6_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack6_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_StrongAttack7_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack7_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_StrongAttack8_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Normal_StrongAttack8_1_Ex]
+ReqEnergyAmount = 0                                          # 200.0
+
+[P_Eve_Sword_Normal_StrongAttack9_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_Swim_Dash1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Sword_UWSwim_Dash1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Air_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Air_LightAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Air_LightAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Air_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Combo_DashAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Combo_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Combo_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_End1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_End2_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Tachy_JustEvade_LightAttack1_1]
 InputDuration = 99                                           # 1.5
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_JustEvade_LightAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Tachy_JustEvade_StrongAttack1_1]
 InputDuration = 99                                           # 1.5
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_JustEvade_StrongAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Tachy_JustParry_LightAttack1_1]
 InputDuration = 99                                           # 1.2000000476837158
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_JustParry_LightAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_JustParry_LightAttackCombo2_1]
+ReqEnergyAmount = 0                                          # "+0"
 
 [P_Eve_Tachy_JustParry_StrongAttack1_1]
 InputDuration = 99                                           # 1.2000000476837158
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_JustParry_StrongAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Lockon_Evade1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_DashAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_DashAttackCombo1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_Evade1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_FinishAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_Guard1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_LightAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_LightAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_LightAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_LightAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_LightAttack4_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_StrongAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_StrongAttack1_2]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_StrongAttack2_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Normal_StrongAttack3_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Skill_ChainStab1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Skill_ParrySlash1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Skill_ScrewAttack1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Skill_SwordAura1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Start1_1]
+ReqEnergyAmount = 0                                          # "+0"
+
+[P_Eve_Tachy_Start2_1]
+ReqEnergyAmount = 0                                          # "+0"
 

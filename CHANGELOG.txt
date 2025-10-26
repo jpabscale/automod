@@ -1,3 +1,5 @@
+3.3.4: Fixed .diff[.into] .toml output. Fixed detection of .@ data table path. Handled non-existent UAssetAPI struct in original AST. Updated SB patches. Upgraded retoc.
+
 3.3.3: Fixed handling enum value when :: is required. Fixed handling of non-existent property. Added Wanted: Dead game config. Upgraded retoc.
 
 3.3.2: Upgraded UAssetCLI. Added more Kena Carefree mod without attack/charm buffs. Reorganized SB patches and character table without lifesteal and shield regen buff. Upgraded retoc. Download the latest FModel dev commit sha. Further refined .@ UAssetAPI Struct check.
