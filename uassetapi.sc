@@ -216,7 +216,7 @@ def fromValue(v: Any): JsonNode = {
   }
 }
 
-def objSetJson(addToFilePatches: Boolean, uassetName: String, name: String, o: ObjectNode, property: String, value: JsonNode): Option[JsonNode] = {
+def objSetJson(isAt: Boolean, addToFilePatches: Boolean, uassetName: String, name: String, o: ObjectNode, property: String, value: JsonNode): Option[JsonNode] = {
   assert(!value.isMissingNode)
   def toEnumPrettyString(enumType: TextNode)(node: JsonNode): JsonNode = TextNode.valueOf(s"${enumType.asText}::${node.asText}")
   val (rOpt, valueOpt) = value match {
@@ -229,7 +229,7 @@ def objSetJson(addToFilePatches: Boolean, uassetName: String, name: String, o: O
       (oldValueOpt, Some(toEnumPrettyString(enumType)(newValue)))
     case _ =>
       if (!(o.get("Value") != null || o.get(property) != null)) automod.exit(-1, s"Cannot replace a non-existing property: $name/$property")
-      val oldValueOpt = Option(o.replace(if (o.get("Value") != null) "Value" else property, value))  
+      val oldValueOpt = Option(o.replace(if (isAt && o.get(property) != null) property else "Value", value))  
       (oldValueOpt, Option(value))
   }
   automod.logPatch(uassetName, s"* $name/$property: ${automod.toJsonPrettyString(rOpt)} => ${automod.toJsonPrettyString(valueOpt)}", console = false)
@@ -268,7 +268,7 @@ case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean
   }
 
   def setJson(property: String, value: JsonNode): Option[JsonNode] =
-    objSetJson(addToFilePatches, uassetName, name, obj(property), property, value)
+    objSetJson(isAt = false, addToFilePatches, uassetName, name, obj(property), property, value)
   
   def set(name: String, value: Boolean): Boolean = setJson(name, BooleanNode.valueOf(value)).map(_.asBoolean).getOrElse(false)
   def set(name: String, value: Int): Int = setJson(name, IntNode.valueOf(value)).map(_.asInt).getOrElse(0)

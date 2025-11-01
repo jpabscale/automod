@@ -1,3 +1,5 @@
+3.3.5: Prefix license files with the mod name when packaging mods. Lazily use original value in property patching. Fixed patching .@ object property.
+
 3.3.4: Fixed .diff[.into] .toml output. Fixed detection of .@ data table path. Handled non-existent UAssetAPI struct in original AST. Updated SB patches. Upgraded retoc.
 
 3.3.3: Fixed handling enum value when :: is required. Fixed handling of non-existent property. Added Wanted: Dead game config. Upgraded retoc.

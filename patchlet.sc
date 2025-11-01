@@ -233,12 +233,13 @@ def evalStructProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean
                        code: String, obj: uassetapi.Struct, property: String, orig: JsonNode, _ast: automod.JsonAst, 
                        _origAst: automod.JsonAst): JsonNode = {
   val currentValue = obj.getJson(property)
-  val origValue = uassetapi.Struct(uassetName, orig, addToFilePatches = false).getJson(property)
-  evalProperty(lang, uassetName, addToFilePatches, dataMap, code, obj.name, currentValue, origValue, property, _ast, _origAst)
+  evalProperty(lang, uassetName, addToFilePatches, dataMap, code, obj.name, currentValue, 
+    uassetapi.Struct(uassetName, orig, addToFilePatches = false).getJson(property), 
+    property, _ast, _origAst)
 }
 
 def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, dataMap: collection.Map[String, ObjectNode], 
-                 code: String, name: String, currentValue: JsonNode, origValue: JsonNode, property: String, _ast: automod.JsonAst, 
+                 code: String, name: String, currentValue: JsonNode, origValue: => JsonNode, property: String, _ast: automod.JsonAst, 
                  _origAst: automod.JsonAst): JsonNode = {
   lang match {
     case Lang.Scala =>
@@ -367,7 +368,7 @@ sealed trait FilteredChanges {
         }
       case _ =>
     }
-    uassetapi.objSetJson(addToFilePatches, uassetName, name, o, property, value)
+    uassetapi.objSetJson(isAt = true, addToFilePatches, uassetName, name, o, property, value)
   }
   def applyStructChanges(path: String, node: JsonNode, orig: JsonNode): Unit = {
     val obj = uassetapi.Struct(uassetName, node, addToFilePatches)

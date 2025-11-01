@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.4"
+var version = "3.3.5"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,7 +207,7 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "ae52058d26cf508137c33d7a9ba628e94703d27e"
+  @BeanProperty var fmodel: String = "6fa336c3eec0e0efd2277081c7ba9221651b925b"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
   @BeanProperty var retoc: String = "0.1.5-pre.1"
@@ -1271,7 +1271,7 @@ def generateMod(addToFilePatches: Boolean,
       println()
       println(s"Copying licenses ...")
       for (l <- licenses) {
-        val dest = modDir / l.last
+        val dest = modDir / s"$modName-${l.last}"
         os.copy.over(l, dest)
       }
       println()
