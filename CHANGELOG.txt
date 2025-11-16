@@ -1,3 +1,5 @@
+3.3.6: Added support .included in patches directory to include files in the generated mod. Upgraded retoc.
+
 3.3.5: Prefix license files with the mod name when packaging mods. Lazily use original value in property patching. Fixed patching .@ object property.
 
 3.3.4: Fixed .diff[.into] .toml output. Fixed detection of .@ data table path. Handled non-existent UAssetAPI struct in original AST. Updated SB patches. Upgraded retoc.

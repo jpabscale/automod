@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.5"
+var version = "3.3.6"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,10 +207,10 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "6fa336c3eec0e0efd2277081c7ba9221651b925b"
+  @BeanProperty var fmodel: String = "d58acea554bcb28128443b525b45a740609e964b"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
-  @BeanProperty var retoc: String = "0.1.5-pre.1"
+  @BeanProperty var retoc: String = "0.1.5-pre.2"
   @BeanProperty var uassetCli: String = "1.0.1"
 }
 
@@ -532,11 +532,11 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     setup = false
     println(s"Setting up retoc v$retocVersion in $toolsDir ...")
     val retocBundleName = osKind match {
-      case OsKind.WinAmd64 | OsKind.WinArm64 => "retoc-x86_64-pc-windows-msvc.zip"
-      case OsKind.MacAmd64 => "retoc-x86_64-apple-darwin.tar.xz"
-      case OsKind.LinuxAmd64 => "retoc-x86_64-unknown-linux-gnu.tar.xz"
-      case OsKind.LinuxArm64 => "retoc-aarch64-unknown-linux-gnu.tar.xz"
-      case OsKind.MacArm64 => "retoc-aarch64-apple-darwin.tar.xz"
+      case OsKind.WinAmd64 | OsKind.WinArm64 => "retoc_cli-x86_64-pc-windows-msvc.zip"
+      case OsKind.MacAmd64 => "retoc_cli-x86_64-apple-darwin.tar.xz"
+      case OsKind.LinuxAmd64 => "retoc_cli-x86_64-unknown-linux-gnu.tar.xz"
+      case OsKind.LinuxArm64 => "retoc_cli-aarch64-unknown-linux-gnu.tar.xz"
+      case OsKind.MacArm64 => "retoc_cli-aarch64-apple-darwin.tar.xz"
     }
     val retocBundle = downloadCheck(s"$retocUrlPrefix/$retocBundleName")
     os.remove.all(retocExe / os.up)
@@ -545,7 +545,7 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
       os.proc(zipExe, "x", retocBundle).call(cwd = retocExe / os.up)
     } else {
       os.proc("tar", "xf", retocBundle).call(cwd = toolsDir)
-      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("retoc-")) {
+      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("retoc_cli-")) {
         os.move.over(p, toolsDir / "retoc")
       }
     }
@@ -1244,6 +1244,19 @@ def generateMod(addToFilePatches: Boolean,
 
     val pack = workingDir / s"$modName.$modExt"
     os.remove.all(pack)
+
+    val includedDir = patchesDir / ".included"
+    if (os.exists(includedDir)) {
+      println("Copying included files")
+      for (p <- os.walk(includedDir) if os.isFile(p)) {
+        val relPath = p.relativeTo(includedDir)
+        val p2 = output / relPath
+        os.makeDir.all(p2 / os.up)
+        os.copy(p, p2)
+        println(s"* Added $p2")
+      }
+      println()
+    }
 
     os.makeDir.all(modDir)
     val utocPak = modDir / (if (config.game.zen) s"${modName}_P.utoc" else if (modName.head.toString.toIntOption.nonEmpty) s"pakChunk${modName}_P.pak" else s"pakChunk888-${modName}_P.pak")
