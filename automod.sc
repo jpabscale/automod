@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.6"
+var version = "3.3.7"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,11 +207,11 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "d58acea554bcb28128443b525b45a740609e964b"
+  @BeanProperty var fmodel: String = "f51ad82e1fea24cf7f784767f7f07a6237774ebe"
   @BeanProperty var jd: String = "2.3.0"
   @BeanProperty var repak: String = "0.2.3-pre.1"
   @BeanProperty var retoc: String = "0.1.5-pre.2"
-  @BeanProperty var uassetCli: String = "1.0.1"
+  @BeanProperty var uassetCli: String = "1.0.2"
 }
 
 class Config {
@@ -1467,8 +1467,8 @@ def writeToml(isDiff: Boolean, path: os.Path, data: UAssetPropertyChanges, origA
       val old = if (isDiff) valuePair.oldValueOpt else if (obj == null) None else Option(obj.getJson(property))
       val comment = tomlString(old, default = "N/A")
       var line = s"$property = $v"
-      if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString}${if (isDataTable) s" # $comment$sep" else ""}"
-      else line = s"$line${if (isDataTable) s"    # $comment$sep" else ""}"
+      if (line.length < oldValueColumn - 2) line = s"$line${(for (_ <- 0 until oldValueColumn - line.length - 1) yield ' ').mkString}${if (isDataTable) s" # $comment$sep" else sep}"
+      else line = s"$line${if (isDataTable) s"    # $comment$sep" else sep}"
       os.write.append(path, line)
     }
     os.write.append(path, sep)

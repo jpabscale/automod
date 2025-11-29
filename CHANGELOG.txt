@@ -1,3 +1,5 @@
+3.3.7: Upgraded UAssetCLI. Fixed generated .toml formatting.
+
 3.3.6: Added support .included in patches directory to include files in the generated mod. Upgraded retoc.
 
 3.3.5: Prefix license files with the mod name when packaging mods. Lazily use original value in property patching. Fixed patching .@ object property.
