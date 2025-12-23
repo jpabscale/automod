@@ -1,3 +1,5 @@
+3.3.8: Upgraded repak and UAssetCLI. Fixed .demo.{soa, sb} when their game directory is specified in .config.json.
+
 3.3.7: Upgraded UAssetCLI. Fixed generated .toml formatting.
 
 3.3.6: Added support .included in patches directory to include files in the generated mod. Upgraded retoc.

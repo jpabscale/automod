@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.7"
+var version = "3.3.8"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,11 +207,11 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "f51ad82e1fea24cf7f784767f7f07a6237774ebe"
+  @BeanProperty var fmodel: String = "fe4529908ee38e128f789f7e54b72310aac99dfb"
   @BeanProperty var jd: String = "2.3.0"
-  @BeanProperty var repak: String = "0.2.3-pre.1"
+  @BeanProperty var repak: String = "0.2.3-pre.3"
   @BeanProperty var retoc: String = "0.1.5-pre.2"
-  @BeanProperty var uassetCli: String = "1.0.2"
+  @BeanProperty var uassetCli: String = "1.0.3"
 }
 
 class Config {
@@ -1617,7 +1617,7 @@ def execute(p: os.proc): Unit = {
   if (p.call(cwd = workingDir, check = false, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0) exit(-1)
 }
 
-def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
+def demoSoA(): Unit = {
   val modName = "all-in-one"
   val modPatches = patchesDir / modName
   val aioPatches = automodDir / "patches" / soaGameId / ".all-in-one"
@@ -1632,10 +1632,7 @@ def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
 
   try {
     println()
-    gameDirOpt match {
-      case Some(gameDir) => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", "-g", soaGameId, modName, gameDir, noCodePatching, includePatches))
-      case _ => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", "-g", soaGameId, modName, noCodePatching, includePatches))
-    }
+    execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", "-g", soaGameId, modName, noCodePatching, includePatches))
     val src = workingDir / s"$modName.$modExt"
     val dest = workingDir / s"soa-$modName.$modExt"
     if (osKind.isWin) execute(os.proc("cmd.exe", "/d", "/c", "move", src, dest))
@@ -1648,7 +1645,7 @@ def demoSoA(gameDirOpt: Option[os.Path]): Unit = {
   }
 }
 
-def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Option[os.Path]): Unit = {
+def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean): Unit = {
   val oldConfigOpt = writeConfig(initConfig)
 
   var modName = if (isAIO) "all-in-one" 
@@ -1716,10 +1713,7 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean, gameDirOpt: Optio
 
   try {
     println()
-    gameDirOpt match {
-      case Some(gameDir) => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, gameDir, noCodePatching, includePatches))
-      case _ => execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, noCodePatching, includePatches))
-    }
+    execute(os.proc("scala-cli", "--suppress-outdated-dependency-warning", automodDir / "project.scala", "--", modName, noCodePatching, includePatches))
   } catch {
     case _: Throwable => exit(-1)
   } finally {
@@ -2055,16 +2049,16 @@ def run(): Unit = {
   println()
   val setup = init(gameDirOpt)
 
-  def demoSbFirst(): Unit = demoSb(isAIO = false, isHard = false, isEffect = false, gameDirOpt)
-  def demoSbAio(): Unit = demoSb(isAIO = true, isHard = false, isEffect = false, gameDirOpt)
-  def demoSbAioHard(): Unit = demoSb(isAIO = true, isHard = true, isEffect = false, gameDirOpt)
-  def demoSbEffect(): Unit = demoSb(isAIO = false, isHard = false, isEffect = true, gameDirOpt)
+  def demoSbFirst(): Unit = demoSb(isAIO = false, isHard = false, isEffect = false)
+  def demoSbAio(): Unit = demoSb(isAIO = true, isHard = false, isEffect = false)
+  def demoSbAioHard(): Unit = demoSb(isAIO = true, isHard = true, isEffect = false)
+  def demoSbEffect(): Unit = demoSb(isAIO = false, isHard = false, isEffect = true)
   def demoSbAll(): Unit = { demoSbFirst(); demoSbAio(); demoSbAioHard(); demoSbEffect() }
 
   argName match {
     case ".batch" => checkPatchesDir(); batch(parseOptions(next))
     case ".demo.sb" => demoSbAll()
-    case ".demo.soa" => demoSoA(gameDirOpt)
+    case ".demo.soa" => demoSoA()
     case ".diff" => diff(checkDir(absPath(cliArgs(1))), checkDir(absPath(cliArgs(2))), checkDirAvailable(absPath(cliArgs(3))))
     case ".diff.into" =>
       val out = checkDirAvailable(absPath(cliArgs(3)))
