@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.3.9"
+var version = "3.4.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,11 +207,11 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "8de4402032d3f73f581ad103d200e1b52026288e"
+  @BeanProperty var fmodel: String = "14e05da2e0ee6ee5024991714f8ea67466c7c3fa"
   @BeanProperty var jd: String = "2.4.0"
-  @BeanProperty var repak: String = "0.2.3-pre.3"
+  @BeanProperty var repak: String = "0.2.4-pre.1"
   @BeanProperty var retoc: String = "0.1.6-pre.1"
-  @BeanProperty var uassetCli: String = "1.0.3"
+  @BeanProperty var uassetCli: String = "1.0.4"
 }
 
 class Config {
