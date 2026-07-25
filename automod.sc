@@ -13,7 +13,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.4.0"
+var version = "3.4.1"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -207,11 +207,11 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "14e05da2e0ee6ee5024991714f8ea67466c7c3fa"
-  @BeanProperty var jd: String = "2.4.0"
-  @BeanProperty var repak: String = "0.2.4-pre.1"
-  @BeanProperty var retoc: String = "0.1.6-pre.1"
-  @BeanProperty var uassetCli: String = "1.0.4"
+  @BeanProperty var fmodel: String = "b2708293f64ffc858b4901ff785a9078b99c67f4"
+  @BeanProperty var jd: String = "2.5.0"
+  @BeanProperty var repak: String = "0.2.4-pre.2"
+  @BeanProperty var retoc: String = "0.1.6-pre.2"
+  @BeanProperty var uassetCli: String = "1.0.5"
 }
 
 class Config {
@@ -649,23 +649,6 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
   setup
 }
 
-def initCache(hasGameDir: Boolean): Unit = {
-  if (usmapUri.startsWith(usmapUrlPrefix) && (autoupdateUsmaps.contains(usmapPath.baseName) || !os.exists(automodGameCacheDir) && !hasGameDir)) {
-    val msg = s"Setting up $automodGameCacheDir ..."
-    download(usmapUri.replace("/usmap/", "/cache/").replace(".usmap.7z", ".7z"), 
-             if (os.exists(automodGameCacheDir)) Some(msg) else None) match {
-      case Some(p) =>
-        if (!os.exists(automodGameCacheDir)) println(msg)
-        os.remove.all(automodGameCacheDir) 
-        os.proc(zipExe, "x", p).call(cwd = automodDir, stdout = os.Inherit, stderr = os.Inherit)
-        os.remove.all(p)
-        println()
-      case _ =>
-    }
-    println()
-  }
-}
-
 def toJsonNode(content: String): JsonNode = new ObjectMapper().readTree(content)
 
 def jdFilePatches(path: os.Path)(err: Vector[String] => Unit = 
@@ -1023,7 +1006,6 @@ def generateMod(addToFilePatches: Boolean,
                 currentAstMap: collection.mutable.HashMap[String, (JsonAst, JsonAst, JsonAst)] = collection.mutable.HashMap.empty,
                 origAstMap: collection.mutable.HashMap[String, JsonNode] = null,
                 uassetNameRequests: Vector[String] = Vector())(): Unit = {
-  initCache(gamePakDirOpt.nonEmpty)
 
   val cacheKey = cacheDir / gameId / "key.properties"
   val output = workingDir / "out"
@@ -1245,18 +1227,21 @@ def generateMod(addToFilePatches: Boolean,
     val pack = workingDir / s"$modName.$modExt"
     os.remove.all(pack)
 
-    val includedDir = patchesDir / ".included"
-    if (os.exists(includedDir)) {
-      println("Copying included files")
-      for (p <- os.walk(includedDir) if os.isFile(p)) {
-        val relPath = p.relativeTo(includedDir)
-        val p2 = output / relPath
-        os.makeDir.all(p2 / os.up)
-        os.copy(p, p2)
-        println(s"* Added $p2")
+    def includeAssets(includedDir: os.Path) = {
+      if (os.exists(includedDir)) {
+        println("Copying included files")
+        for (p <- os.walk(includedDir) if os.isFile(p)) {
+          val relPath = p.relativeTo(includedDir)
+          val p2 = output / relPath
+          os.makeDir.all(p2 / os.up)
+          os.copy(p, p2)
+          println(s"* Added $p2")
+        }
+        println()
       }
-      println()
     }
+    includeAssets(patchesDir / ".included")
+    includeAssets(patchesDir / gameId / modName / ".included")
 
     os.makeDir.all(modDir)
     val utocPak = modDir / (if (config.game.zen) s"${modName}_P.utoc" else if (modName.head.toString.toIntOption.nonEmpty) s"pakChunk${modName}_P.pak" else s"pakChunk888-${modName}_P.pak")
@@ -1646,8 +1631,6 @@ def demoSoA(): Unit = {
 }
 
 def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean): Unit = {
-  val oldConfigOpt = writeConfig(initConfig)
-
   var modName = if (isAIO) "all-in-one" 
                 else if (isEffect) "effect-table" 
                      else "beta-burst-recovery-scan"
@@ -1717,7 +1700,6 @@ def demoSb(isAIO: Boolean, isHard: Boolean, isEffect: Boolean): Unit = {
   } catch {
     case _: Throwable => exit(-1)
   } finally {
-    oldConfigOpt.foreach(writeConfig)
     if (osKind.isWin) execute(os.proc("cmd", "/D", "/C", "rmdir", "/s", "/q", modPatches))
     else execute(os.proc("rm", "-fR", modPatches))
   }

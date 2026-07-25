@@ -1,3 +1,5 @@
+3.4.1: Upgraded UAssetCLI, repak, retoc, jd, and libs. Fixed uasset includes. Removed github cached json usage.
+
 3.4.0: Upgraded repak, UAsssetCLI, and libs.
 
 3.3.9: Upgraded retoc, jd, and libs.
