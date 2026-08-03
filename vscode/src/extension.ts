@@ -9,7 +9,6 @@ const tempDir = isWindows? `${process.env.LOCALAPPDATA}${fsep}Temp${fsep}automod
 interface Tools {
   retoc: string
   repak: string
-  uassetCli: string
   fmodel: string
   jd: string
 }
@@ -52,8 +51,7 @@ function toolEquals(t1: Tools, t2: Tools): boolean {
   return t1.retoc == t2.retoc && 
     t1.repak == t2.repak &&
     t1.fmodel == t2.fmodel &&
-    t1.jd == t2.jd &&
-    t1.uassetCli == t2.uassetCli;
+    t1.jd == t2.jd;
 }
 
 function configEquals(c1: Config, c2: Config): boolean {

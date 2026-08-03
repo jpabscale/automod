@@ -3,6 +3,8 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, ObjectWriter}
 import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import com.fasterxml.jackson.dataformat.toml.TomlMapper
 import com.fasterxml.jackson.core.`type`.TypeReference
+import com.github.jpabscale.uasset4j.api.UAssetService
+import com.github.jpabscale.uasset4j.unrealtypes.EngineVersion
 import com.jayway.jsonpath
 import java.util.{EnumSet, Map => JMap}
 import java.util.concurrent.ConcurrentHashMap
@@ -13,7 +15,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.4.1"
+var version = "3.5.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -75,8 +77,6 @@ val osKind = if (util.Properties.isWin) if (isArm) OsKind.WinArm64 else OsKind.W
              else if (util.Properties.isMac) if (isArm) OsKind.MacArm64 else OsKind.MacAmd64
              else exit(-1, s"Unsupported platform")
 
-if (osKind.isMac) exit(-1, s"Unsupported platform: .NET 8 for macOS does not currently work well enough for UAssetCLI")
-
 val automodDir = {
   var file = new java.io.File(sourcecode.File())
   while (!new java.io.File(file, "automod.sc").exists) file = file.getParentFile
@@ -93,6 +93,7 @@ val uassetFilterSepChar = '$'
 var gameId = "SB"
 var maxLogs = 30
 var noPar = false
+var usePak = false
 var licenses = Seq[os.Path]()
 var cliArgs = {
   var r = args match {
@@ -107,6 +108,9 @@ var cliArgs = {
         r = r.drop(2)
       case Array("-p", _*) =>
         noPar = true
+        r = r.tail
+      case Array("--pak", _*) =>
+        usePak = true
         r = r.tail
       case Array("-l", num, _*) =>
         num.toIntOption match {
@@ -126,7 +130,6 @@ var cliArgs = {
   r
 }
 
-noPar = noPar || osKind.isLinux || osKind.isMac || osKind.isArm
 
 def exit(code: Int, msg: String = null): Nothing = {
   Option(msg).foreach((if (code == 0) Console.out else Console.err).println(_))
@@ -207,11 +210,10 @@ val wantedDeadGame = {
 }
 
 class Tools {
-  @BeanProperty var fmodel: String = "b2708293f64ffc858b4901ff785a9078b99c67f4"
+  @BeanProperty var fmodel: String = "7c86ee47ec2722152b735b7cb788686f6ea3e91a"
   @BeanProperty var jd: String = "2.5.0"
   @BeanProperty var repak: String = "0.2.4-pre.2"
-  @BeanProperty var retoc: String = "0.1.6-pre.2"
-  @BeanProperty var uassetCli: String = "1.0.5"
+  @BeanProperty var retoc: String = "0.1.6-pre.3"
 }
 
 class Config {
@@ -298,6 +300,11 @@ val emptyPropertyChanges: PropertyChanges = TreeMap.empty
 val emptyUAssetPropertyChanges: UAssetPropertyChanges = ILinkedHashMap.empty
 val emptyFilePatches: FilePatches = TreeMap.empty
 val emptyCodePatches: CodePatches = TreeMap.empty
+
+type RawScriptPatches = TreeMap[OrderedString, os.Path]
+
+val rawPatchExtensions = Vector("toml", "patch", "sc", "js", "ts", "lua", "py")
+val rawPatchExtensionOrder = Map("toml" -> 0, "patch" -> 1, "sc" -> 2, "js" -> 3, "ts" -> 4, "lua" -> 5, "py" -> 6)
 
 val jp: jsonpath.ParseContext = {
   jsonpath.Configuration.setDefaults(new jsonpath.Configuration.Defaults {
@@ -386,7 +393,6 @@ val usmapDir = toolsDir / "usmap"
 
 val retocVersion = config.tools.retoc
 val repakVersion = config.tools.repak
-val uassetCliVersion = config.tools.uassetCli
 var fmodelSha = config.tools.fmodel
 var fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = config.tools.jd
@@ -403,7 +409,6 @@ val usmapPath = usmapDir / (if (usmapFilename.isEmpty || usmapFilename == "Mappi
 
 val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
 val repakUrlPrefix = s"https://github.com/jpabscale/repak/releases/download/v$repakVersion"
-val uassetCliUrl = s"https://github.com/jpabscale/UAssetCLI/releases/download/v$uassetCliVersion/UAssetCLI.zip"
 def fmodelUrl(sha: String): String = s"https://github.com/4sval/FModel/releases/download/qa/$sha.zip"
 val jdUrlPrefix = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion"
 val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
@@ -425,7 +430,6 @@ val repakPackOptions: Seq[os.Shellable] = {
     r
   }
 }
-val uassetCliDir = toolsDir / "UAssetCLI"
 val uassetGuiSettingsDir = localAppData / "UAssetGUI"
 val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
 val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
@@ -434,6 +438,7 @@ val cacheDir = workingDir / ".cache"
 val tempDir = localAppData / "Temp" / "automod"
 val setupVscodeDir = tempDir / ".setup.vscode.dir"
 lazy val dotnet = if (os.exists(os.home / ".dotnet" / "dotnet")) absPath(os.home / ".dotnet" / "dotnet") else "dotnet"
+lazy val javaExe = if (os.exists(os.Path(System.getProperty("java.home")) / "bin" / "java")) absPath(os.Path(System.getProperty("java.home")) / "bin" / "java") else "java"
 
 val discardProcessOutput = new os.ProcessOutput {
   def redirectTo: ProcessBuilder.Redirect = ProcessBuilder.Redirect.DISCARD
@@ -575,15 +580,6 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
       }
     }
     os.remove.all(repakBundle)
-    println()
-  }
-
-  if (!os.exists(uassetCliDir)) {
-    setup = false
-    println(s"Setting up UAssetCLI v$uassetCliVersion in $uassetCliDir ...")
-    val uassetCliZip = downloadCheck(uassetCliUrl)
-    os.proc(zipExe, "x", uassetCliZip).call(cwd = toolsDir)
-    os.remove.all(uassetCliZip)
     println()
   }
 
@@ -804,6 +800,27 @@ def tomlFilePatches(path: os.Path): UAssetPropertyChanges = {
 
 var patchesInitialized = false
 private var _patches = emptyFilePatches
+private var _rawJsonPatches = emptyFilePatches
+private var _rawScriptPatches: RawScriptPatches = TreeMap.empty
+
+def rawJsonPatches: FilePatches = {
+  if (!patchesInitialized) patches
+  _rawJsonPatches
+}
+
+def rawScriptPatches: RawScriptPatches = {
+  if (!patchesInitialized) patches
+  _rawScriptPatches
+}
+
+def langForRawExt(ext: String): patchlet.Lang = ext.toLowerCase match {
+  case "sc" => patchlet.Lang.Scala
+  case "js" => patchlet.Lang.Js
+  case "ts" => patchlet.Lang.Typescript
+  case "py" => patchlet.Lang.Python
+  case "lua" => patchlet.Lang.Lua
+  case _ => exit(-1, s"Unsupported raw script patch extension: $ext")
+}
 
 val updatedPatches = new ConcurrentHashMap[(String, String, String), JsonNode]
 
@@ -840,6 +857,8 @@ def applyChanges(path: String, map: FilePatches, uassetName: String, data: UAsse
 
 def updatePatches(): Unit = {
   var map = if (_patches == null) emptyFilePatches else _patches
+  var rawJsonMap = if (_rawJsonPatches == null) emptyFilePatches else _rawJsonPatches
+  var rawScriptMap = if (_rawScriptPatches == null) TreeMap.empty[OrderedString, os.Path] else _rawScriptPatches
 
   def rec(path: os.Path): Unit =   {
     if (path.last.headOption == Some('.')) {
@@ -850,7 +869,11 @@ def updatePatches(): Unit = {
       if (os.isDir(p1) && os.isDir(p2)) p1.last <= p2.last
       else if (os.isDir(p1)) false
       else if (os.isDir(p2)) true
-      else p1.last <= p2.last
+      else {
+        val r1 = rawPatchExtensionOrder.getOrElse(p1.ext.toLowerCase, Int.MaxValue)
+        val r2 = rawPatchExtensionOrder.getOrElse(p2.ext.toLowerCase, Int.MaxValue)
+        if (r1 != r2) r1 < r2 else p1.last <= p2.last
+      }
     )) {
       if (os.isDir(p)) {
         rec(p)
@@ -859,19 +882,20 @@ def updatePatches(): Unit = {
           println(s"Ignoring $path ...")
         } else {
           p.ext.toLowerCase match {
-            case "patch" =>
+            case ext if rawPatchExtensions.contains(ext) =>
               val uassetName = p.baseName
               logPatch(uassetName, s"Loading $p ...", console = true)
               var relPath = p.relativeTo(patchesDir).toString
               if (osKind.isWin) relPath = relPath.replace('/' , '\\')
-              map = applyChanges(relPath, map, uassetName, jdFilePatches(p)())
-              logPatch(uassetName, "", console = false)
-            case "toml" =>
-              val uassetName = p.baseName
-              logPatch(uassetName, s"Loading $p ...", console = true)
-              var relPath = p.relativeTo(patchesDir).toString
-              if (osKind.isWin) relPath = relPath.replace('/' , '\\')
-              map = applyChanges(relPath, map, uassetName, tomlFilePatches(p))
+              if (ext == "toml" && uassetName.endsWith(".json")) {
+                rawJsonMap = applyChanges(relPath, rawJsonMap, uassetName, tomlFilePatches(p))
+              } else if (ext == "toml") {
+                map = applyChanges(relPath, map, uassetName, tomlFilePatches(p))
+              } else if (ext == "patch") {
+                map = applyChanges(relPath, map, uassetName, jdFilePatches(p)())
+              } else {
+                rawScriptMap = rawScriptMap + (OrderedString(uassetName, relPath) -> p)
+              }
               logPatch(uassetName, "", console = false)
             case _ =>
           }
@@ -883,6 +907,8 @@ def updatePatches(): Unit = {
   if (os.isDir(patchesDir)) rec(patchesDir)
   println()
   _patches = map
+  _rawJsonPatches = rawJsonMap
+  _rawScriptPatches = rawScriptMap
 }
 
 def patches: FilePatches = {
@@ -969,9 +995,10 @@ val logs = new java.util.concurrent.ConcurrentHashMap[String, java.io.BufferedWr
 def logPatch(uassetName: String, l: String, console: Boolean): Unit = {
   val line = if (l.length > 1024) l.substring(0, 1024) else l
   if (console) println(line)
-  val p = logDir / s"$uassetName.log"
+  val logName = s"${uassetName.replace('/', uassetFilterSepChar)}.log"
+  val p = logDir / logName
   val key = absPath(p)
-  var q = logs.get(absPath(logDir / s"$uassetName.log"))
+  var q = logs.get(absPath(logDir / logName))
   if (q == null) {
     os.makeDir.all(logDir)
     q = new java.io.BufferedWriter(new java.io.FileWriter(key))
@@ -981,7 +1008,7 @@ def logPatch(uassetName: String, l: String, console: Boolean): Unit = {
 }
 
 def logFlush(uassetName: String): Unit = {
-  val key = absPath(logDir / s"$uassetName.log")
+  val key = absPath(logDir / s"${uassetName.replace('/', uassetFilterSepChar)}.log")
   val q = logs.get(key)
   if (q != null) {
     logs.remove(key)
@@ -992,6 +1019,7 @@ def logFlush(uassetName: String): Unit = {
 
 def logFlush(): Unit = {
   for (w <- logs.values.asScala) try w.flush() finally w.close()
+  logs.clear()
 }
 
 def checkPatchesDir(): Unit = if (!os.isDir(patchesDir)) exit(-1, s"Missing directory: $patchesDir")
@@ -1017,7 +1045,6 @@ def generateMod(addToFilePatches: Boolean,
     if (!os.exists(sbPakDir)) return ""
     var r = Vector.empty[String]
     r = r :+ s"retoc=$retocVersion"
-    r = r :+ s"UAssetCLI=$uassetCliVersion"
     for (p <- os.list(sbPakDir).sortWith((p1, p2) => p1.last <= p2.last) if os.isFile(p)) {
       r = r :+ s"${p.last}=${p.toIO.lastModified}"
     }
@@ -1064,20 +1091,21 @@ def generateMod(addToFilePatches: Boolean,
          |https://github.com/trumank/$retocPak/issues""".stripMargin)
   }
 
-  def uassetCliFailed(title: String, pUassetGui: os.proc, at: os.Path, repack: Boolean): Nothing = {
+  def uassetCliFailed(title: String, err: Throwable, at: os.Path, repack: Boolean): Nothing = {
     val moreInfo = if (!repack) "T" else 
       s"""First, check that the patched JSON file has been changed as intended with correct values. 
          |If everyhing looks proper, t""".stripMargin
     exit(-1, 
-      s"""Failed to use UAssetCLI to $title with the following command in $at:
+      s"""Failed to use UAssetService to $title in $at:
          |
-         |${pUassetGui.commandChunks.mkString(" ")}
+         |${err.toString}
          |
          |${moreInfo}ry to see if this is a known UAssetAPI issue (or filing a new one) at:
          |https://github.com/atenfyr/UAssetAPI/issues""".stripMargin)
   }
 
   val uassetNamePathMap = new ConcurrentHashMap[String, os.RelPath]
+  val rawFileNamePathMap = new ConcurrentHashMap[String, os.RelPath]
 
   def unpackJson(n: String): os.Path = {
     var name = n
@@ -1119,11 +1147,7 @@ def generateMod(addToFilePatches: Boolean,
     val gamePakDir = gamePakDirOpt.get
 
     val outputName = output / name
-    val profileCopyDir = outputName / userName
-    val uassetGuiSettingsCopyDir = profileCopyDir / "AppData" / "Local" / "UAssetGUI"
     val retocPakCopyDir = outputName / retocPakExe.baseName
-    val uassetCliCopyDir = outputName / "uassetgui"
-    val uassetCliDll = uassetCliCopyDir / "UAssetCLI.dll"
     val retocPakExeCopy = retocPakCopyDir / retocPakExe.last
     val uassetFilename = s"$name.uasset"
     val uexpFilename = s"$name.uexp"
@@ -1162,14 +1186,12 @@ def generateMod(addToFilePatches: Boolean,
     os.makeDir.all(jsonCache / os.up)
 
     println(s"Converting to $r ...")
-    os.makeDir.all(uassetGuiSettingsCopyDir / os.up)
-    os.copy.over(localAppData / "UAssetGUI", uassetGuiSettingsCopyDir)
-    os.copy.over(uassetCliDir, uassetCliCopyDir)
-    val env = Map[String, String]("USERPROFILE" -> absPath(profileCopyDir), "LOCALAPPDATA" -> absPath(uassetGuiSettingsCopyDir))
-    val pUassetGui = os.proc(dotnet, uassetCliDll, "tojson", uasset, json, s"VER_$ueVersionCode", usmapPath.baseName)
-    if (pUassetGui.call(check = false, cwd = uassetCliCopyDir, stdout = os.Inherit, stderr = os.Inherit, env = env).exitCode != 0) 
-      uassetCliFailed(s"convert $uasset to JSON", pUassetGui, uassetCliCopyDir, repack = false)
-    os.copy.over(uassetCliCopyDir / json, r)
+    val jsonStr = try {
+      UAssetService.toJson(uasset.toNIO, EngineVersion.FromString(s"VER_$ueVersionCode"), usmapPath.toString)
+    } catch {
+      case err: Throwable => uassetCliFailed(s"convert $uasset to JSON", err, outputName, repack = false)
+    }
+    os.write.over(r, jsonStr)
     os.copy.over(r, jsonCache)
     println(s"... done converting to $r")
 
@@ -1179,29 +1201,118 @@ def generateMod(addToFilePatches: Boolean,
     r
   }
 
+  def unpackRawFile(n: String): os.Path = {
+    val filterName = n.replace(uassetFilterSepChar, '/')
+    val lastSegment = filterName.substring(filterName.lastIndexOf('/') + 1)
+
+    def findCached(dir: os.Path): os.Path = {
+      if (!os.isDir(dir)) return null
+      val exact = dir / os.RelPath(filterName)
+      if (os.isFile(exact)) return exact
+      for (p <- os.walk(dir) if os.isFile(p) && p.last == lastSegment) return p
+      null
+    }
+
+    var r: os.Path = null
+
+    def tryCacheDir(dir: os.Path): Boolean = {
+      val rawCache = findCached(dir)
+      if (rawCache != null) {
+        val relPath = rawCache.relativeTo(dir / os.up)
+        r = tempDir / relPath
+        os.makeDir.all(r / os.up)
+        os.copy.over(rawCache, r)
+        rawFileNamePathMap.put(n, relPath)
+        println(s"Using cached $rawCache")
+        return true
+      }
+      false
+    }
+
+    if (cacheHit && tryCacheDir(cacheDir / gameId)) return r
+    if (gamePakDirOpt.isEmpty && usmapUri.startsWith(usmapUrlPrefix) && tryCacheDir(automodGameCacheDir)) return r
+    if (gamePakDirOpt.isEmpty) exit(-1, s"$n is not cached; please supply the game directory")
+
+    val gamePakDir = gamePakDirOpt.get
+
+    val outputName = output / os.RelPath(filterName)
+    val retocPakCopyDir = outputName / retocPakExe.baseName
+    val useZen = config.game.zen && !usePak
+    val pakExe = if (useZen) retocPakExe else repakExe
+    val pakExeCopy = retocPakCopyDir / pakExe.last
+
+    os.makeDir.all(retocPakCopyDir)
+    os.copy.over(pakExe, pakExeCopy)
+
+    println(s"Extracting $filterName ...")
+    val args = if (useZen) {
+      retocPak(pakExeCopy, "unpack", "--filter", filterName, "--no-parallel", gamePakDir, retocPakCopyDir)
+    } else {
+      var r = retocPak(pakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$filterName")
+      for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
+      r
+    }
+    var pRetocPak = os.proc(args: _*)
+    if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
+      retocPakFailed(s"extract $filterName", pRetocPak, retocPakCopyDir)
+
+    var raw: os.Path = null
+    for (p <- os.walk(outputName) if os.isFile(p) && p.last == lastSegment) raw = p
+
+    // Some zen games store raw files in the legacy .pak files that sit next to
+    // the utoc/ucas containers rather than in the zen container itself, so fall
+    // back to repak over those .pak files.
+    if (useZen && raw == null) {
+      val repakExeCopy = retocPakCopyDir / repakExe.last
+      os.copy.over(repakExe, repakExeCopy)
+      var r = retocPak(repakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$filterName")
+      for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
+      pRetocPak = os.proc(r: _*)
+      if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
+        retocPakFailed(s"extract $filterName", pRetocPak, retocPakCopyDir)
+      for (p <- os.walk(outputName) if os.isFile(p) && p.last == lastSegment) raw = p
+    }
+
+    if (raw == null) retocPakFailed(s"extract $filterName (no result)", pRetocPak, retocPakCopyDir)
+    val relPath = raw.relativeTo(retocPakCopyDir)
+    r = tempDir / relPath
+    os.makeDir.all(r / os.up)
+    os.copy.over(raw, r)
+    val rawCache = cacheDir / relPath
+    os.makeDir.all(rawCache / os.up)
+    os.copy.over(r, rawCache)
+    rawFileNamePathMap.put(n, relPath)
+    os.remove.all(outputName)
+    println(s"... done extracting $filterName")
+
+    r
+  }
+
+  def packRawFile(n: String, path: os.Path): Unit = {
+    val dest = output / rawFileNamePathMap.get(n)
+    os.makeDir.all(dest / os.up)
+    os.copy.over(path, dest)
+  }
+
   def packJson(n: String, path: os.Path): Unit = {
     var name = n
     if (name.contains(uassetFilterSepChar)) {
       name = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
     }
     val outputName = output / name
-    val profileCopyDir = outputName / userName
-    val uassetGuiSettingsCopyDir = profileCopyDir / "AppData" / "Local" / "UAssetGUI"
     val uasset = outputName / uassetNamePathMap.get(name)
     val pathCopy = outputName / path.last
-    val uassetCliDll = outputName / "UAssetCLI.dll"
 
     os.makeDir.all(uasset / os.up)
-    os.makeDir.all(uassetGuiSettingsCopyDir / os.up)
-    os.copy.over(localAppData / "UAssetGUI", uassetGuiSettingsCopyDir)
-    for (p <- os.list(uassetCliDir)) os.copy.over(p, outputName / p.last)
     os.copy.over(path, pathCopy)
 
     println(s"Regenerating $uasset ...")
-    val pUassetGui = os.proc(dotnet, uassetCliDll , "fromjson", pathCopy, uasset, usmapPath.baseName)
-    val env = Map[String, String]("USERPROFILE" -> absPath(profileCopyDir), "LOCALAPPDATA" -> absPath(uassetGuiSettingsCopyDir))
-    if (pUassetGui.call(check = false, cwd = outputName, stdout = os.Inherit, stderr = os.Inherit, env = env).exitCode != 0)
-      uassetCliFailed(s"convert $uasset from JSON", pUassetGui, outputName, repack = true)
+    val asset = try {
+      UAssetService.fromJson(os.read(pathCopy), usmapPath.toString)
+    } catch {
+      case err: Throwable => uassetCliFailed(s"convert $uasset from JSON", err, outputName, repack = true)
+    }
+    asset.Write(uasset.toString)
     println(s"... done regenerating $uasset")
     os.makeDir.all(output / gameId)
     val src = outputName / gameId
@@ -1244,10 +1355,11 @@ def generateMod(addToFilePatches: Boolean,
     includeAssets(patchesDir / gameId / modName / ".included")
 
     os.makeDir.all(modDir)
-    val utocPak = modDir / (if (config.game.zen) s"${modName}_P.utoc" else if (modName.head.toString.toIntOption.nonEmpty) s"pakChunk${modName}_P.pak" else s"pakChunk888-${modName}_P.pak")
+    val useZen = config.game.zen && !usePak
+    val utocPak = modDir / (if (useZen) s"${modName}_P.utoc" else if (modName.head.toString.toIntOption.nonEmpty) s"pakChunk${modName}_P.pak" else s"pakChunk888-${modName}_P.pak")
     println(s"Converting to $utocPak ...")
-    val args: Seq[os.Shellable] = if (config.game.zen) retocPak(retocPakExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utocPak)
-                                  else retocPak(retocPakExe, (Seq[os.Shellable]("pack") ++ repakPackOptions ++ Seq[os.Shellable](output, utocPak)): _*)
+    val args: Seq[os.Shellable] = if (useZen) retocPak(retocPakExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utocPak)
+                                  else retocPak(repakExe, (Seq[os.Shellable]("pack") ++ repakPackOptions ++ Seq[os.Shellable](output, utocPak)): _*)
     val pRetocPak = os.proc(args: _*)
     if (pRetocPak.call(check = false, cwd = tempDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
       retocPakFailed(s"pack $modName", pRetocPak, tempDir)
@@ -1301,6 +1413,16 @@ def generateMod(addToFilePatches: Boolean,
     if (noPar) for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName))
     else for (uassetName <- uassetNames.toSeq.par) yield (uassetName, unpackJson(uassetName)))
   println()
+
+  val rawFileNames =
+    if (shouldPack && !disableFilePatching)
+      TreeSet.empty[String] ++ (for (key <- rawJsonPatches.keys) yield key.value) ++ (for (key <- rawScriptPatches.keys) yield key.value)
+    else TreeSet.empty[String]
+  val rawFileMap = Map.empty[String, os.Path] ++ (
+    if (rawFileNames.isEmpty) Seq.empty[(String, os.Path)]
+    else if (noPar) rawFileNames.map(name => (name, unpackRawFile(name)))
+    else rawFileNames.toSeq.par.map(name => (name, unpackRawFile(name))))
+  if (rawFileNames.nonEmpty) println()
 
   if (disableCodePatching & disableFilePatching) return
 
@@ -1364,13 +1486,48 @@ def generateMod(addToFilePatches: Boolean,
   
   println()
 
+  if (!disableFilePatching && rawFileNames.nonEmpty) {
+    for (name <- rawFileNames) {
+      val file = rawFileMap(name)
+      val origBytes = os.read.bytes(file)
+      var currentBytes = origBytes
+      val merged: Seq[(OrderedString, Either[UAssetPropertyChanges, os.Path])] =
+        ((for ((nameKey, tree) <- rawJsonPatches if nameKey.value == name) yield (nameKey, Left(tree))) ++
+         (for ((nameKey, p) <- rawScriptPatches if nameKey.value == name) yield (nameKey, Right(p)))).toSeq.sortBy(_._1)
+      for ((nameKey, change) <- merged) {
+        logPatch(name, s"Patching $file by using ${nameKey.path} ...", console = true)
+        change match {
+          case Left(tree) =>
+            val ast = jp.parse(file.toIO)
+            val origAst = jp.parse(file.toIO)
+            val origAstPath = jpPathList.parse(file.toIO)
+            patchlet.applyRawJsonPatches(name, ast, origAst, origAstPath, tree)
+            writeJson(file, ast.json[JsonNode])
+            currentBytes = os.read.bytes(file)
+          case Right(p) =>
+            currentBytes = patchlet.evalRawScript(langForRawExt(p.ext), p, name, origBytes, currentBytes)
+            os.write.over(file, currentBytes)
+        }
+        println(s"... done patching $file by using ${nameKey.path}")
+        logPatch(name, "", console = false)
+      }
+      logFlush(name)
+    }
+    println()
+  }
+
   modNameOpt match {
     case Some(modName) if !dryRun =>
       val entries = (for (entry <- jsonMap if !skippedUassets.contains(entry._1)) yield entry).toSeq.sortWith((e1, e2) => e1._2.toIO.length <= e2._2.toIO.length())
       if (noPar) entries.foreach(entry => packJson(entry._1, entry._2))
       else entries.par.foreach(entry => packJson(entry._1, entry._2))
       println()
-      if ((jsonMap.keySet -- skippedUassets).nonEmpty) packMod(modName)
+      if (!disableFilePatching && rawFileNames.nonEmpty) {
+        if (noPar) rawFileNames.foreach(name => packRawFile(name, rawFileMap(name)))
+        else rawFileNames.par.foreach(name => packRawFile(name, rawFileMap(name)))
+        println()
+      }
+      if ((jsonMap.keySet -- skippedUassets).nonEmpty || (!disableFilePatching && rawFileNames.nonEmpty)) packMod(modName)
     case _ =>
   }
 
@@ -1831,10 +1988,11 @@ def printUsage(): Nothing = {
        | -s                   Disable Scala CLI server
        |
        |opt:
-       | -g <game-id>         Active game identifier (default: SB)
-       | -l <num>             Maximum task logs to keep (default: 30)
-       | -p                   Disable parallelization
-       | -c <license-path>    Include license file(s) in the generated mod
+        | -g <game-id>         Active game identifier (default: SB)
+        | -l <num>             Maximum task logs to keep (default: 30)
+        | -p                   Disable parallelization
+        | --pak                Force legacy .pak output even for zen games
+        | -c <license-path>    Include license file(s) in the generated mod
        |
        |option:
        | --dry-run            Disable actual mod generation and just test patches
@@ -1926,7 +2084,7 @@ def run(): Unit = {
         if (r) return
         if (os.isDir(p) && !p.last.startsWith(".")) {
           os.list(p).foreach(rec)
-        } else if (os.isFile(p) && (p.ext == "toml" || p.ext == "patch") && !p.last.startsWith(".")) r = true
+        } else if (os.isFile(p) && rawPatchExtensions.contains(p.ext) && !p.last.startsWith(".")) r = true
       }
       rec(root)
       r
@@ -2019,7 +2177,7 @@ def run(): Unit = {
   println(
     s"""* Platform: $osKind
        |* Automod directory: $automodDir
-       |* Using: retoc v$retocVersion, repak v$repakVersion, UAssetCLI v$uassetCliVersion, jd v$jdVersion, $usmapFilename""".stripMargin)
+       |* Using: retoc v$retocVersion, repak v$repakVersion, jd v$jdVersion, $usmapFilename""".stripMargin)
   if (osKind.isWin) println(s"* Extra: FModel @$fmodelShortSha")
   println(
     s"""* Parallelization enabled: ${!noPar}

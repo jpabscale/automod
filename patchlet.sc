@@ -69,11 +69,19 @@ def evalJs(v: Context => Value, code: String): (Context, Value) = {
   (context, evalPoly(context, "js", code))
 }
 
+def evalJsRaw(orig: Array[Byte], current: Array[Byte], code: String): (Context, Value) = {
+  val context = graalContext("js")
+  val bindings = context.getBindings("js")
+  bindings.putMember("__orig", context.asValue(orig))
+  bindings.putMember("__current", context.asValue(current))
+  context.eval("js", "var v = { orig: new Uint8Array(__orig), current: new Uint8Array(__current) }")
+  (context, evalPoly(context, "js", code))
+}
+
 lazy val tsCache = new java.util.concurrent.ConcurrentHashMap[String, String]
 
-def evalTypescript(preamble: String)(v: Context => Value, exp: String): (Context, Value) = {
-  val code = s"$preamble${util.Properties.lineSeparator}$exp"
-  val js = Option(tsCache.get(code)) match {
+def compileTypescript(code: String): String = {
+  Option(tsCache.get(code)) match {
     case Some(c) => c
     case _ =>
       val d = os.temp.dir()
@@ -86,7 +94,26 @@ def evalTypescript(preamble: String)(v: Context => Value, exp: String): (Context
       tsCache.put(code, c)
       c
   }
-  evalJs(v, js)
+}
+
+def evalTypescript(preamble: String)(v: Context => Value, exp: String): (Context, Value) = {
+  val code = s"$preamble${util.Properties.lineSeparator}$exp"
+  evalJs(v, compileTypescript(code))
+}
+
+def evalTypescriptRaw(orig: Array[Byte], current: Array[Byte], exp: String): (Context, Value) = {
+  val preamble = """declare var v: { orig: Uint8Array; current: Uint8Array }"""
+  val code = s"$preamble${util.Properties.lineSeparator}$exp"
+  evalJsRaw(orig, current, compileTypescript(code))
+}
+
+def evalPythonRaw(orig: Array[Byte], current: Array[Byte], code: String): (Context, Value) = {
+  val context = graalContext("python")
+  val bindings = context.getBindings("python")
+  bindings.putMember("__orig", context.asValue(orig.map(_ & 0xFF)))
+  bindings.putMember("__current", context.asValue(current.map(_ & 0xFF)))
+  context.eval("python", "v = { 'orig': bytearray(__orig), 'current': bytearray(__current) }")
+  (context, evalPoly(context, "python", code.trim))
 }
 
 def evalPython(v: Context => Value, code: String): (Context, Value) = {
@@ -112,6 +139,93 @@ def evalLua(v: LuaValue, code: String, err: String => String): JsonNode = {
     uassetapi.fromLuaValue(f.call(v))
   } catch {
     case t: Throwable => automod.exit(-1, err(t.getMessage))
+  }
+}
+
+type RawScriptContext = {
+  def orig: Array[Byte]
+  def current: Array[Byte]
+}
+
+def evalRawScript(lang: Lang, patchPath: os.Path, target: String, orig: Array[Byte], current: Array[Byte]): Array[Byte] = {
+  val code = os.read(patchPath)
+  def err(t: Throwable): Nothing = automod.exit(-1, 
+    s"""Evaluation failed for raw patch $patchPath ($lang) on $target: ${t.getMessage}
+       |$code""".stripMargin)
+  def toBytes(r: Any): Array[Byte] = r match {
+    case b: Array[Byte] => b
+    case s: String => s.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+    case _ => automod.exit(-1, 
+      s"Raw script patch $patchPath ($lang) on $target must return a byte array or a string")
+  }
+  lang match {
+    case Lang.Scala =>
+      try {
+        val f = evalScala[RawScriptContext => Any](
+          s"""{
+             |(v: { def orig: Array[Byte]; def current: Array[Byte] }) => {
+             |  def result(): Any = {
+             |    $code
+             |  }
+             |  result()
+             |}
+             |}""".stripMargin)
+        val origBytes = orig
+        val currentBytes = current
+        val ctx = new { def orig: Array[Byte] = origBytes; def current: Array[Byte] = currentBytes }
+        toBytes(f(ctx))
+      } catch { case t: Throwable => err(t) }
+    case Lang.Js | Lang.Typescript =>
+      try {
+        val (context, r) = lang match {
+          case Lang.Typescript => evalTypescriptRaw(orig, current, code)
+          case _ => evalJsRaw(orig, current, code)
+        }
+        try {
+          if (r.isString) r.asString.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+          else if (r.hasArrayElements) {
+            val out = new Array[Byte](r.getArraySize.toInt)
+            for (i <- 0 until out.length) out(i) = r.getArrayElement(i).asInt.toByte
+            out
+          } else automod.exit(-1, 
+            s"Raw script patch $patchPath ($lang) on $target must return a Uint8Array or a string")
+        } finally context.close
+      } catch { case t: Throwable => err(t) }
+    case Lang.Python =>
+      try {
+        val (context, r) = evalPythonRaw(orig, current, code)
+        try {
+          if (r.isString) r.asString.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+          else if (r.hasArrayElements) {
+            val out = new Array[Byte](r.getArraySize.toInt)
+            for (i <- 0 until out.length) out(i) = r.getArrayElement(i).asInt.toByte
+            out
+          } else automod.exit(-1, 
+            s"Raw script patch $patchPath ($lang) on $target must return a bytearray or a str")
+        } finally context.close
+      } catch { case t: Throwable => err(t) }
+    case Lang.Lua =>
+      try {
+        val v = LuaValue.tableOf(Array[LuaValue](
+          LuaValue.valueOf("orig"), org.luaj.vm2.LuaString.valueOf(orig),
+          LuaValue.valueOf("current"), org.luaj.vm2.LuaString.valueOf(current)))
+        val g = org.luaj.vm2.lib.jse.JsePlatform.standardGlobals
+        org.luaj.vm2.luajc.LuaJC.install(g)
+        g.set(LuaValue.valueOf("JSON"), luaJson)
+        val chunk = g.load(
+          s"""function __f(v)
+             |  $code
+             |end
+             |
+             |_f = __f""".stripMargin)
+        chunk.call()
+        val f = g.get("_f").asInstanceOf[LuaValue]
+        f.call(v) match {
+          case s: org.luaj.vm2.LuaString =>
+            java.util.Arrays.copyOfRange(s.m_bytes, s.m_offset, s.m_offset + s.m_length)
+          case r => r.tojstring().getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        }
+      } catch { case t: Throwable => err(t) }
   }
 }
 
@@ -525,4 +639,15 @@ def kfcMap(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetName: Str
     }
   }
   (r1, r2, rt) 
+}
+
+def applyRawJsonPatches(uassetName: String, ast: automod.JsonAst, origAst: automod.JsonAst, origAstPath: automod.JsonAst, tree: automod.UAssetPropertyChanges): Unit = {
+  for ((key, _) <- tree) {
+    if (!key.startsWith(atPrefix)) automod.exit(-1, 
+      s"Raw JSON patch for $uassetName only supports '$atPrefix' sections, not '$key'")
+  }
+  val (keyFiltered, atFiltered, plain) = kfcMap(0, 0, addToFilePatches = false, uassetName, ast, origAst, origAstPath, tree)
+  if (keyFiltered.nonEmpty) automod.exit(-1, s"Raw JSON patch for $uassetName only supports '$atPrefix' sections, not key-filtered ones: ${keyFiltered.keys.mkString(", ")}")
+  if (plain.nonEmpty) automod.exit(-1, s"Raw JSON patch for $uassetName only supports '$atPrefix' sections, not property sections: ${plain.keys.mkString(", ")}")
+  for (kfc <- atFiltered.values) kfc.applyChanges(ast)
 }

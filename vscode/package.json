@@ -2,7 +2,7 @@
   "name": "automod-vscode",
   "displayName": "automod-vscode",
   "description": "VSCode extension for Auto Modding Script",
-  "version": "3.4.1",
+  "version": "3.5.0",
   "publisher": "jpabscale",
   "icon": "images/automod.png",
   "private": true,
@@ -117,10 +117,6 @@
                 "type": "string",
                 "description": "repak version"
               },
-              "uassetCli": {
-                "type": "string",
-                "description": "UAssetCLI version"
-              },
               "jd": {
                 "type": "string",
                 "description": "jd version"
@@ -133,7 +129,6 @@
             "default": {
               "retoc": "",
               "repak": "",
-              "uassetCli": "",
               "jd": "",
               "fmodel": ""
             },
@@ -209,6 +204,7 @@
     "@types/vscode": "^1.92.0",
     "@typescript-eslint/eslint-plugin": "^8.65.0",
     "@typescript-eslint/parser": "^8.65.0",
+    "@vscode/vsce": "^3.2.0",
     "eslint": "^10.8.0",
     "typescript": "^5.9.3"
   }
