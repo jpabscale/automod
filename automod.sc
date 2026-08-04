@@ -15,7 +15,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.5.0"
+var version = "3.5.1"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -94,6 +94,7 @@ var gameId = "SB"
 var maxLogs = 30
 var noPar = false
 var usePak = false
+var jsonOutDir: os.Path = null
 var licenses = Seq[os.Path]()
 var cliArgs = {
   var r = args match {
@@ -112,6 +113,9 @@ var cliArgs = {
       case Array("--pak", _*) =>
         usePak = true
         r = r.tail
+      case Array("--json-out", p, _*) =>
+        jsonOutDir = absPath(p)
+        r = r.drop(2)
       case Array("-l", num, _*) =>
         num.toIntOption match {
           case Some(n) if n > 0 => 
@@ -331,6 +335,8 @@ def objectWriter: ObjectWriter = {
   printer.indentArraysWith(indenter)
   new ObjectMapper().writer(printer)
 }
+
+def objectMapper: ObjectMapper = new ObjectMapper()
 
 def writeConfig(config: Config): Option[Config] = {
   val oldOpt = if (os.exists(configPath)) Some(readConfig(configPath)) else None
@@ -1107,7 +1113,7 @@ def generateMod(addToFilePatches: Boolean,
   val uassetNamePathMap = new ConcurrentHashMap[String, os.RelPath]
   val rawFileNamePathMap = new ConcurrentHashMap[String, os.RelPath]
 
-  def unpackJson(n: String): os.Path = {
+  def unpackJson(n: String): ObjectNode = {
     var name = n
     if (name.contains(uassetFilterSepChar)) {
       name = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
@@ -1121,26 +1127,30 @@ def generateMod(addToFilePatches: Boolean,
     }
 
     var jsonCache: os.Path = null
-    var r: os.Path = null
 
-    def tryCacheDir(dir: os.Path): Boolean = {
+    def tryCacheDir(dir: os.Path): Option[ObjectNode] = {
       jsonCache = findCached(dir)
-      r = if (jsonCache != null) tempDir / jsonCache.relativeTo(dir / os.up) else null
       if (jsonCache != null && os.exists(jsonCache)) {
-        os.makeDir.all(r / os.up)
-        os.copy.over(jsonCache, r)
         val relPath = jsonCache.relativeTo(dir / os.up)
         uassetNamePathMap.put(name, relPath / os.up / s"${relPath.baseName}.uasset")
         println(s"Using cached $jsonCache")
-        return true
-      }
-      false
+        Some(objectMapper.readTree(jsonCache.toIO).asInstanceOf[ObjectNode])
+      } else None
     }
-     
 
-    if (cacheHit && tryCacheDir(cacheDir / gameId)) return r
+    if (cacheHit) {
+      tryCacheDir(cacheDir / gameId) match {
+        case Some(tree) => return tree
+        case None =>
+      }
+    }
 
-    if (gamePakDirOpt.isEmpty && usmapUri.startsWith(usmapUrlPrefix) && tryCacheDir(automodGameCacheDir)) return r
+    if (gamePakDirOpt.isEmpty && usmapUri.startsWith(usmapUrlPrefix)) {
+      tryCacheDir(automodGameCacheDir) match {
+        case Some(tree) => return tree
+        case None =>
+      }
+    }
 
     if (gamePakDirOpt.isEmpty) exit(-1, s"$name.json is not cached; please supply the game directory")
 
@@ -1181,24 +1191,21 @@ def generateMod(addToFilePatches: Boolean,
     val relPath = uasset.relativeTo(retocPakCopyDir)
     val jsonRelPath = relPath / os.up / s"${relPath.baseName}.json"
     jsonCache = cacheDir / jsonRelPath
-    r = tempDir / jsonRelPath
-    os.makeDir.all(r / os.up)
     os.makeDir.all(jsonCache / os.up)
 
-    println(s"Converting to $r ...")
-    val jsonStr = try {
-      UAssetService.toJson(uasset.toNIO, EngineVersion.FromString(s"VER_$ueVersionCode"), usmapPath.toString)
+    println(s"Converting to $name ...")
+    val tree = try {
+      UAssetService.toJsonNode(uasset.toNIO, EngineVersion.FromString(s"VER_$ueVersionCode"), usmapPath.toString)
     } catch {
       case err: Throwable => uassetCliFailed(s"convert $uasset to JSON", err, outputName, repack = false)
     }
-    os.write.over(r, jsonStr)
-    os.copy.over(r, jsonCache)
-    println(s"... done converting to $r")
+    writeJson(jsonCache, tree)
+    println(s"... done converting to $name")
 
     uassetNamePathMap.put(name, relPath)
     os.remove.all(outputName)
 
-    r
+    tree
   }
 
   def unpackRawFile(n: String): os.Path = {
@@ -1294,21 +1301,27 @@ def generateMod(addToFilePatches: Boolean,
     os.copy.over(path, dest)
   }
 
-  def packJson(n: String, path: os.Path): Unit = {
+  def packJson(n: String, tree: ObjectNode): Unit = {
     var name = n
     if (name.contains(uassetFilterSepChar)) {
       name = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
     }
     val outputName = output / name
     val uasset = outputName / uassetNamePathMap.get(name)
-    val pathCopy = outputName / path.last
 
     os.makeDir.all(uasset / os.up)
-    os.copy.over(path, pathCopy)
+
+    if (jsonOutDir != null) {
+      val relPath = uassetNamePathMap.get(name)
+      val jsonOut = jsonOutDir / relPath / os.up / s"$name.json"
+      os.makeDir.all(jsonOut / os.up)
+      writeJson(jsonOut, tree)
+      println(s"Wrote patched JSON to $jsonOut")
+    }
 
     println(s"Regenerating $uasset ...")
     val asset = try {
-      UAssetService.fromJson(os.read(pathCopy), usmapPath.toString)
+      UAssetService.fromJsonNode(tree, usmapPath.toString)
     } catch {
       case err: Throwable => uassetCliFailed(s"convert $uasset from JSON", err, outputName, repack = true)
     }
@@ -1409,8 +1422,8 @@ def generateMod(addToFilePatches: Boolean,
     uassetNames = uassetNames ++ patchCustom.uassetNames
   }
 
-  val jsonMap = Map.empty[String, os.Path] ++ (
-    if (noPar) for (uassetName <- uassetNames) yield (uassetName, unpackJson(uassetName))
+  val jsonMap = Map.empty[String, ObjectNode] ++ (
+    if (noPar) for (uassetName <- uassetNames.toSeq) yield (uassetName, unpackJson(uassetName))
     else for (uassetName <- uassetNames.toSeq.par) yield (uassetName, unpackJson(uassetName)))
   println()
 
@@ -1449,14 +1462,14 @@ def generateMod(addToFilePatches: Boolean,
   }
 
   def patchUasset(uassetName: String): Unit = {
-    val file = jsonMap(uassetName)
+    val tree = jsonMap(uassetName)
     val (ast: JsonAst, origAst: JsonAst, origAstPath: JsonAst) = currentAstMap.get(uassetName) match {
       case Some(t) => 
         t
       case _ => 
-        val ast = jp.parse(file.toIO)
-        val origAst = jp.parse(file.toIO)
-        val origAstPath = jpPathList.parse(file.toIO)
+        val ast = jp.parse(tree)
+        val origAst = jp.parse(tree.deepCopy())
+        val origAstPath = jpPathList.parse(tree.deepCopy())
         val t = (ast, origAst, origAstPath)
         currentAstMap.put(uassetName, t)
         t
@@ -1468,10 +1481,9 @@ def generateMod(addToFilePatches: Boolean,
       var maxOrder = 0
       for ((uassetNameOrder, _) <- patches if maxOrder < uassetNameOrder.order) maxOrder = uassetNameOrder.order
       for ((uassetNameOrder, tree) <- patches if uassetNameOrder.order != 0 && uassetNameOrder.value == uassetName) {
-        logPatch(uassetName, s"Patching $file by using ${uassetNameOrder.path} ...", console = true)
+        logPatch(uassetName, s"Patching $uassetName by using ${uassetNameOrder.path} ...", console = true)
         patchFromTree(maxOrder, uassetNameOrder.order, addToFilePatches, uassetName, ast, origAst, origAstPath)(tree)
-        writeJson(file, json)
-        println(s"... done patching $file by using ${uassetNameOrder.path}")
+        println(s"... done patching $uassetName by using ${uassetNameOrder.path}")
         logPatch(uassetName, "", console = false)
       }
     }
@@ -1518,7 +1530,7 @@ def generateMod(addToFilePatches: Boolean,
 
   modNameOpt match {
     case Some(modName) if !dryRun =>
-      val entries = (for (entry <- jsonMap if !skippedUassets.contains(entry._1)) yield entry).toSeq.sortWith((e1, e2) => e1._2.toIO.length <= e2._2.toIO.length())
+      val entries = (for (entry <- jsonMap if !skippedUassets.contains(entry._1)) yield entry).toSeq.sortWith((e1, e2) => e1._2.size <= e2._2.size)
       if (noPar) entries.foreach(entry => packJson(entry._1, entry._2))
       else entries.par.foreach(entry => packJson(entry._1, entry._2))
       println()
