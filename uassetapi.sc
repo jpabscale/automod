@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, FloatNode, IntNode, LongNode, NullNode, ObjectNode, TextNode}
 import org.graalvm.polyglot.{Context, Value}
 import org.graalvm.polyglot.proxy.{Proxy, ProxyArray, ProxyObject}
 import org.luaj.vm2.{LuaValue, LuaBoolean, LuaDouble, LuaInteger, LuaNil, LuaString, LuaTable}
@@ -66,6 +66,8 @@ def toPolyValue(context: Context, node: JsonNode): Value = {
     case node: BooleanNode => context.asValue(node.booleanValue)
     case node: IntNode => context.asValue(node.intValue)
     case node: DoubleNode => context.asValue(node.doubleValue)
+    case node: FloatNode => context.asValue(node.doubleValue)
+    case node: LongNode => context.asValue(node.longValue)
     case node: ArrayNode => context.asValue(new PolyArray(context, node))
     case node: ObjectNode => context.asValue(new PolyObject(context, node))
     case node: TextNode => 
@@ -142,6 +144,8 @@ def toLuaValue(node: JsonNode): LuaValue = {
     case node: BooleanNode => LuaValue.valueOf(node.booleanValue)
     case node: IntNode => LuaValue.valueOf(node.intValue)
     case node: DoubleNode => LuaValue.valueOf(node.doubleValue)
+    case node: FloatNode => LuaValue.valueOf(node.doubleValue)
+    case node: LongNode => LuaValue.valueOf(node.doubleValue)
     case node: ArrayNode => 
       var seq = Vector[LuaValue]()
       for (i <- 0 until node.size) {
@@ -173,6 +177,8 @@ def toValue[T](node: JsonNode): Option[T] = {
     case node: BooleanNode => Some(toT(node.booleanValue))
     case node: IntNode => Some(toT(node.doubleValue))
     case node: DoubleNode => Some(toT(node.doubleValue))
+    case node: FloatNode => Some(toT(node.doubleValue))
+    case node: LongNode => Some(toT(node.doubleValue))
     case node: ArrayNode => 
       var builder = Vector.newBuilder[Any]
       for (i <- 0 until node.size) builder += toValue[Any](node.get(i)).get
@@ -237,7 +243,7 @@ def objSetJson(isAt: Boolean, addToFilePatches: Boolean, uassetName: String, nam
   rOpt
 }
 
-case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean) {
+case class Struct(uassetName: String, value: JsonNode, addToFilePatches: Boolean) extends patchlet.StructLike {
   var objectMap: HashMap[String, ObjectNode] = {
     var r = HashMap.empty[String, ObjectNode]
     if (value != null) {

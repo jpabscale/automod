@@ -1,3 +1,5 @@
+4.0.0: Added support for Unity modding using asset4j. Added Kotlin patchlet.
+
 3.5.1: Upgraded uasset4j (including some curve support). Optimized JSON de/serialization. 
 
 3.5.0: Upgraded repak, retoc, jd, and libs. Fixed uasset includes. Removed github cached json usage. Changed to use uasset4j. Added raw file patching support for non-.uasset files (e.g., databases) using script (Scala/TS/JS/Python/Lua) or TOML patches, including automatic raw file extraction and caching. Added the --pak CLI option to generate a legacy .pak even for zen games. Fixed Lua raw patchlet handling of byte values >= 0x80.

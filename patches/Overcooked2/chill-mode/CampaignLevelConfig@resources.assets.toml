@@ -1,0 +1,8 @@
+# Overcooked 2 "easier orders" — first-class class-scoped Unity patch.
+#
+# Scoped to every CampaignLevelConfig in resources.assets: make the order timers more
+# forgiving (double the lifetime / gap between orders, dirty plates return twice as fast).
+['.@: $']
+m_orderLifetime = '=> v.orig[Double] * 2.0'
+m_timeBetweenOrders = '=> v.orig[Double] * 2.0'
+m_plateReturnTime = '=> v.orig[Double] * 0.5'

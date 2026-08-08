@@ -20,6 +20,7 @@ interface Game {
   mapUri: string
   aesKey: string
   zen: boolean
+  unity: boolean
   repakPackOptions: string
 }
 
@@ -44,6 +45,7 @@ function gameEquals(g1: Game, g2: Game): boolean {
     g1.mapUri == g2.mapUri &&
     g1.aesKey == g2.aesKey &&
     g1.zen == g2.zen &&
+    g1.unity == g2.unity &&
     g1.repakPackOptions == g2.repakPackOptions;
 }
 
@@ -154,6 +156,7 @@ async function settingAutomodGames(merge: boolean, value: Games | undefined = un
       games[`${key}.mapUri`] = game.mapUri;
       games[`${key}.aesKey`] = game.aesKey;
       games[`${key}.zen`] = game.zen.toString();
+      games[`${key}.unity`] = game.unity.toString();
       games[`${key}.repakPackOptions`] = game.repakPackOptions;
     }
   }
@@ -164,7 +167,7 @@ async function settingAutomodGames(merge: boolean, value: Games | undefined = un
     const array = key.split(".", 2); 
     const gameId = array[0].trim();
     const property = array[1].trim();
-    const game: Game = r[gameId]? r[gameId] : { directory: "", contentPaks: "", unrealEngine: "", mapUri: "", aesKey: "", zen: true, repakPackOptions: "" }; 
+    const game: Game = r[gameId]? r[gameId] : { directory: "", contentPaks: "", unrealEngine: "", mapUri: "", aesKey: "", zen: true, unity: false, repakPackOptions: "" }; 
     switch(property) {
       case "directory":
         game.directory = newGames[key];
@@ -188,6 +191,18 @@ async function settingAutomodGames(merge: boolean, value: Games | undefined = un
             break;
           case "false":
             game.zen = false;
+            break;
+          default:
+            vscode.window.showInformationMessage(`Invalid value for ${key}: ${newGames[key]}`);
+        }
+        break;
+      case "unity":
+        switch(newGames[key]) {
+          case "true":
+            game.unity = true;
+            break;
+          case "false":
+            game.unity = false;
             break;
           default:
             vscode.window.showInformationMessage(`Invalid value for ${key}: ${newGames[key]}`);

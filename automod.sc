@@ -15,7 +15,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "3.5.1"
+var version = "4.0.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -144,6 +144,7 @@ def exit(code: Int, msg: String = null): Nothing = {
 val zipToolVersion = "25.01"
 var modExt = "zip"
 val usmapUrlPrefix = "https://github.com/jpabscale/automod/releases/download/usmap/"
+val ttmapUrlPrefix = "https://github.com/jpabscale/automod/releases/download/ttmap/"
 val autoupdateUsmaps = TreeSet[String]()
 
 val sbGameId = "SB"
@@ -151,6 +152,9 @@ val soaGameId = "SandsOfAura"
 val pal7GameId = "Pal7"
 val kenaGameId = "Kena"
 val wantedDeadGameId = "WDGame"
+val warmSnowGameId = "WarmSnow"
+val overcooked2GameId = "Overcooked2"
+val bladedFuryGameId = "BladedFury"
 
 class Game {
   @BeanProperty var aesKey: String = ""
@@ -158,6 +162,7 @@ class Game {
   @BeanProperty var directory: String = ""
   @BeanProperty var mapUri: String = ""
   @BeanProperty var repakPackOptions: String = ""
+  @BeanProperty var unity: Boolean = false
   @BeanProperty var unrealEngine: String = ""
   @BeanProperty var zen: Boolean = true
 }
@@ -213,11 +218,44 @@ val wantedDeadGame = {
   g
 }
 
+// Unity games use asset4j instead of UAssetAPI; contentPaks is the bundle/data directory
+// and mapUri is the ttmap release URL (empty for embedded-tree games like Bladed Fury).
+val warmSnowGame = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = s"${warmSnowGameId}_Data"
+  g.unity = true
+  g.mapUri = s"${ttmapUrlPrefix}warmsnow_3.1.0.1.ttmap"
+  g.repakPackOptions = ""
+  g.zen = false
+  g
+}
+val overcooked2Game = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = s"${overcooked2GameId}_Data"
+  g.unity = true
+  g.mapUri = s"${ttmapUrlPrefix}overcooked2_66.678012.ttmap"
+  g.repakPackOptions = ""
+  g.zen = false
+  g
+}
+val bladedFuryGame = {
+  val g = new Game
+  g.directory = ""
+  g.contentPaks = "chopghost_Data/StreamingAssets"
+  g.unity = true
+  g.mapUri = ""
+  g.repakPackOptions = ""
+  g.zen = false
+  g
+}
+
 class Tools {
   @BeanProperty var fmodel: String = "7c86ee47ec2722152b735b7cb788686f6ea3e91a"
   @BeanProperty var jd: String = "2.5.0"
   @BeanProperty var repak: String = "0.2.4-pre.2"
-  @BeanProperty var retoc: String = "0.1.6-pre.3"
+  @BeanProperty var retoc: String = "0.1.6-pre.4"
 }
 
 class Config {
@@ -237,6 +275,9 @@ def initConfig: Config = {
   r.games.put(pal7GameId, pal7Game)
   r.games.put(kenaGameId, kenaGame)
   r.games.put(wantedDeadGameId, wantedDeadGame)
+  r.games.put(warmSnowGameId, warmSnowGame)
+  r.games.put(overcooked2GameId, overcooked2Game)
+  r.games.put(bladedFuryGameId, bladedFuryGame)
   r.tools = new Tools
   r
 }
@@ -307,8 +348,8 @@ val emptyCodePatches: CodePatches = TreeMap.empty
 
 type RawScriptPatches = TreeMap[OrderedString, os.Path]
 
-val rawPatchExtensions = Vector("toml", "patch", "sc", "js", "ts", "lua", "py")
-val rawPatchExtensionOrder = Map("toml" -> 0, "patch" -> 1, "sc" -> 2, "js" -> 3, "ts" -> 4, "lua" -> 5, "py" -> 6)
+val rawPatchExtensions = Vector("toml", "patch", "sc", "js", "ts", "lua", "py", "kt")
+val rawPatchExtensionOrder = Map("toml" -> 0, "patch" -> 1, "sc" -> 2, "kt" -> 3, "js" -> 4, "ts" -> 5, "lua" -> 6, "py" -> 7)
 
 val jp: jsonpath.ParseContext = {
   jsonpath.Configuration.setDefaults(new jsonpath.Configuration.Defaults {
@@ -394,6 +435,8 @@ val config = {
   r
 }
 
+val unityMode = config.game.unity
+
 val toolsDir = automodDir / "tools"
 val usmapDir = toolsDir / "usmap"
 
@@ -402,6 +445,14 @@ val repakVersion = config.tools.repak
 var fmodelSha = config.tools.fmodel
 var fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = config.tools.jd
+// asset4j's version (from project.scala's `using dep` directive) is also the GitHub
+// release tag for ttmapgen.jar — keep them in lockstep by deriving, not hardcoding.
+val asset4jVersion = {
+  val src = os.read(automodDir / "project.scala")
+  """.*com\.github\.jpabscale:asset4j:(\S+)""".r
+    .findFirstMatchIn(src).map(_.group(1))
+    .getOrElse(exit(-1, "Could not find asset4j version in project.scala"))
+}
 val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
 
@@ -412,6 +463,18 @@ val usmapFilename = {
   r
 }
 val usmapPath = usmapDir / (if (usmapFilename.isEmpty || usmapFilename == "Mappings.usmap") s"$gameId.usmap" else usmapFilename)
+
+// Unity games reuse mapUri for the ttmap (the per-game schema artifact). Unlike the
+// usmap, the ttmap is gzip-wrapped JSON with a `.ttmap` extension (content is gzip;
+// Ttmap.read auto-detects it, so the extension doesn't need to say .json.gz).
+val ttmapDir = toolsDir / "ttmap"
+val ttmapUri = config.game.mapUri
+val ttmapFilename = {
+  var r = ttmapUri.substring(ttmapUri.lastIndexOf('/') + 1, ttmapUri.length)
+  if (r.endsWith(".7z")) r = r.substring(0, r.lastIndexOf('.'))
+  r
+}
+val ttmapPath = ttmapDir / (if (ttmapFilename.isEmpty) s"$gameId.ttmap" else ttmapFilename)
 
 val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
 val repakUrlPrefix = s"https://github.com/jpabscale/repak/releases/download/v$repakVersion"
@@ -425,6 +488,7 @@ val repakExe = toolsDir / "repak" / (if (osKind.isWin) "repak.exe" else "repak")
 val retocPakExe = if (config.game.zen) retocExe else repakExe
 val fmodelExe = toolsDir / "FModel.exe"
 val jdExe = toolsDir / (if (osKind.isWin) "jd.exe" else "jd")
+val ttmapgenExe = toolsDir / "ttmapgen.jar"
 val zipExe = toolsDir / "7z" / (if (osKind.isWin) "7z.exe" else "7zz")
 def automodVsix = automodDir / "vscode" / s"automod-vscode-$version.vsix"
 val repakPackOptions: Seq[os.Shellable] = {
@@ -589,7 +653,7 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     println()
   }
 
-  if (usmapUri.nonEmpty && !os.exists(usmapPath)) {
+  if (usmapUri.nonEmpty && !os.exists(usmapPath) && !unityMode) {
     setup = false
     println(s"Setting up $usmapPath ...")
     val f = downloadCheck(usmapUri)
@@ -599,9 +663,20 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     println()
   }
 
+  // Unity: mapUri is the ttmap URL (gzip-wrapped JSON with a .ttmap extension); download
+  // it as-is (no 7z extract).
+  if (ttmapUri.nonEmpty && !os.exists(ttmapPath) && unityMode) {
+    setup = false
+    os.makeDir.all(ttmapDir)
+    println(s"Setting up $ttmapPath ...")
+    val f = downloadCheck(ttmapUri)
+    os.move.over(f, ttmapPath)
+    println()
+  }
+
   {
     val dest = uassetGuiMappingsDir / usmapPath.last
-    if (usmapUri.nonEmpty && !os.exists(dest)) {
+    if (usmapUri.nonEmpty && !os.exists(dest) && !unityMode) {
       setup = false
       os.makeDir.all(uassetGuiMappingsDir)
       os.copy.over(usmapPath, dest)
@@ -643,6 +718,13 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     val jdBundle = downloadCheck(s"$jdUrlPrefix/$jdBundleName")
     os.move.over(jdBundle, jdExe)
     if (!osKind.isWin) jdExe.toIO.setExecutable(true)
+    println()
+  }
+
+  if (!os.exists(ttmapgenExe)) {
+    setup = false
+    println(s"Setting up ttmapgen v$asset4jVersion in $toolsDir ...")
+    downloadCheck(s"https://github.com/jpabscale/asset4j/releases/download/$asset4jVersion/ttmapgen.jar")
     println()
   }
 
@@ -808,6 +890,11 @@ var patchesInitialized = false
 private var _patches = emptyFilePatches
 private var _rawJsonPatches = emptyFilePatches
 private var _rawScriptPatches: RawScriptPatches = TreeMap.empty
+// Unity first-class class-scoped patches: `<ClassName>@<bundle>.toml` -> (className, .@ tree).
+// Keyed by the target bundle (e.g. `resources.assets`); applied via the targeted per-object
+// decode (no whole-file decode), with `.@` paths scoped relative to each object's Data.
+private var _rawClassTomlPatches: Map[String, List[(String, UAssetPropertyChanges)]] = Map.empty
+private var _rawClassScriptPatches: Map[String, List[(String, os.Path)]] = Map.empty
 
 def rawJsonPatches: FilePatches = {
   if (!patchesInitialized) patches
@@ -819,12 +906,23 @@ def rawScriptPatches: RawScriptPatches = {
   _rawScriptPatches
 }
 
+def rawClassTomlPatches: Map[String, List[(String, UAssetPropertyChanges)]] = {
+  if (!patchesInitialized) patches
+  _rawClassTomlPatches
+}
+
+def rawClassScriptPatches: Map[String, List[(String, os.Path)]] = {
+  if (!patchesInitialized) patches
+  _rawClassScriptPatches
+}
+
 def langForRawExt(ext: String): patchlet.Lang = ext.toLowerCase match {
   case "sc" => patchlet.Lang.Scala
   case "js" => patchlet.Lang.Js
   case "ts" => patchlet.Lang.Typescript
   case "py" => patchlet.Lang.Python
   case "lua" => patchlet.Lang.Lua
+  case "kt" => patchlet.Lang.Kotlin
   case _ => exit(-1, s"Unsupported raw script patch extension: $ext")
 }
 
@@ -865,6 +963,8 @@ def updatePatches(): Unit = {
   var map = if (_patches == null) emptyFilePatches else _patches
   var rawJsonMap = if (_rawJsonPatches == null) emptyFilePatches else _rawJsonPatches
   var rawScriptMap = if (_rawScriptPatches == null) TreeMap.empty[OrderedString, os.Path] else _rawScriptPatches
+  var classTomlMap: Map[String, List[(String, UAssetPropertyChanges)]] = Map.empty
+  var classScriptMap: Map[String, List[(String, os.Path)]] = Map.empty
 
   def rec(path: os.Path): Unit =   {
     if (path.last.headOption == Some('.')) {
@@ -895,10 +995,21 @@ def updatePatches(): Unit = {
               if (osKind.isWin) relPath = relPath.replace('/' , '\\')
               if (ext == "toml" && uassetName.endsWith(".json")) {
                 rawJsonMap = applyChanges(relPath, rawJsonMap, uassetName, tomlFilePatches(p))
+              } else if (ext == "toml" && uassetName.contains("@")) {
+                val parts = uassetName.split("@", 2)
+                val className = parts(0)
+                val bundle = parts(1)
+                val tree = tomlFilePatches(p)
+                classTomlMap = classTomlMap + (bundle -> (classTomlMap.getOrElse(bundle, Nil) :+ (className, tree)))
               } else if (ext == "toml") {
                 map = applyChanges(relPath, map, uassetName, tomlFilePatches(p))
               } else if (ext == "patch") {
                 map = applyChanges(relPath, map, uassetName, jdFilePatches(p)())
+              } else if (uassetName.contains("@")) {
+                val parts = uassetName.split("@", 2)
+                val className = parts(0)
+                val bundle = parts(1)
+                classScriptMap = classScriptMap + (bundle -> (classScriptMap.getOrElse(bundle, Nil) :+ (className, p)))
               } else {
                 rawScriptMap = rawScriptMap + (OrderedString(uassetName, relPath) -> p)
               }
@@ -915,6 +1026,8 @@ def updatePatches(): Unit = {
   _patches = map
   _rawJsonPatches = rawJsonMap
   _rawScriptPatches = rawScriptMap
+  _rawClassTomlPatches = classTomlMap
+  _rawClassScriptPatches = classScriptMap
 }
 
 def patches: FilePatches = {
@@ -963,6 +1076,7 @@ def patchFromTree(maxOrder: Int, order: Int, addToFilePatches: Boolean, uassetNa
             case Some(patchlet.Constants.codePrefixScala) => code(patchlet.Constants.codePrefixScala, patchlet.Lang.Scala)
             case Some(patchlet.Constants.codePrefixJavascript) => code(patchlet.Constants.codePrefixJavascript, patchlet.Lang.Js)
             case Some(patchlet.Constants.codePrefixPython) => code(patchlet.Constants.codePrefixPython, patchlet.Lang.Python)
+            case Some(patchlet.Constants.codePrefixKotlin) => code(patchlet.Constants.codePrefixKotlin, patchlet.Lang.Kotlin)
             case _ =>
           }
         case _ =>
@@ -1122,6 +1236,11 @@ def generateMod(addToFilePatches: Boolean,
 
     def findCached(dir: os.Path): os.Path = {
       if (!os.isDir(dir)) return null
+      if (n.contains(uassetFilterSepChar)) {
+        val exact = dir / os.RelPath(s"$n.json".replace(uassetFilterSepChar, '/'))
+        if (os.isFile(exact)) return exact
+        return null
+      }
       for (p <- os.walk(dir) if p.last == json) return p
       null
     }
@@ -1400,10 +1519,15 @@ def generateMod(addToFilePatches: Boolean,
       println()
     }
 
+    // Deterministic archives: pin every file's mtime to a fixed constant before packing so
+    // (a) the archive bytes are reproducible across builds, and (b) extraction restores the
+    // fixed date (like zip's Jan 1 1980 sentinel) for zip and 7z alike — no `-mtm-` needed.
+    for (p <- os.walk(modDir)) p.toIO.setLastModified(315532800000L) // 1980-01-01T00:00:00Z
+
     println(s"Archiving $pack ...")
     modExt match {
-      case "zip" => os.proc(zipExe, "a", s"-t$modExt", "-mtm-", pack, packDirName).call(cwd = tempDir)
-      case "7z" => os.proc(zipExe, "a", s"-t$modExt", "-mx=9", "-mfb=273", "-mtm=off", pack, packDirName).call(cwd = tempDir)
+      case "zip" => os.proc(zipExe, "a", s"-t$modExt", pack, packDirName).call(cwd = tempDir)
+      case "7z" => os.proc(zipExe, "a", s"-t$modExt", "-mx=9", "-mfb=273", pack, packDirName).call(cwd = tempDir)
     }
     
     println()
@@ -1517,7 +1641,8 @@ def generateMod(addToFilePatches: Boolean,
             writeJson(file, ast.json[JsonNode])
             currentBytes = os.read.bytes(file)
           case Right(p) =>
-            currentBytes = patchlet.evalRawScript(langForRawExt(p.ext), p, name, origBytes, currentBytes)
+            currentBytes = patchlet.evalRawScript(langForRawExt(p.ext), p, name,
+              scala.collection.immutable.Map("orig" -> origBytes, "current" -> currentBytes))
             os.write.over(file, currentBytes)
         }
         println(s"... done patching $file by using ${nameKey.path}")
@@ -1994,17 +2119,18 @@ def printUsage(): Nothing = {
        |                         | .search[.flat] <paths-input>.sam <out-path>
        |                         | .setup[.vscode [ <path-to-vscode> ]]
        |                         | .toml[.all] <out-path>
+       |                         | .ttmapgen <args...>
        |                         | .upgrade
        |                         ]
        |
        | -s                   Disable Scala CLI server
        |
        |opt:
-        | -g <game-id>         Active game identifier (default: SB)
-        | -l <num>             Maximum task logs to keep (default: 30)
-        | -p                   Disable parallelization
-        | --pak                Force legacy .pak output even for zen games
-        | -c <license-path>    Include license file(s) in the generated mod
+       | -g <game-id>         Active game identifier (default: SB)
+       | -l <num>             Maximum task logs to keep (default: 30)
+       | -p                   Disable parallelization
+       | --pak                Force legacy .pak output even for zen games
+       | -c <license-path>    Include license file(s) in the generated mod
        |
        |option:
        | --dry-run            Disable actual mod generation and just test patches
@@ -2023,10 +2149,12 @@ def printUsage(): Nothing = {
        |.setup.vscode         Set up modding tools and VSCode extensions
        |.toml                 Merge existing patch files in patches as TOML patch files
        |.toml.all             Merge script code patches with patch files in patches as TOML
+       |.ttmapgen <args...>   Run the asset4j ttmapgen CLI (ttmap generator)
        |.upgrade              Upgrade automod to the latest version""".stripMargin)
 }
 
 def checkDir(p: os.Path): os.Path = if (os.isDir(p)) p else exit(-1, s"$p is not a directory")
+def checkFile(p: os.Path): os.Path = if (os.isFile(p)) p else exit(-1, s"$p is not a file")
 def checkFileExt(p: os.Path, ext: String): os.Path = if (os.isFile(p) && p.ext == ext) p else exit(-1, s"$p is not a file with .$ext extension")
 def checkDirAvailable(p: os.Path): os.Path = if (os.isFile(p)) exit(-1, s"$p is a file") else p
 
@@ -2074,20 +2202,28 @@ def run(): Unit = {
     case ".setup" => if (cliArgs.length != 1) printUsage()
     case ".setup.vscode" => if (cliArgs.length != 1 && cliArgs.length != 2) printUsage()
     case ".toml" | ".toml.all" => if (cliArgs.length != 2) printUsage()
+    case ".ttmapgen" =>
     case ".upgrade" => if (cliArgs.length != 1) printUsage()
     case _ if argName.head != '.' => cliArgs.length >= 2 && !cliArgs(1).startsWith("--")
     case _ => printUsage()
   }
 
-  if (!config.game.contentPaks.startsWith(s"$gameId/")) exit(-1, s"Invalid configuration for $gameId's contentPaks: ${config.game.contentPaks}")
+  if (!unityMode && !config.game.contentPaks.startsWith(s"$gameId/")) exit(-1, s"Invalid configuration for $gameId's contentPaks: ${config.game.contentPaks}")
 
   val gameDir = absPath(config.game.directory)
   val (gamePakDirOpt, gameDirOpt, next) = if (config.game.directory.nonEmpty) (Some(checkDir(gameDir / os.RelPath(config.game.contentPaks))), Some(gameDir), 1) 
                                           else (None, None, 1)
 
   def genMod(modName: String, options: Options): Unit =
-    setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
-                             disableFilePatching = false, options.noCodePatching, options.dryRun, options.includePatches))
+    if (unityMode) {
+      val bundleDir = gamePakDirOpt.get
+      setUAssetGUIConfigAndRun(() => {
+        unitymod.UnityMod.runMod(Some(modName), bundleDir, ttmapPath.toString, options.includePatches, noPar)
+      })
+    } else {
+      setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
+                               disableFilePatching = false, options.noCodePatching, options.dryRun, options.includePatches))
+    }
 
   def batch(options: Options): Unit = {
     def hasTomlOrPatchFiles(root: os.Path): Boolean = {
@@ -2230,6 +2366,8 @@ def run(): Unit = {
       val outDir = checkDirAvailable(absPath(cliArgs(next)))
       checkPatchesDir()
       setUAssetGUIConfigAndRun(toml(gamePakDirOpt, outDir, argName == ".toml"))
+    case ".ttmapgen" =>
+      os.proc(Seq[os.Shellable]("java", "-jar", ttmapgenExe) ++ (for (e <- cliArgs.tail) yield (e: os.Shellable))).call(stdout = os.Inherit, stderr = os.Inherit)
     case ".upgrade" => upgrade()
     case _ =>
       if (argName.head == '.') exit(-1, s"Unrecognized command $argName")

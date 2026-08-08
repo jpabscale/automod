@@ -1,12 +1,33 @@
 {
   "games" : {
+    "BladedFury" : {
+      "aesKey" : "",
+      "contentPaks" : "chopghost_Data/StreamingAssets",
+      "directory" : "",
+      "mapUri" : "",
+      "repakPackOptions" : "",
+      "unity" : true,
+      "unrealEngine" : "",
+      "zen" : false
+    },
     "Kena" : {
       "aesKey" : "",
       "contentPaks" : "Kena/Content/Paks",
       "directory" : "",
       "mapUri" : "",
       "repakPackOptions" : "",
+      "unity" : false,
       "unrealEngine" : "4.27",
+      "zen" : false
+    },
+    "Overcooked2" : {
+      "aesKey" : "",
+      "contentPaks" : "Overcooked2_Data",
+      "directory" : "",
+      "mapUri" : "https://github.com/jpabscale/automod/releases/download/ttmap/overcooked2_66.678012.ttmap",
+      "repakPackOptions" : "",
+      "unity" : true,
+      "unrealEngine" : "",
       "zen" : false
     },
     "Pal7" : {
@@ -15,6 +36,7 @@
       "directory" : "",
       "mapUri" : "",
       "repakPackOptions" : "",
+      "unity" : false,
       "unrealEngine" : "4.25",
       "zen" : false
     },
@@ -24,6 +46,7 @@
       "directory" : "",
       "mapUri" : "https://github.com/jpabscale/automod/releases/download/usmap/StellarBlade_1.4.1.usmap.7z",
       "repakPackOptions" : "",
+      "unity" : false,
       "unrealEngine" : "4.26",
       "zen" : true
     },
@@ -33,6 +56,7 @@
       "directory" : "",
       "mapUri" : "https://github.com/jpabscale/automod/releases/download/usmap/SandsOfAura_1.01.25.usmap.7z",
       "repakPackOptions" : "--version V11",
+      "unity" : false,
       "unrealEngine" : "4.25",
       "zen" : false
     },
@@ -42,14 +66,25 @@
       "directory" : "",
       "mapUri" : "",
       "repakPackOptions" : "",
+      "unity" : false,
       "unrealEngine" : "4.27",
       "zen" : true
+    },
+    "WarmSnow" : {
+      "aesKey" : "",
+      "contentPaks" : "WarmSnow_Data",
+      "directory" : "",
+      "mapUri" : "https://github.com/jpabscale/automod/releases/download/ttmap/warmsnow_3.1.0.1.ttmap",
+      "repakPackOptions" : "",
+      "unity" : true,
+      "unrealEngine" : "",
+      "zen" : false
     }
   },
   "tools" : {
     "fmodel" : "7c86ee47ec2722152b735b7cb788686f6ea3e91a",
     "jd" : "2.5.0",
     "repak" : "0.2.4-pre.2",
-    "retoc" : "0.1.6-pre.3"
+    "retoc" : "0.1.6-pre.4"
   }
 }
