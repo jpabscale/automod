@@ -2,6 +2,8 @@ import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+import os._
+
 // Kotlin patchlet evaluator (plan §M6): compiles the patch body as a Kotlin source file at
 // runtime with the embeddable K2JVMCompiler, loads it in a fresh URLClassLoader, and invokes
 // `eval(v)` — where `v` is the RawScriptContext map (or an inline-property context). Unlike
@@ -30,6 +32,15 @@ object KotlinApi {
     }
   }
 
+  /** Kotlin function form of [ValueOfFn] for `=kt>` property bodies (ValV.valueOf). */
+  def valueOfFn(dataMap: collection.Map[String, com.fasterxml.jackson.databind.node.ObjectNode],
+                uassetName: String,
+                addToFilePatches: Boolean): kotlin.jvm.functions.Function2[String, String, com.fasterxml.jackson.databind.JsonNode] =
+    new kotlin.jvm.functions.Function2[String, String, com.fasterxml.jackson.databind.JsonNode] {
+      override def invoke(objName: String, property: String): com.fasterxml.jackson.databind.JsonNode =
+        new ValueOfFn(dataMap, uassetName, addToFilePatches).valueOf(objName, property)
+    }
+
   private lazy val kotlinCompilerClasspath: String = {
     val cp = System.getProperty("java.class.path")
     // scala-cli gives us the full runtime classpath; the compiler needs kotlin-stdlib too
@@ -53,8 +64,8 @@ object KotlinApi {
    * [v]. Returns whatever the body's last expression evaluates to.
    */
   def evalKotlin(v: java.util.Map[String, Any], body: String): Any = {
-    val tmp = Files.createTempDirectory("ktpatch")
-    val src = tmp.resolve("KtPatch.kt")
+    val tmp = os.temp.dir()
+    val src = tmp / "KtPatch.kt"
     val source =
       s"""package ktp
          |
@@ -94,16 +105,16 @@ object KotlinApi {
          |$body
          |}
          |""".stripMargin
-    Files.write(src, source.getBytes(StandardCharsets.UTF_8))
-    val outDir = tmp.resolve("out")
-    Files.createDirectories(outDir)
+    Files.write(src.toNIO, source.getBytes(StandardCharsets.UTF_8))
+    val outDir = tmp / "out"
+    Files.createDirectories(outDir.toNIO)
     val buf = new java.io.ByteArrayOutputStream()
     val out = new PrintStream(buf)
     val args = Array(
       "-classpath", kotlinCompilerClasspath,
       "-no-stdlib", "-no-reflect",
-      "-d", outDir.toAbsolutePath.toString,
-      src.toAbsolutePath.toString,
+      "-d", outDir.toNIO.toAbsolutePath.toString,
+      src.toNIO.toAbsolutePath.toString,
     )
     val compiler = new org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
     val renderer = org.jetbrains.kotlin.cli.common.messages.MessageRenderer.PLAIN_FULL_PATHS
@@ -116,7 +127,7 @@ object KotlinApi {
            |$source""".stripMargin)
     }
     val cl = new java.net.URLClassLoader(
-      Array(outDir.toUri.toURL), Thread.currentThread.getContextClassLoader)
+      Array(outDir.toNIO.toUri.toURL), Thread.currentThread.getContextClassLoader)
     try {
       val cls = cl.loadClass("ktp.KtPatchKt")
       val patchVCls = cl.loadClass("ktp.PatchV")
@@ -129,6 +140,80 @@ object KotlinApi {
         automod.exit(-1,
           s"""Kotlin patch threw: ${e.getCause}
              |$source""".stripMargin)
+    } finally {
+      cl.close()
+      os.remove.all(tmp)
+    }
+  }
+
+  /**
+   * Compiles [body] as a `=kt>` property-value expression (evalProperty): `eval(v: ValV)` where
+   * `v` exposes objName/orig/current/ast/origAst/valueOf as plain values (not bytes). Mirrors the
+   * Kotlin source evalKotlinValue; do NOT reuse evalKotlin (RawScript context) here — that casts
+   * orig/current to ByteArray and requires a Unity bundle context for toJson().
+   */
+  def evalKotlinValue(v: java.util.Map[String, Any], body: String): Any = {
+    val tmp = os.temp.dir()
+    val src = tmp / "KtPatch.kt"
+    val source =
+      s"""package ktp
+         |
+         |import com.fasterxml.jackson.databind.JsonNode
+         |import com.fasterxml.jackson.databind.ObjectMapper
+         |import com.fasterxml.jackson.databind.node.*
+         |
+         |class ValV(val map: MutableMap<String, Any?>) {
+         |  val objName: String get() = map["objName"] as String
+         |  val orig: Any? get() = map["orig"]
+         |  val current: Any? get() = map["current"]
+         |  val ast: JsonNode get() = map["ast"] as JsonNode
+         |  val origAst: JsonNode get() = map["origAst"] as JsonNode
+         |  operator fun get(key: String): Any? = map[key]
+         |  val valueOf: (String, String) -> JsonNode? get() = map["valueOf"] as (String, String) -> JsonNode?
+         |}
+         |
+         |fun eval(v: ValV): Any? = run {
+         |$body
+         |}
+         |""".stripMargin
+    Files.write(src.toNIO, source.getBytes(StandardCharsets.UTF_8))
+    val outDir = tmp / "out"
+    Files.createDirectories(outDir.toNIO)
+    val buf = new java.io.ByteArrayOutputStream()
+    val out = new PrintStream(buf)
+    val args = Array(
+      "-classpath", kotlinCompilerClasspath,
+      "-no-stdlib", "-no-reflect",
+      "-d", outDir.toNIO.toAbsolutePath.toString,
+      src.toNIO.toAbsolutePath.toString,
+    )
+    val compiler = new org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
+    val renderer = org.jetbrains.kotlin.cli.common.messages.MessageRenderer.PLAIN_FULL_PATHS
+    val code = compiler.exec(out, renderer, args: _*)
+    if (code.getCode != 0) {
+      val msg = new String(buf.toByteArray, StandardCharsets.UTF_8)
+      automod.exit(-1,
+        s"""Kotlin compile failed: ${code}
+           |$msg
+           |$source""".stripMargin)
+    }
+    val cl = new java.net.URLClassLoader(
+      Array(outDir.toNIO.toUri.toURL), Thread.currentThread.getContextClassLoader)
+    try {
+      val cls = cl.loadClass("ktp.KtPatchKt")
+      val valVCls = cl.loadClass("ktp.ValV")
+      val ctor = valVCls.getConstructor(classOf[java.util.Map[_, _]])
+      val valV = ctor.newInstance(v)
+      val m = cls.getMethod("eval", valVCls)
+      m.invoke(null, valV)
+    } catch {
+      case e: java.lang.reflect.InvocationTargetException =>
+        automod.exit(-1,
+          s"""Kotlin value threw: ${e.getCause}
+             |$source""".stripMargin)
+    } finally {
+      cl.close()
+      os.remove.all(tmp)
     }
   }
 
@@ -151,8 +236,8 @@ object KotlinApi {
   }
 
   private def compilePredicate(body: String): (java.util.Map[String, Any]) => Any = {
-    val tmp = Files.createTempDirectory("ktpred")
-    val src = tmp.resolve("KtPred.kt")
+    val tmp = os.temp.dir()
+    val src = tmp / "KtPred.kt"
     val source =
       s"""package ktp
          |
@@ -161,16 +246,16 @@ object KotlinApi {
          |$body
          |}
          |""".stripMargin
-    Files.write(src, source.getBytes(StandardCharsets.UTF_8))
-    val outDir = tmp.resolve("out")
-    Files.createDirectories(outDir)
+    Files.write(src.toNIO, source.getBytes(StandardCharsets.UTF_8))
+    val outDir = tmp / "out"
+    Files.createDirectories(outDir.toNIO)
     val buf = new java.io.ByteArrayOutputStream()
     val out = new PrintStream(buf)
     val args = Array(
       "-classpath", kotlinCompilerClasspath,
       "-no-stdlib", "-no-reflect",
-      "-d", outDir.toAbsolutePath.toString,
-      src.toAbsolutePath.toString,
+      "-d", outDir.toNIO.toAbsolutePath.toString,
+      src.toNIO.toAbsolutePath.toString,
     )
     val compiler = new org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
     val renderer = org.jetbrains.kotlin.cli.common.messages.MessageRenderer.PLAIN_FULL_PATHS
@@ -183,8 +268,9 @@ object KotlinApi {
            |$source""".stripMargin)
     }
     val cl = new java.net.URLClassLoader(
-      Array(outDir.toUri.toURL), Thread.currentThread.getContextClassLoader)
+      Array(outDir.toNIO.toUri.toURL), Thread.currentThread.getContextClassLoader)
     val cls = cl.loadClass("ktp.KtPredKt")
+    os.remove.all(tmp)
     val m = cls.getMethod("eval", classOf[java.util.Map[_, _]])
     (arg: java.util.Map[String, Any]) => m.invoke(null, arg)
   }

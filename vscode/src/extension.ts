@@ -7,8 +7,6 @@ const configFilename = ".config.json"
 const tempDir = isWindows? `${process.env.LOCALAPPDATA}${fsep}Temp${fsep}automod` : `${process.env.HOME}/.local/share/Temp/automod`
 
 interface Tools {
-  retoc: string
-  repak: string
   fmodel: string
   jd: string
 }
@@ -50,9 +48,7 @@ function gameEquals(g1: Game, g2: Game): boolean {
 }
 
 function toolEquals(t1: Tools, t2: Tools): boolean {
-  return t1.retoc == t2.retoc && 
-    t1.repak == t2.repak &&
-    t1.fmodel == t2.fmodel &&
+  return t1.fmodel == t2.fmodel &&
     t1.jd == t2.jd;
 }
 
@@ -391,6 +387,9 @@ export class AutomodTaskProvider implements vscode.TaskProvider {
     if (vscode.window.activeTextEditor?.document.fileName.endsWith(".sam")) {
       tasks.push(newTask({type: type, kind: ".search", args: [ ...cmdPrefix, ".search", "${file}", `${output}${fsep}search-\${fileBasenameNoExtension}-${getTimestamp()}`].filter(isNotUndefined)}));
       tasks.push(newTask({type: type, kind: ".search.flat", args: [ ...cmdPrefix, ".search.flat", "${file}", `${output}${fsep}search.flat-\${fileBasenameNoExtension}-${getTimestamp()}`].filter(isNotUndefined)}));
+    }
+    if (vscode.window.activeTextEditor?.document.fileName.endsWith(".toml") && vscode.window.activeTextEditor.document.getText().includes("[[retarget]]")) {
+      tasks.push(newTask({type: type, kind: ".retarget", args: [ ...cmdPrefix, ".retarget", "${file}"].filter(isNotUndefined)}));
     }
     if (hasPatches) tasks.push(newTask({type: type, kind: ".toml", args: [ ...cmdPrefix, ".toml", `${output}${fsep}toml-${getTimestamp()}`].filter(isNotUndefined)}));
     if (hasPatches) tasks.push(newTask({type: type, kind: ".toml.all", args: [ ...cmdPrefix, ".toml.all", `${output}${fsep}toml.all-${getTimestamp()}`].filter(isNotUndefined)}));

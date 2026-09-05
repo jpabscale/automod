@@ -1,0 +1,117 @@
+# Warm Snow DLC easy-mode — IL patch via dnlib4j (identical rules to base;
+# DLC's PlayerAnimControl / EnemyControl share the same method signatures
+# and float constants as the base game).
+#
+# Player ability base cooldowns -> 2.0f:
+[[float]]
+type = "PlayerAnimControl"
+method = ".ctor"
+old = 14.0
+new = 2.0
+occurrence = 2
+
+[[float]]
+type = "<ParameterInit>"
+method = "MoveNext"
+old = 14.0
+new = 2.0
+
+[[float]]
+type = "EnemyControl"
+method = "LateUpdate"
+old = 14.0
+new = 2.0
+
+# Sword-mode cooldown overrides (per-skill On setters inside PlayerAnimControl):
+[[float]]
+type = "PlayerAnimControl"
+method = "GourdLiquorContainerOn"
+old = 28.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "UnlimitedSwordsOn"
+old = 28.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "EnergySwordOn"
+old = 28.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "ThunderDashOn"
+old = 20.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "BloodSprayOn"
+old = 28.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "AssassinShenXingOn"
+old = 30.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "AssassinMiZongOn"
+old = 30.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "LiangJiOn"
+old = 45.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "HunDunOn"
+old = 45.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "SuoHunOn"
+old = 30.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "PanGuanOn"
+old = 45.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "WanChongOn"
+old = 30.0
+new = 2.0
+
+[[float]]
+type = "PlayerAnimControl"
+method = "KaiTianOn"
+old = 45.0
+new = 2.0
+
+# Swordmaster skill timers (both sites in .ctor):
+[[float]]
+type = "PlayerAnimControl"
+method = ".ctor"
+old = 15.0
+new = 2.0
+occurrence = "1,2"
+
+[[float]]
+type = "PlayerAnimControl"
+method = ".ctor"
+old = 4.0
+new = 2.0
+occurrence = "2,3"

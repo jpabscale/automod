@@ -1,9 +1,11 @@
 import com.fasterxml.jackson.core.util.{DefaultIndenter, DefaultPrettyPrinter}
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper, ObjectWriter}
 import com.fasterxml.jackson.databind.node.{JsonNodeFactory, ArrayNode, BooleanNode, DoubleNode, IntNode, NullNode, ObjectNode, TextNode}
 import com.fasterxml.jackson.dataformat.toml.TomlMapper
 import com.fasterxml.jackson.core.`type`.TypeReference
 import com.github.jpabscale.uasset4j.api.UAssetService
+import com.github.jpabscale.uasset4j.exporttypes.AnimSequenceExport
 import com.github.jpabscale.uasset4j.unrealtypes.EngineVersion
 import com.jayway.jsonpath
 import java.util.{EnumSet, Map => JMap}
@@ -15,7 +17,7 @@ import scala.collection.parallel.CollectionConverters._
 import scala.jdk.CollectionConverters._
 import scala.util.Properties
 
-var version = "4.0.0"
+var version = "4.1.0"
 val header = s"Auto Modding Script v$version"
 
 val isArm = System.getProperty("os.arch") == "arm64" || System.getProperty("os.arch") == "aarch64"
@@ -91,6 +93,7 @@ val ultraCompression = "--ultra-compression"
 val uassetFilterSepChar = '$'
 
 var gameId = "SB"
+var testPatches = false
 var maxLogs = 30
 var noPar = false
 var usePak = false
@@ -107,6 +110,12 @@ var cliArgs = {
       case Array("-g", id, _*) =>
         gameId = id
         r = r.drop(2)
+      case Array("-t", _*) =>
+        testPatches = true
+        r = r.tail
+      case Array("--test-patches", _*) =>
+        testPatches = true
+        r = r.tail
       case Array("-p", _*) =>
         noPar = true
         r = r.tail
@@ -156,6 +165,7 @@ val warmSnowGameId = "WarmSnow"
 val overcooked2GameId = "Overcooked2"
 val bladedFuryGameId = "BladedFury"
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Game {
   @BeanProperty var aesKey: String = ""
   @BeanProperty var contentPaks: String = ""
@@ -251,13 +261,15 @@ val bladedFuryGame = {
   g
 }
 
+// Tool version pins; retoc/repak run in-process via zenpak4j and have no pins anymore.
+// IgnoreUnknown keeps older .config.json files (which still carry the removed keys) loading.
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Tools {
-  @BeanProperty var fmodel: String = "7c86ee47ec2722152b735b7cb788686f6ea3e91a"
+  @BeanProperty var fmodel: String = "5c0387f8eca2be04d1947c971af30eb67e808c4b"
   @BeanProperty var jd: String = "2.5.0"
-  @BeanProperty var repak: String = "0.2.4-pre.2"
-  @BeanProperty var retoc: String = "0.1.6-pre.4"
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Config {
   @BeanProperty var games: java.util.TreeMap[String, Game] = null
   @BeanProperty var tools: Tools = null
@@ -399,7 +411,7 @@ def absPath(p: os.Path): String = p.toString
 def absPath(p: String): os.Path = os.Path(new java.io.File(p).getCanonicalFile.getAbsolutePath)
 
 val workingDir = os.pwd
-var patchesDir = workingDir / "patches"
+var patchesDir = if (testPatches) workingDir / "patches-test" else workingDir / "patches"
 val configPath = workingDir / ".config.json"
 def getLogDir(relOpt: Option[String]): os.Path = {
   relOpt match {
@@ -440,8 +452,6 @@ val unityMode = config.game.unity
 val toolsDir = automodDir / "tools"
 val usmapDir = toolsDir / "usmap"
 
-val retocVersion = config.tools.retoc
-val repakVersion = config.tools.repak
 var fmodelSha = config.tools.fmodel
 var fmodelShortSha = fmodelSha.substring(0, 7)
 val jdVersion = config.tools.jd
@@ -455,6 +465,11 @@ val asset4jVersion = {
 }
 val ueVersion = config.game.unrealEngine
 val ueVersionCode = s"UE${ueVersion.replace('.', '_')}"
+
+val supportedVersions = Set("UE4_25","UE4_26","UE4_27","UE5_0","UE5_1","UE5_2","UE5_3","UE5_4","UE5_5","UE5_6","UE5_7")
+if (ueVersion.nonEmpty && !supportedVersions.contains(ueVersionCode)) {
+  throw new IllegalArgumentException(s"Unsupported engine version: $ueVersion (code=$ueVersionCode). Supported: ${supportedVersions.toSeq.sorted.mkString(", ")}")
+}
 
 val usmapUri = config.game.mapUri
 val usmapFilename = { 
@@ -476,16 +491,21 @@ val ttmapFilename = {
 }
 val ttmapPath = ttmapDir / (if (ttmapFilename.isEmpty) s"$gameId.ttmap" else ttmapFilename)
 
-val retocUrlPrefix = s"https://github.com/jpabscale/retoc/releases/download/v$retocVersion"
-val repakUrlPrefix = s"https://github.com/jpabscale/repak/releases/download/v$repakVersion"
 def fmodelUrl(sha: String): String = s"https://github.com/4sval/FModel/releases/download/qa/$sha.zip"
 val jdUrlPrefix = s"https://github.com/josephburnett/jd/releases/download/v$jdVersion"
 val z7rUrl = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion/7zr.exe"
 val z7UrlPrefix = s"https://github.com/ip7z/7zip/releases/download/$zipToolVersion"
 def vsixUrl = s"https://github.com/jpabscale/automod/releases/download/automod-vsix/automod-vscode-$version.vsix"
-val retocExe = toolsDir / "retoc" / (if (osKind.isWin) "retoc.exe" else "retoc")
-val repakExe = toolsDir / "repak" / (if (osKind.isWin) "repak.exe" else "repak")
-val retocPakExe = if (config.game.zen) retocExe else repakExe
+
+// copy a tool binary + its native deps (retoc needs its Oodle codec .so beside it; without it retoc
+// tries a network download that fails offline)
+def copyTool(exe: os.Path, destDir: os.Path): os.Path = {
+  os.makeDir.all(destDir)
+  os.copy.over(exe, destDir / exe.last)
+  val oodle = exe / os.up / "liboo2corelinux64.so.9"
+  if (os.exists(oodle)) os.copy.over(oodle, destDir / "liboo2corelinux64.so.9")
+  destDir / exe.last
+}
 val fmodelExe = toolsDir / "FModel.exe"
 val jdExe = toolsDir / (if (osKind.isWin) "jd.exe" else "jd")
 val ttmapgenExe = toolsDir / "ttmapgen.jar"
@@ -500,9 +520,6 @@ val repakPackOptions: Seq[os.Shellable] = {
     r
   }
 }
-val uassetGuiSettingsDir = localAppData / "UAssetGUI"
-val uassetGuiConfig = uassetGuiSettingsDir / "config.json"
-val uassetGuiMappingsDir = uassetGuiSettingsDir / "Mappings"
 val automodGameCacheDir = automodDir / ".cache" / (if (usmapFilename.nonEmpty) usmapFilename.replace(".usmap", "") else gameId) / gameId
 val cacheDir = workingDir / ".cache"
 val tempDir = localAppData / "Temp" / "automod"
@@ -603,55 +620,6 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     println()
   }
 
-  if (!os.exists(retocExe)) {
-    setup = false
-    println(s"Setting up retoc v$retocVersion in $toolsDir ...")
-    val retocBundleName = osKind match {
-      case OsKind.WinAmd64 | OsKind.WinArm64 => "retoc_cli-x86_64-pc-windows-msvc.zip"
-      case OsKind.MacAmd64 => "retoc_cli-x86_64-apple-darwin.tar.xz"
-      case OsKind.LinuxAmd64 => "retoc_cli-x86_64-unknown-linux-gnu.tar.xz"
-      case OsKind.LinuxArm64 => "retoc_cli-aarch64-unknown-linux-gnu.tar.xz"
-      case OsKind.MacArm64 => "retoc_cli-aarch64-apple-darwin.tar.xz"
-    }
-    val retocBundle = downloadCheck(s"$retocUrlPrefix/$retocBundleName")
-    os.remove.all(retocExe / os.up)
-    if (osKind.isWin) {
-      os.makeDir.all(retocExe / os.up)
-      os.proc(zipExe, "x", retocBundle).call(cwd = retocExe / os.up)
-    } else {
-      os.proc("tar", "xf", retocBundle).call(cwd = toolsDir)
-      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("retoc_cli-")) {
-        os.move.over(p, toolsDir / "retoc")
-      }
-    }
-    os.remove.all(retocBundle)
-    println()
-  }
-
-  if (!os.exists(repakExe)) {
-    setup = false
-    println(s"Setting up repak v$repakVersion in $toolsDir ...")
-    val repackBundleName = osKind match {
-      case OsKind.WinAmd64 | OsKind.WinArm64 => "repak_cli-x86_64-pc-windows-msvc.zip"
-      case OsKind.MacAmd64 => "repak_cli-x86_64-apple-darwin.tar.xz"
-      case OsKind.LinuxAmd64 => "repak_cli-x86_64-unknown-linux-gnu.tar.xz"
-      case OsKind.LinuxArm64 => "repak_cli-aarch64-unknown-linux-gnu.tar.xz"
-      case OsKind.MacArm64 => "repak_cli-aarch64-apple-darwin.tar.xz"
-    }
-    val repakBundle = downloadCheck(s"$repakUrlPrefix/$repackBundleName")
-    os.remove.all(repakExe / os.up)
-    if (osKind.isWin) {
-      os.makeDir.all(repakExe / os.up)
-      os.proc(zipExe, "x", repakBundle).call(cwd = repakExe / os.up)
-    } else {
-      os.proc("tar", "xf", repakBundle).call(cwd = toolsDir)
-      for (p <- os.list(toolsDir) if os.isDir(p) && p.last.startsWith("repak_")) {
-        os.move.over(p, toolsDir / "repak")
-      }
-    }
-    os.remove.all(repakBundle)
-    println()
-  }
 
   if (usmapUri.nonEmpty && !os.exists(usmapPath) && !unityMode) {
     setup = false
@@ -672,17 +640,6 @@ def init(gameDirOpt: Option[os.Path]): Boolean = {
     val f = downloadCheck(ttmapUri)
     os.move.over(f, ttmapPath)
     println()
-  }
-
-  {
-    val dest = uassetGuiMappingsDir / usmapPath.last
-    if (usmapUri.nonEmpty && !os.exists(dest) && !unityMode) {
-      setup = false
-      os.makeDir.all(uassetGuiMappingsDir)
-      os.copy.over(usmapPath, dest)
-      println(s"Copied map file to $dest")
-      println()
-    }
   }
 
   if (osKind.isWin && !os.exists(fmodelExe)) {
@@ -890,6 +847,11 @@ var patchesInitialized = false
 private var _patches = emptyFilePatches
 private var _rawJsonPatches = emptyFilePatches
 private var _rawScriptPatches: RawScriptPatches = TreeMap.empty
+// IL-patch (.il.toml) rules keyed by target asset, applied via the dnlib4j IL engine (ilengine.sc).
+private var _ilPatches: RawScriptPatches = TreeMap.empty
+// Copy-from patches: `$dest!$source.toml` — copy the SOURCE asset, auto-rename its package
+// identity to dest, then apply the toml body and ship at dest. Keyed destName -> sourceName.
+private var _copyFromPatches = Map.empty[String, String]
 // Unity first-class class-scoped patches: `<ClassName>@<bundle>.toml` -> (className, .@ tree).
 // Keyed by the target bundle (e.g. `resources.assets`); applied via the targeted per-object
 // decode (no whole-file decode), with `.@` paths scoped relative to each object's Data.
@@ -904,6 +866,11 @@ def rawJsonPatches: FilePatches = {
 def rawScriptPatches: RawScriptPatches = {
   if (!patchesInitialized) patches
   _rawScriptPatches
+}
+
+def ilPatches: RawScriptPatches = {
+  if (!patchesInitialized) patches
+  _ilPatches
 }
 
 def rawClassTomlPatches: Map[String, List[(String, UAssetPropertyChanges)]] = {
@@ -963,11 +930,13 @@ def updatePatches(): Unit = {
   var map = if (_patches == null) emptyFilePatches else _patches
   var rawJsonMap = if (_rawJsonPatches == null) emptyFilePatches else _rawJsonPatches
   var rawScriptMap = if (_rawScriptPatches == null) TreeMap.empty[OrderedString, os.Path] else _rawScriptPatches
+  var ilPatchMap = if (_ilPatches == null) TreeMap.empty[OrderedString, os.Path] else _ilPatches
   var classTomlMap: Map[String, List[(String, UAssetPropertyChanges)]] = Map.empty
   var classScriptMap: Map[String, List[(String, os.Path)]] = Map.empty
+  var copyFromMap = _copyFromPatches
 
-  def rec(path: os.Path): Unit =   {
-    if (path.last.headOption == Some('.')) {
+  def rec(path: os.Path, isRoot: Boolean = false): Unit =   {
+    if (!isRoot && path.last.headOption == Some('.')) {
       println(s"Ignoring $path ...")
       return
     }
@@ -1001,6 +970,20 @@ def updatePatches(): Unit = {
                 val bundle = parts(1)
                 val tree = tomlFilePatches(p)
                 classTomlMap = classTomlMap + (bundle -> (classTomlMap.getOrElse(bundle, Nil) :+ (className, tree)))
+              } else if (ext == "toml" && uassetName.contains('!')) {
+                // Copy-from patch: `$dest!$source.toml` — the toml body patches the SOURCE asset
+                // copied (and auto-renamed to dest); the result ships at the dest path.
+                val parts = uassetName.split("!", 2)
+                if (parts.length != 2 || parts(0).isEmpty || parts(1).isEmpty)
+                  exit(-1, s"copy-from patch name must be `$$dest!$$source`: $p")
+                if (!parts(0).contains(uassetFilterSepChar) || !parts(1).contains(uassetFilterSepChar))
+                  exit(-1, s"copy-from patch dest/source must be $$-encoded paths: $p")
+                copyFromMap = copyFromMap + (parts(0) -> parts(1))
+                map = applyChanges(relPath, map, parts(0), tomlFilePatches(p))
+              } else if (ext == "toml" && uassetName.endsWith(".il")) {
+                // IL-patch rule file: target assembly is the name minus the trailing ".il".
+                val targetName = uassetName.stripSuffix(".il")
+                ilPatchMap = ilPatchMap + (OrderedString(targetName, relPath) -> p)
               } else if (ext == "toml") {
                 map = applyChanges(relPath, map, uassetName, tomlFilePatches(p))
               } else if (ext == "patch") {
@@ -1021,13 +1004,15 @@ def updatePatches(): Unit = {
     }
   }
 
-  if (os.isDir(patchesDir)) rec(patchesDir)
+  if (os.isDir(patchesDir)) rec(patchesDir, isRoot = true)
   println()
   _patches = map
   _rawJsonPatches = rawJsonMap
   _rawScriptPatches = rawScriptMap
+  _ilPatches = ilPatchMap
   _rawClassTomlPatches = classTomlMap
   _rawClassScriptPatches = classScriptMap
+  _copyFromPatches = copyFromMap
 }
 
 def patches: FilePatches = {
@@ -1144,6 +1129,497 @@ def logFlush(): Unit = {
 
 def checkPatchesDir(): Unit = if (!os.isDir(patchesDir)) exit(-1, s"Missing directory: $patchesDir")
 
+def retocPakCmd(exe: os.Path, args: os.Shellable*): Vector[os.Shellable] = {
+  var r = Vector[os.Shellable](exe, "-g", gameId)
+  val aesKey = config.game.aesKey
+  if (aesKey.size > 1) {
+    r = r :+ "--aes-key"
+    r = r :+ (if (aesKey.head == '0' && Character.toLowerCase(aesKey(1)) == 'x') aesKey else s"0x$aesKey")
+  }
+  r = r ++ args
+  r
+}
+
+def extractAssetPath(name: String, gamePakDir: os.Path, workDir: os.Path): os.Path = {
+  val bare = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
+  // fresh temp dir per call (the kotlin port does the same): callers extract several
+  // assets into a shared workDir and keep every path alive until after conversion
+  val retocPakCopyDir = os.temp.dir()
+  val filterName = if (config.game.zen) s"${name.replace(uassetFilterSepChar, '/')}.uasset" else name.replace(uassetFilterSepChar, '/')
+  val aesKeyOpt = Some(config.game.aesKey).filter(_.nonEmpty)
+  try {
+    if (config.game.zen) {
+      // positional args: Scala can't see Kotlin parameter names
+      com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.retoc_to_legacy(
+        List(gamePakDir.toNIO).asJava, retocPakCopyDir.toNIO,
+        com.github.jpabscale.zenpak4j.retoc.EngineVersion.valueOf(ueVersionCode),
+        filterName, aesKeyOpt.orNull, gameId)
+    } else {
+      // (pakFiles, outputDir, strip_prefix, aes_key, game_id, include, verbose)
+      com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.repak_unpack(
+        os.list(gamePakDir).filter(_.ext == "pak").map(_.toNIO).toList.asJava,
+        retocPakCopyDir.toNIO, "../../../", aesKeyOpt.orNull, gameId,
+        List(s"**/$filterName.*", s"$filterName.*").asJava, false)
+    }
+  } catch { case err: Throwable => exit(-1, s"Failed to extract $filterName (${err.getClass.getName}): ${err.getMessage}") }
+  if (name.contains(uassetFilterSepChar)) {
+    val rel = name.replace(uassetFilterSepChar, '/').stripPrefix("/")
+    val exact = retocPakCopyDir / os.RelPath(rel + ".uasset")
+    if (os.isFile(exact)) exact else exit(-1, s"Failed to extract $name (exact path not found: $exact)")
+  } else {
+    // Bare-name resolution must be deterministic regardless of os.walk order: accumulate ALL
+    // same-named matches and sort by path, never the first walk hit.
+    os.walk(retocPakCopyDir).filter(p => os.isFile(p) && p.last == s"$bare.uasset")
+      .toSeq.sortBy(_.toString).headOption
+      .getOrElse(exit(-1, s"Failed to extract $name (no .uasset result)"))
+  }
+}
+
+def extractAndDecodeAsset(name: String, gamePakDir: os.Path, workDir: os.Path): ObjectNode = {
+  val uasset = extractAssetPath(name, gamePakDir, workDir)
+  UAssetService.toJsonNode(uasset.toNIO, EngineVersion.FromString(s"VER_$ueVersionCode"), usmapPath.toString)
+}
+
+/**
+ * A single `.retarget` config job (one `[[retarget]]` block). `base` present => merge; absent =>
+ * standalone. Every element is required (no defaults); `retime` is merge-only.
+ */
+case class RetargetJob(
+  anim: String,
+  base: Option[String],
+  from: String,
+  to: String,
+  mode: String,
+  bakeFormat: String,
+  eliminate: Boolean,
+  retime: Option[Int],
+  as: String,
+  out: String,
+  bones: String)
+
+val retargetModes = Set("delta", "scale", "copy")
+val retargetBakeFormats = Set("float96", "fixed48")
+val boneOverrideValues = Set("freeze", "copy", "delta", "scale")
+
+def boneOverrideOf(v: String): retargeter.BoneOverride = v match {
+  case "freeze" => retargeter.BoneOverride(null, true)
+  case "copy"   => retargeter.BoneOverride(retargeter.RetargetMode.COPY, false)
+  case "delta"  => retargeter.BoneOverride(retargeter.RetargetMode.DELTA, false)
+  case "scale"  => retargeter.BoneOverride(retargeter.RetargetMode.SCALE, false)
+  case other    => throw new IllegalArgumentException(s"unknown bone override value: $other")
+}
+
+/**
+ * Parse a `.retarget <config.toml>`. Schema: `[[retarget]]` jobs (all elements required; `base`
+ * present => merge) + `[bones.<id>]` configs mapping bone name -> "freeze"|"copy"|"delta"|"scale"
+ * (per-bone overrides of the job `mode`; a bone not listed uses the job's mode). Structural
+ * validation (required fields, value validity, merge/standalone consistency, `bones` id and value
+ * validity) runs HERE — all errors reported, nothing executes. Bone-name-in-skeleton and output
+ * collisions are checked separately (they need the target skeletons loaded).
+ */
+def parseRetargetConfig(path: os.Path): (Vector[RetargetJob], Map[String, Map[String, retargeter.BoneOverride]]) = {
+  val toml: JMap[String, Object] =
+    new TomlMapper().readValue(path.toIO, new TypeReference[JMap[String, Object]] {})
+  val errors = scala.collection.mutable.ArrayBuffer.empty[String]
+
+  val bonesRaw = Option(toml.get("bones"))
+    .map(_.asInstanceOf[JMap[String, JMap[String, String]]])
+    .getOrElse(java.util.Collections.emptyMap[String, JMap[String, String]]())
+  val boneConfigs: Map[String, Map[String, retargeter.BoneOverride]] = bonesRaw.asScala.map {
+    case (id, m) =>
+      val parsed = scala.collection.mutable.HashMap.empty[String, retargeter.BoneOverride]
+      for ((bone, v) <- m.asScala) {
+        if (boneOverrideValues.contains(v)) parsed.put(bone, boneOverrideOf(v))
+        else errors += s"$path: [bones.$id] bone '$bone' has invalid value '$v' (expected freeze|copy|delta|scale)"
+      }
+      id -> parsed.toMap
+  }.toMap
+
+  val jobsRaw = Option(toml.get("retarget"))
+    .map(_.asInstanceOf[java.util.List[JMap[String, Object]]])
+    .getOrElse {
+      errors += s"$path: no [[retarget]] jobs found"
+      java.util.Collections.emptyList[JMap[String, Object]]()
+    }
+  val jobs = jobsRaw.asScala.zipWithIndex.map { case (j, idx) =>
+    val where = s"$path: [[retarget]] #${idx + 1}"
+    def str(k: String): Option[String] = Option(j.get(k)).map(_.toString)
+    def req(k: String): Option[String] = str(k) match {
+      case Some(v) if v.nonEmpty => Some(v)
+      case _ => errors += s"$where: missing required '$k'"; None
+    }
+    val anim = req("anim")
+    val from = req("from")
+    val to = req("to")
+    val mode = req("mode")
+    val bakeFormat = req("bake-format")
+    val as = req("as")
+    val out = req("out")
+    val bones = req("bones")
+    val base = str("base")
+    val retime = str("retime") match {
+      case Some(v) => v.toIntOption match {
+        case Some(n) => Some(n)
+        case None => errors += s"$where: 'retime' must be an integer"; None
+      }
+      case None => None
+    }
+    val eliminate = str("eliminate") match {
+      case Some("true") => true
+      case Some("false") => false
+      case Some(v) => errors += s"$where: 'eliminate' must be true|false (got '$v')"; false
+      case None => errors += s"$where: missing required 'eliminate'"; false
+    }
+    mode.foreach(m => if (!retargetModes.contains(m)) errors += s"$where: 'mode' must be delta|scale|copy (got '$m')")
+    bakeFormat.foreach(b => if (!retargetBakeFormats.contains(b)) errors += s"$where: 'bake-format' must be float96|fixed48 (got '$b')")
+    if (base.isEmpty && retime.isDefined) errors += s"$where: 'retime' requires 'base' (merge job)"
+    bones.foreach(b => if (!boneConfigs.contains(b)) errors += s"$where: 'bones' references undefined [bones.$b]")
+    RetargetJob(
+      anim.getOrElse(""), base, from.getOrElse(""), to.getOrElse(""),
+      mode.getOrElse(""), bakeFormat.getOrElse(""), eliminate, retime,
+      as.getOrElse(""), out.getOrElse(""), bones.getOrElse(""))
+  }.toVector
+
+  if (errors.nonEmpty) {
+    errors.foreach(e => System.err.println(e))
+    exit(-1, s"$path: retarget config failed validation (${errors.size} error(s)) — nothing was run")
+  }
+  (jobs, boneConfigs)
+}
+
+def renameAsset(exp: ObjectNode, tree: ObjectNode, targetPath: String): Unit = {  val oldName = exp.get("ObjectName").asText
+  val newName = targetPath.substring(targetPath.lastIndexOf('/') + 1)
+  // The retarget output must ship as a NEW package at targetPath — set the FolderName too, so the
+  // written asset needs no post-processing rename (rename_wave_full.sc used to do this).
+  tree.put("FolderName", targetPath)
+  val nameMap = tree.get("NameMap").asInstanceOf[ArrayNode]
+  for (i <- 0 until nameMap.size) {
+    val p = nameMap.get(i).asText
+    if (p.endsWith("/" + oldName)) nameMap.set(i, TextNode.valueOf(targetPath))
+    else if (p == oldName) nameMap.set(i, TextNode.valueOf(newName))
+  }
+  val existing = nameMap.asScala.map(_.asText).toSet
+  // FName.FromStringFragments parses a trailing `_<digits>` as base+number, so the NameMap must
+  // hold the STRIPPED base (`..._JumpAttack2` for `..._JumpAttack2_1`) or serialization throws
+  // DummyFNameSerializationException. Add order matters (FName indices) and matches the wire scripts.
+  val strippedBase = newName.replaceFirst("(_[0-9]+)$", "")
+  if (!existing.contains(strippedBase)) nameMap.add(strippedBase)
+  if (!existing.contains(newName)) nameMap.add(newName)
+  if (!existing.contains(targetPath)) nameMap.add(targetPath)
+  exp.put("ObjectName", newName)
+}
+
+/** Stored `$`-encoded patch path -> UE game path (`$SB$Content$Art$X` -> `/Game/Art/X`). */
+def gamePathOf(name: String): String = {
+  val stored = name.stripPrefix("$").replace(uassetFilterSepChar, '/')
+  val idx = stored.indexOf("/Content/")
+  if (idx >= 0) "/Game/" + stored.substring(idx + "/Content/".length)
+  else "/" + stored
+}
+
+/**
+ * Auto-rename a copy-from asset's package identity from [src] to [dest] (both `$`-encoded paths).
+ * Renames every export whose ObjectName == the source's bare name, the exact source package-path
+ * and bare-name NameMap entries, and adds the dest names (incl. the `_<digits>`-stripped base).
+ * References to OTHER assets (e.g. an AnimResourcePath pointing at the source's animation) are left
+ * untouched — those are patched deliberately in the toml body.
+ */
+def autoRenameCopiedAsset(tree: ObjectNode, src: String, dest: String): Unit = {
+  val srcBare = src.substring(src.lastIndexOf(uassetFilterSepChar) + 1)
+  val destBare = dest.substring(dest.lastIndexOf(uassetFilterSepChar) + 1)
+  val srcGame = gamePathOf(src)
+  val destGame = gamePathOf(dest)
+  // The copy ships as a NEW package at dest — set the FolderName so the copied asset needs no
+  // post-processing rename (rename_rm.sc/rename_show.sc used to do this for RM anims/shows).
+  tree.put("FolderName", destGame)
+  val exports = tree.get("Exports").asInstanceOf[ArrayNode]
+  for (i <- 0 until exports.size) {
+    val e = exports.get(i).asInstanceOf[ObjectNode]
+    if (e.get("ObjectName") != null && e.get("ObjectName").asText == srcBare)
+      e.put("ObjectName", destBare)
+  }
+  val nameMap = tree.get("NameMap").asInstanceOf[ArrayNode]
+  for (i <- 0 until nameMap.size) {
+    val p = nameMap.get(i).asText
+    if (p == srcGame) nameMap.set(i, TextNode.valueOf(destGame))
+    else if (p == srcBare) nameMap.set(i, TextNode.valueOf(destBare))
+  }
+  val existing = nameMap.asScala.map(_.asText).toSet
+  for (n <- Seq(destGame, destBare, destBare.replaceFirst("(_[0-9]+)$", "")) if !existing.contains(n)) nameMap.add(n)
+}
+
+def retarget(animName: String, fromMesh: String, toMesh: String, mode: String, bakeFormat: String, eliminate: Boolean, overrides: Map[String, retargeter.BoneOverride], asPath: String, outDirOpt: Option[os.Path], gamePakDir: os.Path): Unit = {  val workDir = os.temp.dir(prefix = "retarget")
+  try {
+    val animUassetPath = extractAssetPath(animName, gamePakDir, workDir)
+    val engine = EngineVersion.FromString(s"VER_$ueVersionCode")
+    val usmap = usmapPath.toString
+    val animAsset = UAssetService.load(animUassetPath.toNIO, engine, usmap)
+
+    val fromUassetPath = extractAssetPath(fromMesh, gamePakDir, workDir)
+    val toUassetPath = extractAssetPath(toMesh, gamePakDir, workDir)
+
+    val to = UAssetService.toJsonNode(toUassetPath.toNIO, EngineVersion.FromString(s"VER_$ueVersionCode"), usmapPath.toString)
+    val (skeletonPath, skeletonName) = meshSkeletonRef(to, gamePathOf(toMesh), toMesh.substring(toMesh.lastIndexOf(uassetFilterSepChar) + 1))
+
+    val fmt = if (bakeFormat == "fixed48") com.github.jpabscale.uasset4j.animation.AnimationCompressionFormat.ACF_Fixed48NoW else com.github.jpabscale.uasset4j.animation.AnimationCompressionFormat.ACF_Float96NoW
+    val srcRef = UAssetService.skeletonBoneMap(fromUassetPath.toNIO, engine, usmap)
+    if (srcRef == null) exit(-1, s"$fromMesh has no reference skeleton")
+    val dstRef = UAssetService.skeletonBoneMap(toUassetPath.toNIO, engine, usmap)
+    if (dstRef == null) exit(-1, s"$toMesh has no reference skeleton")
+    val animExport = animAsset.getExports.asScala.collectFirst { case e: AnimSequenceExport => e }
+      .getOrElse(exit(-1, s"$animName is not an AnimSequence"))
+    val modeEnum = mode match {
+      case "copy" => retargeter.RetargetMode.COPY
+      case "scale" => retargeter.RetargetMode.SCALE
+      case _ => retargeter.RetargetMode.DELTA
+    }
+    val r = retargeter.Retargeter.retarget(animExport, srcRef, dstRef, modeEnum, 3000, fmt, eliminate, overrides)
+    if (!r.applied) exit(-1, s"Keyframe retarget failed for $animName")
+    val retree = UAssetService.toJsonNode(animAsset)
+    val rexp = (0 until retree.get("Exports").size)
+      .map(i => retree.get("Exports").get(i).asInstanceOf[ObjectNode])
+      .find(_.has("CompressedTrackToSkeletonMapTable"))
+      .getOrElse(exit(-1, s"$animName is not an AnimSequence"))
+    val rdata = rexp.get("Data").asInstanceOf[ArrayNode]
+    val rimports = retree.get("Imports").asInstanceOf[ArrayNode]
+    val rnameMap = retree.get("NameMap").asInstanceOf[ArrayNode]
+    swapSkeleton(rdata, rimports, rnameMap, skeletonPath, skeletonName)
+    println(s"Swapping Skeleton reference to $skeletonPath")
+    renameAsset(rexp, retree, asPath)
+    val asset = UAssetService.fromJsonNode(retree, usmapPath.toString)
+
+    val outDir = outDirOpt.getOrElse(workingDir / "retarget")
+    // Output under <out>/SB/Content/<as-path>.uasset — the `as` path already ends with the anim
+    // name, so it maps directly to the game file path. Droppable straight into a `.included` dir.
+    val gameRel = asPath.stripPrefix("/Game/")
+    val uasset = outDir / "SB" / "Content" / os.RelPath(gameRel + ".uasset")
+    os.makeDir.all(uasset / os.up)
+    asset.Write(uasset.toString)
+    println(s"Wrote retargeted animation to $uasset")
+  } finally {
+    os.remove.all(workDir)
+  }
+}
+
+/**
+ * Merge-retarget: use the target character's OWN animation for the slot ([baseAnim]) as the base
+ * (full body coverage: legs, weapon constraints, cosmetics) and overwrite only the tracks whose
+ * bones the source ([animName]) drives. Bones the source doesn't animate stay as the base, so the
+ * result keeps the target's complete pose. Output is named after the base (it replaces it).
+ */
+def mergeRetarget(animName: String, baseAnim: String, fromMesh: String, toMesh: String, mode: String, bakeFormat: String, eliminate: Boolean, retime: Option[Int], overrides: Map[String, retargeter.BoneOverride], asPath: Option[String], outDirOpt: Option[os.Path], gamePakDir: os.Path): Unit = {
+  val workDir = os.temp.dir(prefix = "retarget")
+  try {
+    val animUassetPath = extractAssetPath(animName, gamePakDir, workDir)
+    val baseUassetPath = extractAssetPath(baseAnim, gamePakDir, workDir)
+    val fromUassetPath = extractAssetPath(fromMesh, gamePakDir, workDir)
+    val toUassetPath = extractAssetPath(toMesh, gamePakDir, workDir)
+
+    val to = UAssetService.toJsonNode(toUassetPath.toNIO, EngineVersion.FromString(s"VER_$ueVersionCode"), usmapPath.toString)
+    val (skeletonPath, skeletonName) = meshSkeletonRef(to, gamePathOf(toMesh), toMesh.substring(toMesh.lastIndexOf(uassetFilterSepChar) + 1))
+    val fmt = if (bakeFormat == "fixed48") com.github.jpabscale.uasset4j.animation.AnimationCompressionFormat.ACF_Fixed48NoW else com.github.jpabscale.uasset4j.animation.AnimationCompressionFormat.ACF_Float96NoW
+    val engine = EngineVersion.FromString(s"VER_$ueVersionCode")
+    val usmap = usmapPath.toString
+    val animAsset = UAssetService.load(animUassetPath.toNIO, engine, usmap)
+    val baseAsset = UAssetService.load(baseUassetPath.toNIO, engine, usmap)
+    val srcRef = UAssetService.skeletonBoneMap(fromUassetPath.toNIO, engine, usmap)
+    if (srcRef == null) exit(-1, s"$fromMesh has no reference skeleton")
+    val dstRef = UAssetService.skeletonBoneMap(toUassetPath.toNIO, engine, usmap)
+    if (dstRef == null) exit(-1, s"$toMesh has no reference skeleton")
+    val animExport = animAsset.getExports.asScala.collectFirst { case e: AnimSequenceExport => e }
+      .getOrElse(exit(-1, s"$animName is not an AnimSequence"))
+    val baseExport = baseAsset.getExports.asScala.collectFirst { case e: AnimSequenceExport => e }
+      .getOrElse(exit(-1, s"$baseAnim is not an AnimSequence"))
+    val modeEnum = mode match {
+      case "copy" => retargeter.RetargetMode.COPY
+      case "scale" => retargeter.RetargetMode.SCALE
+      case _ => retargeter.RetargetMode.DELTA
+    }
+    val r = retargeter.Retargeter.mergeRetarget(
+      animExport, baseExport, srcRef, dstRef, modeEnum, fmt,
+      retime.getOrElse(0), eliminate, Set.empty[String], overrides, native = true)
+    if (!r.applied) exit(-1, s"Merge retarget failed for $animName")
+    val uncovered = r.uncovered.toList
+    println(s"Merge coverage: ${uncovered.size} base bones left to EVE (source doesn't drive them)")
+    val core = uncovered.filter(n => n.startsWith("Bip001") || n.contains("Weapon") || n.contains("Constraint") || n.contains("Thigh") || n.contains("Foot"))
+    if (core.nonEmpty) {
+      println(s"  NOTE: core bones not driven by source (stuck at base animation): ${core.take(12).mkString(", ")}")
+      println("  These will NOT show Raven's motion; consider a source animation that animates them.")
+    }
+    // Native merge returns the SOURCE asset (native instanced notify objects survive).
+    val merged = animAsset
+    // Write to a temp file first so the validator can read the merged result.
+    val validateTmp = workDir / "merged_validate.uasset"
+    merged.Write(validateTmp.toString)
+    val fidelity = validateMergedMotion(fromUassetPath.toNIO, animUassetPath.toNIO, toUassetPath.toNIO, validateTmp.toNIO, engine, usmap)
+    fidelity.foreach(println)
+
+    // Apply skeleton swap + rename to the merged asset's JSON tree.
+    val retree = UAssetService.toJsonNode(merged)
+    val rexp = (0 until retree.get("Exports").size)
+      .map(i => retree.get("Exports").get(i).asInstanceOf[ObjectNode])
+      .find(_.has("CompressedTrackToSkeletonMapTable"))
+      .getOrElse(exit(-1, s"$baseAnim is not an AnimSequence"))
+    val rdata = rexp.get("Data").asInstanceOf[ArrayNode]
+    val rimports = retree.get("Imports").asInstanceOf[ArrayNode]
+    val rnameMap = retree.get("NameMap").asInstanceOf[ArrayNode]
+    swapSkeleton(rdata, rimports, rnameMap, skeletonPath, skeletonName)
+    println(s"Swapping Skeleton reference to $skeletonPath")
+    val baseName = baseAnim.substring(baseAnim.lastIndexOf(uassetFilterSepChar) + 1)
+    val renameTo = asPath.getOrElse(gamePathOf(baseAnim))
+    renameAsset(rexp, retree, renameTo)
+    val asset = UAssetService.fromJsonNode(retree, usmapPath.toString)
+
+    val outDir = outDirOpt.getOrElse(workingDir / "retarget")
+    // Output under <out>/SB/Content/<as-path>.uasset (the `as` path already ends with the anim
+    // name). Droppable straight into a `.included` dir.
+    val outGamePath = asPath.getOrElse(gamePathOf(baseAnim))
+    val gameRel = outGamePath.stripPrefix("/Game/")
+    val uasset = outDir / "SB" / "Content" / os.RelPath(gameRel + ".uasset")
+    os.makeDir.all(uasset / os.up)
+    asset.Write(uasset.toString)
+    println(s"Wrote merge-retargeted animation to $uasset")
+  } finally {
+    os.remove.all(workDir)
+  }
+}
+
+/**
+ * Validate bone-name existence in the target skeleton and output collisions for a parsed config —
+ * BEFORE any job runs. Loads each distinct `to` skeleton once, then checks every `[bones.<id>]`
+ * bone name a job references against it. All errors reported together; exits without running.
+ */
+def validateRetargetSkeletons(jobs: Vector[RetargetJob], boneConfigs: Map[String, Map[String, retargeter.BoneOverride]], gamePakDir: os.Path, workDir: os.Path): Unit = {
+  val errors = scala.collection.mutable.ArrayBuffer.empty[String]
+  val engine = EngineVersion.FromString(s"VER_$ueVersionCode")
+  val usmap = usmapPath.toString
+  val toBones = scala.collection.mutable.HashMap.empty[String, Set[String]]
+  for (job <- jobs if !toBones.contains(job.to)) {
+    val uasset = extractAssetPath(job.to, gamePakDir, workDir)
+    val ref = UAssetService.skeletonBoneMap(uasset.toNIO, engine, usmap)
+    if (ref == null) errors += s"${job.to} has no reference skeleton"
+    else toBones.put(job.to, ref.FinalNameToIndexMap.asScala.keySet.toSet)
+  }
+  for (job <- jobs) {
+    val bones = boneConfigs.getOrElse(job.bones, Map.empty).keySet
+    val available = toBones.getOrElse(job.to, Set.empty)
+    for (bone <- bones if !available.contains(bone))
+      errors += s"[[retarget]] for ${job.anim}: bone '$bone' (bones.${job.bones}) does not exist in target skeleton ${job.to}"
+  }
+  val seen = scala.collection.mutable.HashMap.empty[(String, String), String]
+  for (job <- jobs) {
+    val name = job.as.substring(job.as.lastIndexOf('/') + 1)
+    val key = (job.out, name)
+    seen.get(key) match {
+      case Some(prev) => errors += s"output collision: ${job.out}/$name.uasset would be written by both $prev and ${job.anim}"
+      case None => seen.put(key, job.anim)
+    }
+  }
+  if (errors.nonEmpty) {
+    errors.foreach(e => System.err.println(e))
+    exit(-1, s"retarget config failed validation (${errors.size} error(s)) — nothing was run")
+  }
+}
+
+def runRetargetJob(job: RetargetJob, boneConfigs: Map[String, Map[String, retargeter.BoneOverride]], gamePakDir: os.Path, configDir: os.Path): Unit = {
+  val overrides = boneConfigs.getOrElse(job.bones, Map.empty)
+  // `out` may be absolute or relative to the config file's directory.
+  val outDir: Option[os.Path] = Option(job.out).map { p =>
+    if (new java.io.File(p).isAbsolute) os.Path(p) else (configDir / os.RelPath(p))
+  }
+  job.base match {
+    case Some(b) => mergeRetarget(job.anim, b, job.from, job.to, job.mode, job.bakeFormat, job.eliminate, job.retime, overrides, Some(job.as), outDir, gamePakDir)
+    case None => retarget(job.anim, job.from, job.to, job.mode, job.bakeFormat, job.eliminate, overrides, job.as, outDir, gamePakDir)
+  }
+}
+
+/** `.retarget <config.toml>`: parse -> validate all -> run every job in one launch. */
+def runRetargets(configPath: os.Path, gamePakDir: os.Path): Unit = {
+  val (jobs, boneConfigs) = parseRetargetConfig(configPath)
+  val workDir = os.temp.dir(prefix = "retarget")
+  try {
+    validateRetargetSkeletons(jobs, boneConfigs, gamePakDir, workDir)
+  } finally {
+    os.remove.all(workDir)
+  }
+  println(s"Config valid: running ${jobs.size} retarget job(s) from $configPath")
+  jobs.foreach(j => runRetargetJob(j, boneConfigs, gamePakDir, configPath / os.up))
+}
+
+/** Run the motion-fidelity validator after a merge (Scala port of uasset4j's `validateMergedMotion`). */
+def validateMergedMotion(
+  srcMeshPath: java.nio.file.Path,
+  srcAnimPath: java.nio.file.Path,
+  dstMeshPath: java.nio.file.Path,
+  mergedPath: java.nio.file.Path,
+  engine: EngineVersion,
+  mappingsName: String,
+): List[String] = {
+  val srcRef = UAssetService.skeletonBoneMap(srcMeshPath, engine, mappingsName)
+  if (srcRef == null) return List("source mesh has no reference skeleton")
+  val dstRef = UAssetService.skeletonBoneMap(dstMeshPath, engine, mappingsName)
+  if (dstRef == null) return List("target mesh has no reference skeleton")
+  def animOf(p: java.nio.file.Path): AnimSequenceExport = {
+    val a = UAssetService.load(p, engine, mappingsName)
+    a.getExports.asScala.collectFirst { case e: AnimSequenceExport => e }
+      .getOrElse(throw new IllegalArgumentException(s"$p is not an AnimSequence"))
+  }
+  val src = animOf(srcAnimPath)
+  val mrg = animOf(mergedPath)
+  val srcTracks = src.decodeCompressedData()
+  if (srcTracks == null) return List("source decode failed")
+  val mrgTracks = mrg.decodeCompressedData()
+  if (mrgTracks == null) return List("merged decode failed")
+  val srcTable = src.getCompressedTrackToSkeletonMapTable
+  if (srcTable == null) return List("source table missing")
+  val mrgTable = mrg.getCompressedTrackToSkeletonMapTable
+  if (mrgTable == null) return List("merged table missing")
+  val srcFrames = src.compressedNumberOfFrames()
+  val mrgFrames = mrg.compressedNumberOfFrames()
+  val report = retargeter.RetargetValidator.validate(
+    srcRef, srcTracks, srcTable, if (srcFrames == null) 0 else srcFrames.intValue,
+    dstRef, mrgTracks, mrgTable, if (mrgFrames == null) 0 else mrgFrames.intValue)
+  val lines = scala.collection.mutable.ListBuffer.empty[String]
+  lines += s"motion fidelity: ${report.poorCorrelation.size} poor-correlation, ${report.missing.size} missing-motion bones"
+  for (n <- report.missing) lines += s"  MISSING MOTION: $n"
+  for (n <- report.poorCorrelation) lines += s"  POOR CORRELATION: $n"
+  if (report.missing.isEmpty && report.poorCorrelation.isEmpty) lines += "  OK: merged motion matches Raven for all skeletal bones"
+  lines.toList
+}
+
+def meshSkeletonRef(tree: ObjectNode, fallbackPath: String, fallbackName: String): (String, String) = {
+  val exports = tree.get("Exports").asInstanceOf[ArrayNode]
+  if (exports.size == 0) exit(-1, "target has no exports")
+  val data = exports.get(0).get("Data").asInstanceOf[ArrayNode]
+  val imports = tree.get("Imports").asInstanceOf[ArrayNode]
+  var pkg = -1
+  for (p <- data.asScala if p.get("Name") != null && p.get("Name").asText == "Skeleton") pkg = p.get("Value").asInt
+  if (pkg >= 0) exit(-1, s"${exports.get(0).get("ObjectName")} has no Skeleton reference")
+  if (pkg == -1) (fallbackPath, fallbackName)
+  else {
+    val short = imports.get(-pkg - 1)
+    val full = imports.get(-short.get("OuterIndex").asInt - 1)
+    (full.get("ObjectName").asText, short.get("ObjectName").asText)
+  }
+}
+
+def swapSkeleton(data: ArrayNode, imports: ArrayNode, nameMap: ArrayNode, skeletonPath: String, skeletonName: String): Unit = {
+  var pkg = -1
+  for (p <- data.asScala if p.get("Name").asText == "Skeleton") pkg = p.get("Value").asInt
+  if (pkg >= 0) exit(-1, "Animation has no Skeleton reference")
+  val short = imports.get(-pkg - 1).asInstanceOf[ObjectNode]
+  val full = imports.get(-short.get("OuterIndex").asInt - 1).asInstanceOf[ObjectNode]
+  full.put("ObjectName", skeletonPath)
+  short.put("ObjectName", skeletonName)
+  val existing = nameMap.asScala.map(_.asText).toSet
+  // Add order matters (FName indices) and matches the wire scripts: name before path.
+  if (!existing.contains(skeletonName)) nameMap.add(skeletonName)
+  if (!existing.contains(skeletonPath)) nameMap.add(skeletonPath)
+}
+
+def hasIncludedAssets(patchesDir: os.Path, gameId: String, modName: String): Boolean =
+  os.isDir(patchesDir / ".included") || os.isDir(patchesDir / gameId / modName / ".included")
+
 def generateMod(addToFilePatches: Boolean,
                 modNameOpt: Option[String], 
                 gamePakDirOpt: Option[os.Path], 
@@ -1151,8 +1627,10 @@ def generateMod(addToFilePatches: Boolean,
                 disableCodePatching: Boolean, 
                 dryRun: Boolean,
                 includePatches: Boolean,
-                currentAstMap: collection.mutable.HashMap[String, (JsonAst, JsonAst, JsonAst)] = collection.mutable.HashMap.empty,
-                origAstMap: collection.mutable.HashMap[String, JsonNode] = null,
+                skipPack: Boolean = false,
+                currentAstMap: collection.mutable.Map[String, (JsonAst, JsonAst, JsonAst)] =
+                  new ConcurrentHashMap[String, (JsonAst, JsonAst, JsonAst)]().asScala,
+                origAstMap: collection.mutable.Map[String, JsonNode] = null,
                 uassetNameRequests: Vector[String] = Vector())(): Unit = {
 
   val cacheKey = cacheDir / gameId / "key.properties"
@@ -1164,7 +1642,6 @@ def generateMod(addToFilePatches: Boolean,
     val sbPakDir = gamePakDirOpt.get
     if (!os.exists(sbPakDir)) return ""
     var r = Vector.empty[String]
-    r = r :+ s"retoc=$retocVersion"
     for (p <- os.list(sbPakDir).sortWith((p1, p2) => p1.last <= p2.last) if os.isFile(p)) {
       r = r :+ s"${p.last}=${p.toIO.lastModified}"
     }
@@ -1228,6 +1705,17 @@ def generateMod(addToFilePatches: Boolean,
   val rawFileNamePathMap = new ConcurrentHashMap[String, os.RelPath]
 
   def unpackJson(n: String): ObjectNode = {
+    _copyFromPatches.get(n) match {
+      case Some(src) if src != n =>
+        // Copy-from dest: extract the SOURCE asset, auto-rename its package identity to this dest,
+        // and point the output path at the dest so packJson ships the patched copy there.
+        val srcTree = unpackJson(src)
+        autoRenameCopiedAsset(srcTree, src, n)
+        val destBare = n.substring(n.lastIndexOf(uassetFilterSepChar) + 1)
+        uassetNamePathMap.put(destBare, os.RelPath(n.stripPrefix("$").replace(uassetFilterSepChar, '/') + ".uasset"))
+        return srcTree
+      case _ =>
+    }
     var name = n
     if (name.contains(uassetFilterSepChar)) {
       name = name.substring(name.lastIndexOf(uassetFilterSepChar) + 1)
@@ -1237,12 +1725,17 @@ def generateMod(addToFilePatches: Boolean,
     def findCached(dir: os.Path): os.Path = {
       if (!os.isDir(dir)) return null
       if (n.contains(uassetFilterSepChar)) {
-        val exact = dir / os.RelPath(s"$n.json".replace(uassetFilterSepChar, '/'))
+        // The decoded path already starts with the gameId (e.g. SB/Content/...), and the cache is
+        // written as cacheDir/<decoded>; dir = cacheDir/gameId, so strip the gameId prefix before
+        // joining — otherwise the lookup double-prefixes and never hits (the `$`-named tomls
+        // re-extract every run).
+        val decoded = s"$n.json".replace(uassetFilterSepChar, '/').stripPrefix("/")
+        val stripped = decoded.stripPrefix(s"$gameId/")
+        val exact = dir / os.RelPath(stripped)
         if (os.isFile(exact)) return exact
         return null
       }
-      for (p <- os.walk(dir) if p.last == json) return p
-      null
+      os.walk(dir).toSeq.sortBy(_.toString).find(_.last == json).orNull
     }
 
     var jsonCache: os.Path = null
@@ -1276,37 +1769,44 @@ def generateMod(addToFilePatches: Boolean,
     val gamePakDir = gamePakDirOpt.get
 
     val outputName = output / name
-    val retocPakCopyDir = outputName / retocPakExe.baseName
-    val retocPakExeCopy = retocPakCopyDir / retocPakExe.last
+    val retocPakCopyDir = outputName / "zenpak"
+    // fresh extraction dir each run (the kotlin port uses a new temp dir; stale files make
+    // the in-process tools throw FileAlreadyExistsException)
+    os.remove.all(retocPakCopyDir)
+    os.makeDir.all(retocPakCopyDir)
     val uassetFilename = s"$name.uasset"
     val uexpFilename = s"$name.uexp"
 
-    os.makeDir.all(retocPakCopyDir)
-    os.copy.over(retocPakExe, retocPakExeCopy)
-
     println(s"Extracting $uassetFilename ...")
-    val args = if (config.game.zen) {
-                 val filterName = s"${n.replace(uassetFilterSepChar, '/')}.uasset"
-                 retocPak(retocPakExeCopy, "to-legacy", "--verbose", "--no-shaders", "--no-compres-shaders", "--no-parallel", 
-                          "--version", ueVersionCode, "--filter", filterName, gamePakDir, retocPakCopyDir)
-               } else {
-                 val filterName = s"${n.replace(uassetFilterSepChar, '/')}"
-                 var r = retocPak(retocPakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$filterName.*")
-                 for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
-                 r
-               }
-    val pRetocPak = os.proc(args: _*)
-    if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0 || !os.exists(retocPakCopyDir / gameId) || os.walk(retocPakCopyDir / gameId).isEmpty)
-      retocPakFailed(s"extract $uassetFilename (double check the .uasset name)", pRetocPak, retocPakCopyDir)
+    val aesKeyOpt = Some(config.game.aesKey).filter(_.nonEmpty)
+    try {
+      if (config.game.zen) {
+        val filterName = s"${n.replace(uassetFilterSepChar, '/')}.uasset"
+        // positional args: Scala can't see Kotlin parameter names
+        com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.retoc_to_legacy(
+          List(gamePakDir.toNIO).asJava, retocPakCopyDir.toNIO,
+          com.github.jpabscale.zenpak4j.retoc.EngineVersion.valueOf(ueVersionCode),
+          filterName, aesKeyOpt.orNull, gameId)
+      } else {
+        val filterName = s"${n.replace(uassetFilterSepChar, '/')}"
+        // (pakFiles, outputDir, strip_prefix, aes_key, game_id, include, verbose)
+        com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.repak_unpack(
+          os.list(gamePakDir).filter(_.ext == "pak").map(_.toNIO).toList.asJava,
+          retocPakCopyDir.toNIO, "../../../", aesKeyOpt.orNull, gameId,
+          List(s"**/$filterName.*", s"$filterName.*").asJava, false)
+      }
+    } catch { case err: Throwable => exit(-1, s"Failed to extract $uassetFilename (${err.getClass.getName}): ${err.getMessage}") }
+    if (!os.exists(retocPakCopyDir / gameId) || os.walk(retocPakCopyDir / gameId).isEmpty)
+      exit(-1, s"Failed to extract $uassetFilename (double check the .uasset name)")
     println(s"... done extracting $uassetFilename")
     
     var uasset: os.Path = null
-    for (p <- os.walk(outputName) if os.isFile(p))
+    for (p <- os.walk(outputName).toSeq.sortBy(_.toString) if os.isFile(p) && uasset == null)
       if (p.last == uassetFilename) uasset = p 
       else if (p.last == uexpFilename) {}
       else os.remove(p)
 
-    if (uasset == null) retocPakFailed(s"extract $uassetFilename (no result)", pRetocPak, retocPakCopyDir)
+    if (uasset == null) exit(-1, s"Failed to extract $uassetFilename (no result)")
     val relPath = uasset.relativeTo(retocPakCopyDir)
     val jsonRelPath = relPath / os.up / s"${relPath.baseName}.json"
     jsonCache = cacheDir / jsonRelPath
@@ -1328,15 +1828,14 @@ def generateMod(addToFilePatches: Boolean,
   }
 
   def unpackRawFile(n: String): os.Path = {
-    val filterName = n.replace(uassetFilterSepChar, '/')
+    val filterName = n.replace(uassetFilterSepChar, '/').stripPrefix("/")
     val lastSegment = filterName.substring(filterName.lastIndexOf('/') + 1)
 
     def findCached(dir: os.Path): os.Path = {
       if (!os.isDir(dir)) return null
       val exact = dir / os.RelPath(filterName)
       if (os.isFile(exact)) return exact
-      for (p <- os.walk(dir) if os.isFile(p) && p.last == lastSegment) return p
-      null
+      os.walk(dir).toSeq.sortBy(_.toString).find(p => os.isFile(p) && p.last == lastSegment).orNull
     }
 
     var r: os.Path = null
@@ -1362,25 +1861,31 @@ def generateMod(addToFilePatches: Boolean,
     val gamePakDir = gamePakDirOpt.get
 
     val outputName = output / os.RelPath(filterName)
-    val retocPakCopyDir = outputName / retocPakExe.baseName
+    val retocPakCopyDir = outputName / "zenpak"
     val useZen = config.game.zen && !usePak
-    val pakExe = if (useZen) retocPakExe else repakExe
-    val pakExeCopy = retocPakCopyDir / pakExe.last
 
+    // fresh extraction dir each run (see unpackJson)
+    os.remove.all(retocPakCopyDir)
     os.makeDir.all(retocPakCopyDir)
-    os.copy.over(pakExe, pakExeCopy)
+
+    val aesKeyOpt = Some(config.game.aesKey).filter(_.nonEmpty)
+    def unpackRaw(zen: Boolean): Unit = try {
+      if (zen) {
+        // (inputFiles, outputDir, filter, aes_key, game_id)
+        com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.retoc_unpack(
+          List(gamePakDir.toNIO).asJava, retocPakCopyDir.toNIO,
+          filterName, aesKeyOpt.orNull, gameId)
+      } else {
+        // (pakFiles, outputDir, strip_prefix, aes_key, game_id, include, verbose)
+        com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.repak_unpack(
+          os.list(gamePakDir).filter(_.ext == "pak").map(_.toNIO).toList.asJava,
+          retocPakCopyDir.toNIO, "../../../", aesKeyOpt.orNull, gameId,
+          List(s"**/$filterName", s"$filterName").asJava, false)
+      }
+    } catch { case err: Throwable => exit(-1, s"Failed to extract $filterName: ${err.getMessage}") }
 
     println(s"Extracting $filterName ...")
-    val args = if (useZen) {
-      retocPak(pakExeCopy, "unpack", "--filter", filterName, "--no-parallel", gamePakDir, retocPakCopyDir)
-    } else {
-      var r = retocPak(pakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$filterName")
-      for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
-      r
-    }
-    var pRetocPak = os.proc(args: _*)
-    if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
-      retocPakFailed(s"extract $filterName", pRetocPak, retocPakCopyDir)
+    unpackRaw(useZen)
 
     var raw: os.Path = null
     for (p <- os.walk(outputName) if os.isFile(p) && p.last == lastSegment) raw = p
@@ -1389,17 +1894,13 @@ def generateMod(addToFilePatches: Boolean,
     // the utoc/ucas containers rather than in the zen container itself, so fall
     // back to repak over those .pak files.
     if (useZen && raw == null) {
-      val repakExeCopy = retocPakCopyDir / repakExe.last
-      os.copy.over(repakExe, repakExeCopy)
-      var r = retocPak(repakExeCopy, "unpack", "-o", retocPakCopyDir, "-i", s"**/$filterName")
-      for (p <- os.list(gamePakDir) if p.ext == "pak") r :+= p
-      pRetocPak = os.proc(r: _*)
-      if (pRetocPak.call(check = false, cwd = retocPakCopyDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
-        retocPakFailed(s"extract $filterName", pRetocPak, retocPakCopyDir)
+      os.remove.all(retocPakCopyDir)
+      os.makeDir.all(retocPakCopyDir)
+      unpackRaw(false)
       for (p <- os.walk(outputName) if os.isFile(p) && p.last == lastSegment) raw = p
     }
 
-    if (raw == null) retocPakFailed(s"extract $filterName (no result)", pRetocPak, retocPakCopyDir)
+    if (raw == null) exit(-1, s"Failed to extract $filterName (no result)")
     val relPath = raw.relativeTo(retocPakCopyDir)
     r = tempDir / relPath
     os.makeDir.all(r / os.up)
@@ -1490,11 +1991,40 @@ def generateMod(addToFilePatches: Boolean,
     val useZen = config.game.zen && !usePak
     val utocPak = modDir / (if (useZen) s"${modName}_P.utoc" else if (modName.head.toString.toIntOption.nonEmpty) s"pakChunk${modName}_P.pak" else s"pakChunk888-${modName}_P.pak")
     println(s"Converting to $utocPak ...")
-    val args: Seq[os.Shellable] = if (useZen) retocPak(retocPakExe, "to-zen", "--no-parallel", "--version", ueVersionCode, output, utocPak)
-                                  else retocPak(repakExe, (Seq[os.Shellable]("pack") ++ repakPackOptions ++ Seq[os.Shellable](output, utocPak)): _*)
-    val pRetocPak = os.proc(args: _*)
-    if (pRetocPak.call(check = false, cwd = tempDir, stdout = os.Inherit, stderr = os.Inherit).exitCode != 0)
-      retocPakFailed(s"pack $modName", pRetocPak, tempDir)
+    val aesKeyOpt = Some(config.game.aesKey).filter(_.nonEmpty)
+    try {
+      if (useZen) {
+        // (inputDir, outputUtoc, engine_version, game_store, filter, aes_key, game_id, verbose)
+        com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE.retoc_to_zen(
+          output.toNIO, utocPak.toNIO,
+          com.github.jpabscale.zenpak4j.retoc.EngineVersion.valueOf(ueVersionCode),
+          gamePakDirOpt.map(p => List(absPath(p.toString).toNIO).asJava).orNull,
+          null, aesKeyOpt.orNull, gameId, false)
+      } else {
+        // repakPackOptions carries only `--version <v>` today; anything else is a config error
+        val version = repakPackOptions.flatMap(_.value).grouped(2).foldLeft(Option.empty[com.github.jpabscale.zenpak4j.repak.Version]) {
+          (acc, pair) => (acc, pair.toList) match {
+            case (None, "--version" :: v :: Nil) =>
+              Some(com.github.jpabscale.zenpak4j.repak.Version.values
+                .find(_.name == v)
+                .getOrElse(exit(-1, s"unsupported repak version '$v' in repakPackOptions")))
+            case (None, Nil) => acc
+            case _ => exit(-1, s"unsupported repakPackOption '${pair.mkString(" ")}' for in-process packing")
+          }
+        }.getOrElse(com.github.jpabscale.zenpak4j.repak.Version.V8B)
+        // ZenPakService.repak_pack's JVM name is mangled by its ULong param (path_hash_seed)
+        // and ActionPack's full constructor is synthetic-private, so reflect
+        val repakPack = classOf[com.github.jpabscale.zenpak4j.ZenPakService].getDeclaredMethod(
+          "repak_pack-5lwdpRA", classOf[java.nio.file.Path], classOf[java.nio.file.Path],
+          classOf[String], classOf[com.github.jpabscale.zenpak4j.repak.Version],
+          classOf[com.github.jpabscale.zenpak4j.repak.Compression], java.lang.Long.TYPE,
+          classOf[String], java.lang.Boolean.TYPE)
+        repakPack.setAccessible(true)
+        repakPack.invoke(com.github.jpabscale.zenpak4j.ZenPakService.INSTANCE,
+          output.toNIO, utocPak.toNIO, "../../../", version, null,
+          java.lang.Long.valueOf(0L), gameId, java.lang.Boolean.FALSE)
+      }
+    } catch { case err: Throwable => exit(-1, s"Failed to pack $modName: ${err.getMessage}") }
     println()
 
     if (includePatches) {
@@ -1519,10 +2049,14 @@ def generateMod(addToFilePatches: Boolean,
       println()
     }
 
-    // Deterministic archives: pin every file's mtime to a fixed constant before packing so
+    // Deterministic archives: pin every entry's mtime to a fixed constant before packing so
     // (a) the archive bytes are reproducible across builds, and (b) extraction restores the
     // fixed date (like zip's Jan 1 1980 sentinel) for zip and 7z alike — no `-mtm-` needed.
-    for (p <- os.walk(modDir)) p.toIO.setLastModified(315532800000L) // 1980-01-01T00:00:00Z
+    def pinTimes(root: os.Path): Unit = {
+      for (p <- os.walk(root)) p.toIO.setLastModified(315532800000L) // 1980-01-01T00:00:00Z
+      root.toIO.setLastModified(315532800000L) // os.walk skips the root; its wall-clock mtime
+    }
+    pinTimes(modDir)
 
     println(s"Archiving $pack ...")
     modExt match {
@@ -1664,7 +2198,8 @@ def generateMod(addToFilePatches: Boolean,
         else rawFileNames.par.foreach(name => packRawFile(name, rawFileMap(name)))
         println()
       }
-      if ((jsonMap.keySet -- skippedUassets).nonEmpty || (!disableFilePatching && rawFileNames.nonEmpty)) packMod(modName)
+      if (!skipPack && ((jsonMap.keySet -- skippedUassets).nonEmpty || (!disableFilePatching && rawFileNames.nonEmpty) ||
+          hasIncludedAssets(patchesDir, gameId, modName))) packMod(modName)
     case _ =>
   }
 
@@ -1672,24 +2207,6 @@ def generateMod(addToFilePatches: Boolean,
   messageOpt match {
     case Some(msg) => exit(-1, msg)
     case _ =>
-  }
-}
-
-def setUAssetGUIConfigAndRun(f: () => Unit): Unit = {
-  val oldConfigOpt = if (os.exists(uassetGuiConfig)) Some(os.read(uassetGuiConfig)) else None
-  try {
-    os.write.over(uassetGuiConfig,
-      s"""{
-         |  "PreferredVersion": $ueVersion,
-         |  "PreferredMappings": "${usmapPath.baseName}"
-         |}""".stripMargin)
-
-    f()
-  } finally {
-    oldConfigOpt match {
-      case Some(oldConfig) => os.write.over(uassetGuiConfig, oldConfig)
-      case _ => os.remove(uassetGuiConfig)
-    }
   }
 }
 
@@ -1760,11 +2277,11 @@ def toml(gamePakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boo
     exit(-1, s"$path is not a directory")
   }
 
-  val currMap = collection.mutable.HashMap.empty[String, (JsonAst, JsonAst, JsonAst)]
-  val origMap = collection.mutable.HashMap.empty[String, JsonNode]
+  val currMap = new ConcurrentHashMap[String, (JsonAst, JsonAst, JsonAst)]().asScala
+  val origMap = new ConcurrentHashMap[String, JsonNode]().asScala
   if (!disableCodePatching)
-    generateMod(addToFilePatches = true, None, gamePakDirOpt, disableFilePatching = true, disableCodePatching, dryRun = true, includePatches = false, currMap, origMap)()
-  generateMod(addToFilePatches = true, None, gamePakDirOpt, disableFilePatching = false, disableCodePatching, dryRun = true, includePatches = false, currMap, origMap)()
+    generateMod(addToFilePatches = true, None, gamePakDirOpt, disableFilePatching = true, disableCodePatching, dryRun = true, includePatches = false, currentAstMap = currMap, origAstMap = origMap)()
+  generateMod(addToFilePatches = true, None, gamePakDirOpt, disableFilePatching = false, disableCodePatching, dryRun = true, includePatches = false, currentAstMap = currMap, origAstMap = origMap)()
 
   os.makeDir.all(path)
   var noPatch = true
@@ -1781,7 +2298,12 @@ def toml(gamePakDirOpt: Option[os.Path], path: os.Path, disableCodePatching: Boo
 
   for ((uassetName, data) <- map) {
     noPatch = false
-    val p = path / s"$uassetName.toml"
+    // copy-from patches re-emit as `$dest!$source.toml` so the file round-trips through `.batch`
+    val name = _copyFromPatches.get(uassetName) match {
+      case Some(src) => s"$uassetName!$src.toml"
+      case None      => s"$uassetName.toml"
+    }
+    val p = path / name
     writeToml(isDiff = false, p, data, Some(origMap(uassetName)))
   }
   if (noPatch) println("No patches to write")
@@ -2138,7 +2660,8 @@ def printUsage(): Nothing = {
        | --no-code-patching   Disable code patching
        | --ultra-compression  Use 7z ultra compression
        |
-       |.batch                Generate a mod for each sub-folder in patches${fsep}<game-id> 
+       |.batch [mod...]       Generate a mod for each sub-folder in patches${fsep}<game-id>, or only the
+       |                       named mod(s) (e.g. `.batch eve-raven raven-sword`)
        |.demo.sb              Generate all Stellar Blade demonstration mods
        |.demo.soa             Generate Sands of Aura demonstration mod
        |.diff                 Recursively diff JSON files and write jd and TOML patch files
@@ -2165,11 +2688,11 @@ class Options {
   var ultraCompression: Boolean = false
 }
 
-def parseOptions(next: Int): Options = {
+def parseOptions(args: Seq[String]): Options = {
   def redundant(option: String): Nothing = exit(-1, s"Redundant option $option")
   var r = new Options
-  for (i <- next until cliArgs.length) {
-    cliArgs(i) match {
+  for (arg <- args) {
+    arg match {
       case `dryRun` =>
         if (r.dryRun) redundant(dryRun)
         r.dryRun = true
@@ -2196,7 +2719,8 @@ def run(): Unit = {
   argName match {
     case "" => printUsage()
     case _ if argName.startsWith(".demo.") => if (cliArgs.length != 1) printUsage()
-    case ".batch" => if (cliArgs.tail.exists(!_.startsWith("--"))) printUsage()
+    case ".batch" => if (cliArgs.tail.exists(x => x.startsWith("-") && !x.startsWith("--"))) printUsage()
+    case ".retarget" => if (cliArgs.length != 2) printUsage()
     case ".diff" | ".diff.into" => if (cliArgs.length != 4) printUsage()
     case ".search" | ".search.flat" => if (cliArgs.length != 3) printUsage()
     case ".setup" => if (cliArgs.length != 1) printUsage()
@@ -2217,20 +2741,21 @@ def run(): Unit = {
   def genMod(modName: String, options: Options): Unit =
     if (unityMode) {
       val bundleDir = gamePakDirOpt.get
-      setUAssetGUIConfigAndRun(() => {
-        unitymod.UnityMod.runMod(Some(modName), bundleDir, ttmapPath.toString, options.includePatches, noPar)
-      })
+      unitymod.UnityMod.runMod(Some(modName), bundleDir, ttmapPath.toString, options.includePatches, noPar)
     } else {
-      setUAssetGUIConfigAndRun(generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
-                               disableFilePatching = false, options.noCodePatching, options.dryRun, options.includePatches))
+      generateMod(addToFilePatches = false, Some(modName), gamePakDirOpt, 
+                  disableFilePatching = false, options.noCodePatching, options.dryRun, options.includePatches)()
     }
 
-  def batch(options: Options): Unit = {
-    def hasTomlOrPatchFiles(root: os.Path): Boolean = {
+  def batch(options: Options, only: Vector[String] = Vector.empty): Unit = {
+    // A patch folder is a mod if it has toml/patch files OR a `.included` dir (assets-only mods
+    // that ship retargeted animations / table assets without table patches).
+    def hasModFiles(root: os.Path): Boolean = {
+      if (hasIncludedAssets(patchesDir, gameId, root.last)) return true
       var r = false
       def rec(p: os.Path): Unit = {
         if (r) return
-        if (os.isDir(p) && !p.last.startsWith(".")) {
+        if (os.isDir(p) && (!p.last.startsWith(".") || p == root)) {
           os.list(p).foreach(rec)
         } else if (os.isFile(p) && rawPatchExtensions.contains(p.ext) && !p.last.startsWith(".")) r = true
       }
@@ -2240,20 +2765,31 @@ def run(): Unit = {
     val gamePatches = patchesDir / gameId
     var ok = false
     if (os.isDir(gamePatches)) {
-      for (p <- os.list(gamePatches) if os.isDir(p) && !p.last.startsWith(".") && hasTomlOrPatchFiles(p)) {
-        val modName = p.last
-        val oldPatchesDir = patchesDir
-        val oldLogDir = logDir
-        try {
-          patchesDir = p
-          _patches = null
-          patchesInitialized = false
-          logDir = getLogDir(Some(modName))
-          genMod(modName, options)
-          ok = true
-        } finally {
-          patchesDir = oldPatchesDir
-          logDir = oldLogDir
+      val wanted = only.toSet
+      for (p <- os.list(gamePatches) if os.isDir(p)) {
+        val clean = p.last.stripPrefix(".")
+        // A dot-prefixed directory is a disabled mod; it is only built when explicitly requested by
+        // its dot-prefixed name (e.g. `.easy-mode-il`), but the generated mod name drops the dot.
+        if (!hasModFiles(p)) {
+          // no patch files to build
+        } else if (wanted.nonEmpty && !wanted.contains(p.last)) {
+          // not requested (disabled mods require the dot-prefixed name)
+        } else {
+          val modName = clean
+          val oldPatchesDir = patchesDir
+          val oldLogDir = logDir
+          try {
+            patchesDir = p
+            _patches = null
+            _copyFromPatches = Map.empty
+            patchesInitialized = false
+            logDir = getLogDir(Some(modName))
+            genMod(modName, options)
+            ok = true
+          } finally {
+            patchesDir = oldPatchesDir
+            logDir = oldLogDir
+          }
         }
       }
     }
@@ -2324,9 +2860,13 @@ def run(): Unit = {
   println(header)
   println(
     s"""* Platform: $osKind
-       |* Automod directory: $automodDir
-       |* Using: retoc v$retocVersion, repak v$repakVersion, jd v$jdVersion, $usmapFilename""".stripMargin)
-  if (osKind.isWin) println(s"* Extra: FModel @$fmodelShortSha")
+       |* Automod directory: $automodDir""".stripMargin)
+  // jd only matters for the diff commands; the usmap only for UE (non-unity) games —
+  // skip the line when neither applies
+  val using =
+    (if (cliArgs.head == ".diff" || cliArgs.head == ".diff.into") Seq(s"jd v$jdVersion") else Seq.empty) ++
+    (if (usmapUri.nonEmpty && !unityMode) Seq(usmapFilename) else Seq.empty)
+  if (using.nonEmpty) println(s"* Using: ${using.mkString(", ")}")
   println(
     s"""* Parallelization enabled: ${!noPar}
        |* Maximum task logs: $maxLogs""".stripMargin)
@@ -2344,7 +2884,15 @@ def run(): Unit = {
   def demoSbAll(): Unit = { demoSbFirst(); demoSbAio(); demoSbAioHard(); demoSbEffect() }
 
   argName match {
-    case ".batch" => checkPatchesDir(); batch(parseOptions(next))
+    case ".batch" =>
+      checkPatchesDir()
+      batch(
+        parseOptions(cliArgs.drop(next).filter(_.startsWith("--")).toIndexedSeq),
+        cliArgs.drop(next).filter(!_.startsWith("--")).toVector,
+      )
+    case ".retarget" =>
+      if (gamePakDirOpt.isEmpty) exit(-1, ".retarget requires the game directory (supply -g and the data dir)")
+      runRetargets(absPath(cliArgs(1)), gamePakDirOpt.get)
     case ".demo.sb" => demoSbAll()
     case ".demo.soa" => demoSoA()
     case ".diff" => diff(checkDir(absPath(cliArgs(1))), checkDir(absPath(cliArgs(2))), checkDirAvailable(absPath(cliArgs(3))))
@@ -2365,7 +2913,7 @@ def run(): Unit = {
     case ".toml" | ".toml.all" => 
       val outDir = checkDirAvailable(absPath(cliArgs(next)))
       checkPatchesDir()
-      setUAssetGUIConfigAndRun(toml(gamePakDirOpt, outDir, argName == ".toml"))
+      toml(gamePakDirOpt, outDir, argName == ".toml")()
     case ".ttmapgen" =>
       os.proc(Seq[os.Shellable]("java", "-jar", ttmapgenExe) ++ (for (e <- cliArgs.tail) yield (e: os.Shellable))).call(stdout = os.Inherit, stderr = os.Inherit)
     case ".upgrade" => upgrade()
@@ -2373,7 +2921,7 @@ def run(): Unit = {
       if (argName.head == '.') exit(-1, s"Unrecognized command $argName")
       checkPatchesDir()
       val modName = argName
-      val option = parseOptions(next)
+      val option = parseOptions(cliArgs.drop(next).toIndexedSeq)
       genMod(modName, option)
   }
   println("... done!")

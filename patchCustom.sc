@@ -4,7 +4,7 @@ import scala.collection.immutable.{TreeMap, TreeSet}
 lazy val uassetNames: TreeSet[String] = TreeSet(
   // insert the uasset name that you want to handle in the patch method here (without file extension)
 
-  // Stellar Blade Data Tables
+  // Data Tables
   // "AchievementTable",
   // "AcquisitionSkillTable",
   // "ActivityTable",

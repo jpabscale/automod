@@ -1,0 +1,15 @@
+# Warm Snow DLC easy mode — first-class class-scoped Unity patch.
+#
+# Filename `MonsterSetting@resources.toml`: automod scopes every `.@` section below to the
+# objects of script class `MonsterSetting` in `resources.assets`, so paths are `$`-rooted
+# JSONPaths relative to the object's Data (`$` = object root). `$.list.Array[*]` navigates
+# into the monster stat table (one entry per monster), and the field changes apply to every entry.
+#
+# Changes (per monster entry):
+#   - MonsterHP / MonsterAtk / MonsterDef halved
+#   - SoulDrop multiplied by 10 (rich)
+['.@: $.list.Array[*]']
+MonsterHP = '=kt> (v.orig as Double) * 0.5'
+MonsterAtk = '=kt> (v.orig as Double) * 0.5'
+MonsterDef = '=kt> (v.orig as Double) * 0.5'
+SoulDrop = '=kt> (v.orig as Double) * 10'

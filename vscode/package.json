@@ -2,7 +2,7 @@
   "name": "automod-vscode",
   "displayName": "automod-vscode",
   "description": "VSCode extension for Auto Modding Script",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "publisher": "jpabscale",
   "icon": "images/automod.png",
   "private": true,
@@ -109,14 +109,6 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-              "retoc": {
-                "type": "string",
-                "description": "retoc version"
-              },
-              "repak": {
-                "type": "string",
-                "description": "repak version"
-              },
               "jd": {
                 "type": "string",
                 "description": "jd version"
@@ -127,8 +119,6 @@
               }
             },
             "default": {
-              "retoc": "",
-              "repak": "",
               "jd": "",
               "fmodel": ""
             },

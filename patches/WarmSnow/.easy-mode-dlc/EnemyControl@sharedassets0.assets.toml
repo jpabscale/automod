@@ -1,0 +1,16 @@
+# Warm Snow DLC easy mode — first-class class-scoped Unity patch.
+#
+# Filename `EnemyControl@sharedassets0.toml`: automod scopes every `.@` section below to
+# the objects of script class `EnemyControl` in `sharedassets0.assets` (the file's JSON
+# objects carry a `Script` field from asset4j), so paths are relative to the object's Data.
+#
+# Changes (per EnemyControl config):
+#   - PRE_MAX_HP / PRE_ATK_MEELE halved where the field is present
+#   - specialDiffHpRate halved (difficulty HP multiplier)
+#   - PRE_SOUL_COUNT and RedSoulsCount multiplied by 10 (rich)
+['.@: $']
+PRE_MAX_HP = '=kt> (v.orig as Double) * 0.5'
+PRE_ATK_MEELE = '=kt> (v.orig as Double) * 0.5'
+specialDiffHpRate = '=kt> (v.orig as Double) * 0.5'
+PRE_SOUL_COUNT = '=kt> (v.orig as Double) * 10'
+RedSoulsCount = '=kt> (v.orig as Double) * 10'

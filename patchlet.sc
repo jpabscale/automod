@@ -21,7 +21,8 @@ object Constants {
   val atPrefix = ".@:"
   val javaRegexPrefix = ".*:"
   val addValueKey = "value"
-  lazy val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
+  private val tbLocal = ThreadLocal.withInitial(() => runtimeMirror(getClass.getClassLoader).mkToolBox())
+  def tb = tbLocal.get // scala.tools.reflect.ToolBox is not thread-safe; give each thread its own
 
   val dataTableJsonPath = toJsonPath(automod.dataTablePath) // "$['Exports'][0]['Table']['Data']"
   def toJsonPath(jsonPtr: String): String = ("$" +: jsonPtr.split('/').drop(1).map(s => s.toIntOption match {
@@ -675,14 +676,25 @@ def evalProperty(lang: Lang, uassetName: String, addToFilePatches: Boolean, data
       }
     case Lang.Kotlin =>
       try {
+        def toJava(v: Any): Any = v match {
+          case m: scala.collection.Map[_, _] =>
+            val r = new java.util.LinkedHashMap[String, Any]()
+            m.foreach { case (k, v2) => r.put(k.toString, toJava(v2)) }
+            r
+          case s: scala.collection.Iterable[_] =>
+            val r = new java.util.ArrayList[Any]()
+            s.foreach(x => r.add(toJava(x)))
+            r
+          case other => other
+        }
         val jv = new java.util.HashMap[String, Any]()
         jv.put("objName", name)
-        jv.put("orig", uassetapi.toValue[Any](origValue).getOrElse(null))
-        jv.put("current", uassetapi.toValue[Any](currentValue).getOrElse(null))
+        jv.put("orig", toJava(uassetapi.toValue[Any](origValue).getOrElse(null)))
+        jv.put("current", toJava(uassetapi.toValue[Any](currentValue).getOrElse(null)))
         jv.put("ast", _ast.json[JsonNode])
         jv.put("origAst", _origAst.json[JsonNode])
-        jv.put("valueOf", new kotlinapi.KotlinApi.ValueOfFn(dataMap, uassetName, addToFilePatches))
-        return uassetapi.fromValue(kotlinapi.KotlinApi.evalKotlin(jv, code))
+        jv.put("valueOf", kotlinapi.KotlinApi.valueOfFn(dataMap, uassetName, addToFilePatches))
+        return uassetapi.fromValue(kotlinapi.KotlinApi.evalKotlinValue(jv, code))
       } catch {
         case t: Throwable =>
           automod.exit(-1, 

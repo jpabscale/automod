@@ -74,6 +74,7 @@ object UnityMod {
     case class ClassChange(className: String, tree: automod.UAssetPropertyChanges) extends UnityChange
     case class RawChange(path: os.Path) extends UnityChange
     case class ClassRawChange(className: String, path: os.Path) extends UnityChange
+    case class IlChange(path: os.Path) extends UnityChange
 
     val mergedByTarget = collection.mutable.LinkedHashMap.empty[
       String, Seq[(automod.OrderedString, UnityChange)]]
@@ -98,6 +99,10 @@ object UnityMod {
     for ((nameKey, patch) <- automod.rawScriptPatches) {
       val targetRel = nameKey.value.replace(automod.uassetFilterSepChar, '/')
       add(targetRel, nameKey, RawChange(patch))
+    }
+    for ((nameKey, patch) <- automod.ilPatches) {
+      val targetRel = nameKey.value.replace(automod.uassetFilterSepChar, '/')
+      add(targetRel, nameKey, IlChange(patch))
     }
 
     if (mergedByTarget.isEmpty)
@@ -171,6 +176,10 @@ object UnityMod {
               "path" -> file.toString, "originalPath" -> file.toString,
               "patchDir" -> (p / os.up).toString)
             currentBytes = patchlet.evalRawScript(automod.langForRawExt(p.ext), p, nameKey.value, ctx)
+          case IlChange(p) =>
+            // IL patch rule file (.il.toml) applied via the dnlib4j IL engine (ilengine.sc).
+            val root = ilengine.IlEngine.parseToml(p)
+            currentBytes = ilengine.IlEngine.applyIlPatch(root, currentBytes)
         }
       }
       val dest = output / os.RelPath(targetRel)
@@ -255,11 +264,13 @@ object UnityMod {
       println()
     }
 
-    // Deterministic archives: pin every file's mtime to a fixed constant before packing so
+    // Deterministic archives: pin every entry's mtime to a fixed constant before packing so
     // (a) the archive bytes are reproducible across builds, and (b) extraction restores the
     // fixed date (like zip's Jan 1 1980 sentinel) for zip and 7z alike — no `-mtm-` needed.
-    def pinTimes(root: os.Path): Unit =
+    def pinTimes(root: os.Path): Unit = {
       for (p <- os.walk(root)) p.toIO.setLastModified(315532800000L) // 1980-01-01T00:00:00Z
+      root.toIO.setLastModified(315532800000L) // os.walk skips the root; its wall-clock mtime
+    }
     pinTimes(modDir)
 
     println(s"Archiving $pack ...")

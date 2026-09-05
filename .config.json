@@ -82,9 +82,7 @@
     }
   },
   "tools" : {
-    "fmodel" : "7c86ee47ec2722152b735b7cb788686f6ea3e91a",
-    "jd" : "2.5.0",
-    "repak" : "0.2.4-pre.2",
-    "retoc" : "0.1.6-pre.4"
+    "fmodel" : "5c0387f8eca2be04d1947c971af30eb67e808c4b",
+    "jd" : "2.5.0"
   }
 }
