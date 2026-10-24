@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<title>Outfitter — slot packs and stock replacers (reads your own game)</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 16px; }
+  button { padding: 8px 14px; margin-right: 8px; }
+  pre { background: #111; color: #ddd; padding: 12px; border-radius: 6px; overflow-x: auto; height: 320px; }
+  .ok { color: #1a7f37; } .err { color: #b42318; }
+  small { color: #666; }
+  .containerRow { margin: 4px 0; }
+  .containerRow input.fitName { margin-left: 8px; }
+  .containerRow select.fitTarget { margin-left: 8px; max-width: 19rem; }
+  #browserWarning { display: none; margin: 12px 0; padding: 10px 12px; border: 1px solid #b42318; background: #fef3f2; color: #b42318; border-radius: 6px; }
+
+  /* Dark mode: the OS preference when standalone, or whichever theme an embedding page pushes
+     with a postMessage (see the script below). Colors match the Bootstrap/Docsy palette the
+     docs site uses; color-scheme flips the native widgets (buttons, selects, scrollbars). */
+  [data-theme=light] { color-scheme: light; }
+  [data-theme=dark] { color-scheme: dark; }
+  [data-theme=dark] body { background: #212529; color: #dee2e6; }
+  [data-theme=dark] small { color: #adb5bd; }
+  [data-theme=dark] .ok { color: #3fb950; }
+  [data-theme=dark] .err { color: #ff9b93; }
+  [data-theme=dark] pre { background: #0d1117; color: #d0d7de; }
+  [data-theme=dark] #browserWarning { background: #2d1614; color: #ff9b93; }
+</style>
+<script>
+  // Theme: follow the OS by default; an embedding page (the automod docs site) pushes its own
+  // choice with { type: "outfitter-theme", theme: "light" | "dark" } and owns it from then on.
+  (() => {
+    const root = document.documentElement;
+    const mq = matchMedia("(prefers-color-scheme: dark)");
+    let pushed = false;
+    const applyOs = () => { if (!pushed) root.dataset.theme = mq.matches ? "dark" : "light"; };
+    applyOs();
+    mq.addEventListener("change", applyOs);
+    addEventListener("message", (event) => {
+      const msg = event.data;
+      if (!msg || msg.type !== "outfitter-theme" || (msg.theme !== "light" && msg.theme !== "dark")) return;
+      root.dataset.theme = msg.theme;
+      pushed = true;
+    });
+  })();
+</script>
+<script>
+  // Height: tell an embedding page how tall this document is, so it can drop the inner
+  // scrollbar and show the tool in full. Re-reported after any DOM change (the fit list,
+  // status lines, the warning box) and on resize; standalone (no parent) stays silent.
+  // This runs in <head>, where document.body is still null — observing null throws and
+  // kills the whole script, so wait for the body first.
+  (() => {
+    if (window.parent === window) return;
+    let last = 0;
+    let queued = false;
+    const report = () => {
+      queued = false;
+      const height = Math.ceil(document.documentElement.scrollHeight);
+      if (height === last) return;
+      last = height;
+      window.parent.postMessage({ type: "outfitter-height", height }, "*");
+    };
+    const schedule = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(report);
+    };
+    const start = () => {
+      new MutationObserver(schedule).observe(document.body,
+        { subtree: true, childList: true, characterData: true, attributes: true });
+      addEventListener("resize", schedule);
+      schedule();
+    };
+    if (document.body) start();
+    else addEventListener("DOMContentLoaded", start, { once: true });
+  })();
+</script>
+</head>
+<body>
+<p>Each detected fit gets a target: an Outfitter slot (<code>Normal (Custom)</code> is the
+custom slot), or a named stock outfit / hair / glasses / earring / sword
+(<code>Default</code>, <code>Default Fusion</code>, <code>Tachy</code>, <code>Tachy Fusion</code> for weapons).
+Archives may be <code>.zip</code>, <code>.7z</code>, or <code>.rar</code>; CNS mods with a
+<code>.dekcns.json</code> are accepted.</p>
+<div id="browserWarning"></div>
+<ol>
+  <li><button id="pickGame">1. Select game Paks folder</button> <small>…/StellarBlade/SB/Content/Paks</small>
+      <span id="gameState"></span></li>
+  <li><button id="pickZip">2. Select mod archive</button> <small>zip / rar / 7z</small> <span id="zipState"></span></li>
+  <li><button id="pickOut">3. Select output folder</button> <small>gets one target-named .zip per fit</small> <span id="outState"></span></li>
+</ol>
+<input type="file" id="fileInput" accept=".zip,.rar,.7z" style="display:none">
+<div id="fitOpts" style="display:none; margin:-8px 0 16px 0">
+  <small>Fits (uncheck to skip; edit names and choose a target):</small>
+  <div id="containerList"></div>
+</div>
+<div id="runRow" style="margin:0 0 16px 0">
+  <button id="run" disabled>4. Convert</button> <span id="runState"></span>
+  <small style="margin-left:12px">summaries:
+    <select id="zenConvention" title="Upstream retoc layout, or the cooker layout the game boots">
+      <option value="detect" selected>detect from game paks</option>
+      <option value="cooker">cooker (force)</option>
+      <option value="upstream">upstream (force)</option>
+    </select>
+  </small>
+  <small style="margin-left:12px">skeleton:
+    <input id="targetSkeleton" size="52" placeholder="optional rebind, e.g. /Game/Art/Character/Weapon/Sword/CH_W_Sword_03/CH_W_Sword_03_Skeleton" title="Repoint every skeleton import at this game skeleton instead of the one the mod was authored against (e.g. a 1329 FX-socket skeleton). Empty keeps the mod skeleton.">
+  </small>
+</div>
+<div id="downloads" style="display:none; margin:8px 0">
+  <small>Writing to the folder failed — download instead:</small>
+  <div id="downloadLinks"></div>
+</div>
+<pre id="log"></pre>
+<script type="module" src="./shell.js"></script>
+</body>
+</html>
