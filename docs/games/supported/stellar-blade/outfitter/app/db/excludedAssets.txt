@@ -1,0 +1,1 @@
+/Game/Art/Character/NPC/CH_NPC_01/Blueprints/CH_NPC_01_AnimBP
