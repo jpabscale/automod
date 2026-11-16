@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; worker-src 'self'; style-src 'self'; img-src 'self' data:">
+  <title>Automod Agentic Mod Manager for Stellar Blade v1.5.0</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="styles.css?v=20261116-144546">
+</head>
+<body>
+  <header>
+    <h1 id="app-title">Automod Agentic Mod Manager for Stellar Blade v1.5.0</h1>
+  </header>
+
+  <main>
+    <section class="panel panel-folders">
+      <div class="panel-head">
+        <h2>Folders <span class="muted folders-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Nothing is uploaded</span></h2>
+        <div class="panel-actions">
+          <label for="agent-mode" class="muted agent-mode-label" title="Agent mode" aria-label="Agent mode"><i class="fa-solid fa-robot" aria-hidden="true"></i></label>
+          <select id="agent-mode" aria-label="Agent mode">
+            <option value="none">None</option>
+            <option value="agent">Agent</option>
+            <option value="agent-plus">Agent+</option>
+          </select>
+          <a class="agent-doc" id="agent-doc" href="AGENTS.md" aria-label="AGENTS.md" title="AGENTS.md"><i class="fa-solid fa-book" aria-hidden="true"></i></a>
+        </div>
+      </div>
+      <div class="row hidden" id="mods-row">
+        <button id="pick-mods">Create/select ~mods folder</button>
+        <span id="mods-path" class="muted">not selected</span>
+      </div>
+      <div class="row">
+        <button id="pick-archives">Select mod archives folder</button>
+        <span id="archives-path" class="muted">not connected</span>
+        <button id="refresh-archives" class="icon-button" type="button" aria-label="Refresh archives" data-tip="Sync archives (Scan &amp; plan on change)" disabled>
+          <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div id="fsa-warning" class="warning hidden"></div>
+    </section>
+
+    <section class="panel panel-mods">
+      <div class="panel-head">
+        <h2>Mods <span id="mod-count" class="muted"></span></h2>
+        <div id="drop-zone" class="drop-zone disabled">Select the mod archives folder above to enable drag/drop</div>
+        <div class="panel-actions">
+          <button id="scan" class="icon-button" type="button" aria-label="Scan & plan (Shift-click to scan only)" data-tip="Scan & plan (Shift-click to scan only)">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          </button>
+          <button id="plan" class="icon-button" type="button" aria-label="Plan (dry run, no files written)" data-tip="Plan (dry run, no files written)">
+            <i class="fa-solid fa-diagram-project" aria-hidden="true"></i>
+          </button>
+          <button id="apply" class="icon-button" type="button" aria-label="Apply" data-tip="Apply" disabled>
+            <i class="fa-solid fa-play" aria-hidden="true"></i>
+          </button>
+          <button id="uninstall" class="icon-button" type="button" aria-label="Uninstall" data-tip="Uninstall">
+            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <ol id="mod-list" class="mod-list"></ol>
+      <div class="muted reorder-hint">Drag rows to reorder, or select a row and use ↑/↓.</div>
+    </section>
+
+    <section class="panel panel-conflicts panel-info">
+      <div class="tabs" role="tablist" aria-label="Info and conflicts">
+        <button id="tab-info" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="info-pane">Info</button>
+        <button id="tab-conflicts" class="tab" type="button" role="tab" aria-selected="false" aria-controls="conflicts-pane">
+          Conflicts <span id="conflict-count" class="muted"></span>
+        </button>
+        <button id="tab-plan" class="tab" type="button" role="tab" aria-selected="false" aria-controls="plan-pane">Plan / Dry Run</button>
+        <button id="tab-log" class="tab" type="button" role="tab" aria-selected="false" aria-controls="log-pane">Log</button>
+        <span class="tabs-status" role="status" aria-live="polite">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          <span id="status" title="Engine loading…">Engine loading…</span>
+        </span>
+      </div>
+      <div id="info-pane" class="tab-pane" role="tabpanel" aria-labelledby="tab-info">
+        <div class="folder-help">
+          <p><i class="fa-solid fa-folder-open" aria-hidden="true"></i> <strong><code>~mods</code></strong>
+          — the game's installed-mod folder. The manager writes the merged overlay, trimmed mods, and
+          its backup/state files here. It should be inside <code>SB/Content/Paks</code>.</p>
+          <p><i class="fa-solid fa-box-archive" aria-hidden="true"></i> <strong>Mod archives folder</strong>
+          — the folder containing your original <code>.zip</code>/<code>.7z</code>/<code>.rar</code>
+          downloads. Used to import, reorder, and restore mods; dropped archives are saved here.
+          Nothing is uploaded.</p>
+        </div>
+        <hr>
+        <p>Manage Stellar Blade mods entirely in your browser. Select your <code>~mods</code>
+        and mod-archives folders; all reads, merges, and writes stay on this device.</p>
+        <ul class="feature-list">
+          <li><i class="fa-solid fa-bars-staggered" aria-hidden="true"></i> Drag-and-drop priority with per-property pins</li>
+          <li><i class="fa-solid fa-code-merge" aria-hidden="true"></i> DataTable row merging plus per-asset merge</li>
+          <li><i class="fa-solid fa-file-zipper" aria-hidden="true"></i> Support <code>.zip</code>, <code>.7z</code>, and <code>.rar</code> mod archives</li>
+          <li><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Trim losing chunks; source archives are the backup</li>
+          <li><i class="fa-solid fa-robot" aria-hidden="true"></i> Agent API with <code>None</code>, <code>Agent</code>, and <code>Agent+</code> modes</li>
+        </ul>
+        <p class="agent-modes"><strong>Agent modes:</strong> <code>None</code> disables the agent API.
+        <code>Agent</code> lets the agent inspect, edit the draft, and plan, but apply/uninstall need
+        your approval. <code>Agent+</code> applies and uninstalls automatically. Back up
+        <code>~mods</code> before uninstalling.</p>
+        <hr>
+        <!-- build-mod-manager.sh replaces the tokens with the publish time. -->
+        <p class="last-updated">Last updated: <time datetime="2026-11-16T14:45:46Z">2026-11-16 14:45 UTC</time></p>
+      </div>
+      <div id="conflicts-pane" class="tab-pane hidden" role="tabpanel" aria-labelledby="tab-conflicts">
+        <div id="conflicts" class="conflicts"></div>
+      </div>
+      <div id="plan-pane" class="tab-pane hidden" role="tabpanel" aria-labelledby="tab-plan">
+        <div id="plan-summary" class="plan-summary">No plan yet. Select mods and click Plan.</div>
+        <div class="muted plan-note">Dry run: computes merges in memory; no files are written until Apply.</div>
+        <div id="plan-tables" class="plan-tables"></div>
+      </div>
+      <div id="log-pane" class="tab-pane hidden" role="tabpanel" aria-labelledby="tab-log">
+        <pre id="log-content" class="agent-doc-content log-tab-content">No log entries yet.</pre>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="approval">
+    <h2>Approve</h2>
+    <p id="approval-text"></p>
+    <div class="row">
+      <button id="approval-reject">Reject</button>
+      <button id="approval-approve">Approve</button>
+    </div>
+  </dialog>
+
+  <dialog id="folder-permission-dialog" aria-labelledby="folder-permission-title">
+    <h2 id="folder-permission-title">Restore saved folders</h2>
+    <p>The manager remembers <code>~mods</code> and your mod-archives folder from the
+    last visit. Allow access to reuse them without opening the folder pickers?</p>
+    <p id="folder-permission-status" class="warning hidden"></p>
+    <div class="row">
+      <button id="folder-deny" type="button">Disallow</button>
+      <button id="folder-allow" type="button">Allow</button>
+    </div>
+  </dialog>
+
+  <dialog id="agent-doc-dialog" class="agent-doc-dialog" aria-labelledby="agent-doc-title">
+    <div class="dialog-head">
+      <h2 id="agent-doc-title">AGENTS.md</h2>
+      <div class="row">
+        <button id="agent-doc-copy" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i> Copy</button>
+        <button id="agent-doc-download" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Download</button>
+        <button id="agent-doc-close" type="button" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div id="agent-doc-platform" class="agent-doc-platform" role="group" aria-label="Launch instructions platform">
+      <span class="muted">Launch instructions:</span>
+      <label><input type="checkbox" value="windows"> Windows</label>
+      <label><input type="checkbox" value="linux"> Linux</label>
+      <label><input type="checkbox" value="macos"> macOS</label>
+    </div>
+    <pre id="agent-doc-content" class="agent-doc-content">Loading…</pre>
+  </dialog>
+
+  <script type="module" src="shell.js?v=20261116-144546"></script>
+  <script type="module" src="agent.js?v=20261116-144546"></script>
+</body>
+</html>
